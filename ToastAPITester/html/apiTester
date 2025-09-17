@@ -1,0 +1,2002 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toast API Test Client</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            width: 1rem;
+            height: 1rem;
+            animation: spin 1s ease-in-out infinite;
+        }
+        .spinner-dark {
+            border-top-color: #374151; /* dark:bg-gray-700 */
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        /* Hide sections by default, except proxy */
+        #workflowSelectionSection, #orderBuilderSection, #fetchOrderSection, #updateOrderSection, #resultsSection {
+            display: none;
+        }
+        details > summary {
+            cursor: pointer;
+            list-style: none;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+        .details-arrow {
+            transition: transform 0.2s;
+        }
+        details[open] .details-arrow {
+            transform: rotate(180deg);
+        }
+        input:required, select:required {
+            border-color: #fbbf24; /* amber-400 */
+        }
+
+        /* Config Panel Styles */
+        #configPanel {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        #configPanel.open {
+            transform: translateX(0);
+        }
+        #configOverlay {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+        #configOverlay.open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Troubleshooting Panel Styles */
+        #troubleshootingPanel {
+            transform: translateX(100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        #troubleshootingPanel.open {
+            transform: translateX(0);
+        }
+        #troubleshootingOverlay {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+        #troubleshootingOverlay.open {
+            opacity: 1;
+            visibility: visible;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 antialiased">
+
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl md:text-4xl font-bold text-blue-600 dark:text-blue-400">Toast API Test Client</h1>
+            <p class="mt-2 text-gray-600 dark:text-gray-400">A multi-workflow tool for testing the Toast Orders API.</p>
+        </header>
+
+        <div id="mainContent" class="hidden grid grid-cols-1 lg:grid-cols-9 gap-6">
+            <div class="lg:col-span-4 space-y-6" id="configWrapper">
+                <section id="savedLocationsSection" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                    <h2 class="text-xl font-semibold mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">Quick Access</h2>
+                    <div class="flex items-center gap-4">
+                        <select id="savedLocationsSelect" class="w-full bg-gray-50 dark:bg-gray-700 rounded-md p-2 border border-gray-300 dark:border-gray-600">
+                            <option value="">Load a saved location...</option>
+                        </select>
+                        <button id="clearLocationsBtn" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-md transition flex-shrink-0">Clear</button>
+                    </div>
+                </section>
+                
+                <details id="authSection" class="bg-white dark:bg-gray-800 rounded-lg shadow-md" open>
+                    <summary class="p-6 w-full flex justify-between items-center cursor-pointer list-none">
+                        <h2 class="text-xl font-semibold">Step 1: Authentication</h2>
+                        <svg class="details-arrow w-6 h-6 transform transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                    </summary>
+                    <div class="px-6 pb-6 border-t border-gray-200 dark:border-gray-700">
+                        <div id="authForm" class="pt-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="md:col-span-2">
+                                    <label for="environmentSelect" class="block text-sm font-medium mb-1">API Environment</label>
+                                    <select id="environmentSelect" class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md p-2">
+                                        <option value="https://ws-sandbox-api.eng.toasttab.com/">Sandbox</option>
+                                        <option value="https://ws-preprod-api.eng.toasttab.com/">Preproduction</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="clientId" class="block text-sm font-medium mb-1">Client ID</label>
+                                    <input type="password" id="clientId" class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md p-2" placeholder="Enter your Client ID">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label for="clientSecret" class="block text-sm font-medium mb-1">Client Secret</label>
+                                    <input type="password" id="clientSecret" class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md p-2" placeholder="Enter your Client Secret">
+                                </div>
+                            </div>
+                            <button id="authBtn" class="mt-4 w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition flex items-center justify-center disabled:bg-gray-400">
+                                <span id="authBtnText">Authenticate</span>
+                                <div id="authSpinner" class="spinner ml-3 hidden"></div>
+                            </button>
+                            <div id="authStatus" class="mt-2 text-sm text-center"></div>
+                        </div>
+                        <div id="authenticatedView" class="hidden pt-6">
+                             <div class="space-y-3">
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Client ID</label>
+                                    <input type="text" id="maskedClientId" class="w-full bg-gray-200 dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded-md p-2" disabled>
+                                </div>
+                                 <div>
+                                    <label class="block text-sm font-medium mb-1">Client Secret</label>
+                                    <input type="text" id="maskedClientSecret" class="w-full bg-gray-200 dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded-md p-2" disabled>
+                                </div>
+                             </div>
+                             <button id="logoutBtn" class="mt-4 w-full md:w-auto bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-md transition">Reset Session</button>
+                        </div>
+                    </div>
+                </details>
+                
+                <details id="dataFetchSection" class="bg-white dark:bg-gray-800 rounded-lg shadow-md" open>
+                    <summary class="p-6 w-full flex justify-between items-center cursor-pointer list-none">
+                        <h2 class="text-xl font-semibold">Step 2: Fetch Data</h2>
+                        <svg class="details-arrow w-6 h-6 transform transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                    </summary>
+                    <div class="px-6 pb-6 pt-0 border-t border-gray-200 dark:border-gray-700">
+                         <div class="space-y-4 pt-6">
+                            <div class="flex items-end gap-2">
+                                <div class="flex-grow">
+                                    <label for="restaurantGuid" class="block text-sm font-medium mb-1">Restaurant GUID</label>
+                                    <input type="text" id="restaurantGuid" class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md p-2" placeholder="Enter restaurant GUID">
+                                </div>
+                                 <button id="fetchRestaurantNameBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-md transition flex-shrink-0 flex items-center justify-center">
+                                    <span id="fetchRestaurantNameBtnText">Fetch Restaurant</span>
+                                    <div id="fetchRestaurantNameSpinner" class="spinner ml-2 hidden"></div>
+                                </button>
+                            </div>
+
+                            <div id="restaurantNameStatus" class="mt-2 text-sm text-center"></div>
+
+                            <div id="configFetchSection" class="hidden space-y-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                                <div id="restaurantName" class="p-3 bg-gray-100 dark:bg-gray-700 rounded-md text-center font-medium"></div>
+                                <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
+                                    <label class="block text-sm font-medium md:col-span-4">Dining Options, Employees, Menus, etc.</label>
+                                    <button id="fetchAllConfigBtn" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-2 rounded-md transition text-sm flex items-center justify-center">
+                                        <span id="fetchAllConfigBtnText">Fetch All</span>
+                                        <div id="fetchAllConfigSpinner" class="spinner ml-2 hidden"></div>
+                                    </button>
+                                    <div id="allConfigStatus" class="md:col-span-5 text-xs text-center"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+            </div>
+            
+            <div class="lg:col-span-5 space-y-6" id="workflowWrapper">
+                <section id="workflowSelectionSection" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                    <h2 class="text-xl font-semibold mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">Step 3: Choose Your Workflow</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <button id="createWorkflowBtn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition text-center">Create New Order</button>
+                        <button id="fetchWorkflowBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition text-center">Fetch/Review Order</button>
+                        <button id="updateWorkflowBtn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-lg transition text-center">Update Existing Order</button>
+                    </div>
+                </section>
+
+                <section id="orderBuilderSection" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                    <div class="flex justify-between items-center mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">
+                        <h2 class="text-xl font-semibold">Build Your Order</h2>
+                        <button class="resetWorkflowBtn text-sm text-blue-500 hover:underline">Change Workflow</button>
+                    </div>
+                    <div class="space-y-6">
+                        <div>
+                            <h3 class="text-md font-semibold mb-2">Order Details</h3>
+                            <div class="space-y-4">
+                                <select id="diningOptionsSelect" class="w-full bg-gray-50 dark:bg-gray-700 rounded-md p-2 border border-gray-300 dark:border-gray-600" required></select>
+                                <select id="employeeSelect" class="w-full bg-gray-50 dark:bg-gray-700 rounded-md p-2 border border-gray-300 dark:border-gray-600"></select>
+                                <select id="taxSelect" class="w-full bg-gray-50 dark:bg-gray-700 rounded-md p-2 border border-gray-300 dark:border-gray-600"></select>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-md font-semibold mb-2">Guest Details</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <input type="text" id="guestFirstName" placeholder="First Name" class="bg-gray-50 dark:bg-gray-700 rounded-md p-2 border border-gray-300 dark:border-gray-600">
+                                <input type="text" id="guestLastName" placeholder="Last Name" class="bg-gray-50 dark:bg-gray-700 rounded-md p-2 border border-gray-300 dark:border-gray-600">
+                                <input type="tel" id="guestPhone" placeholder="Phone Number" class="bg-gray-50 dark:bg-gray-700 rounded-md p-2 border border-gray-300 dark:border-gray-600">
+                                <input type="email" id="guestEmail" placeholder="Email Address" class="bg-gray-50 dark:bg-gray-700 rounded-md p-2 border border-gray-300 dark:border-gray-600">
+                            </div>
+                             <button id="generateDetailsBtn" class="mt-2 text-xs bg-teal-500 hover:bg-teal-600 text-white font-semibold py-1 px-2 rounded">Generate Random</button>
+                        </div>
+                        <div id="deliveryInfoSection" class="hidden">
+                            <h3 class="text-md font-semibold mb-2">Delivery Details</h3>
+                            <div class="space-y-4">
+                                <input type="text" id="deliveryAddress1" placeholder="Street Address" class="w-full bg-gray-50 dark:bg-gray-700 rounded-md p-2 border border-gray-300 dark:border-gray-600">
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <input type="text" id="deliveryCity" placeholder="City" class="bg-gray-50 dark:bg-gray-700 rounded-md p-2 border border-gray-300 dark:border-gray-600">
+                                    <input type="text" id="deliveryState" placeholder="State" class="bg-gray-50 dark:bg-gray-700 rounded-md p-2 border border-gray-300 dark:border-gray-600">
+                                    <input type="text" id="deliveryZip" placeholder="Zip Code" class="bg-gray-50 dark:bg-gray-700 rounded-md p-2 border border-gray-300 dark:border-gray-600">
+                                </div>
+                                <textarea id="deliveryNotes" placeholder="Delivery Notes (e.g., Be careful of the dog)" rows="3" class="w-full bg-gray-50 dark:bg-gray-700 rounded-md p-2 border border-gray-300 dark:border-gray-600"></textarea>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-md font-semibold mb-2">Add Items to Cart</h3>
+                            <div class="flex items-end gap-4 flex-wrap">
+                                <div class="flex-grow">
+                                    <label for="itemSelectAdd" class="block text-sm font-medium mb-1">Select Item</label>
+                                     <select id="itemSelectAdd" class="w-full bg-gray-50 dark:bg-gray-700 rounded-md p-2 border border-gray-300 dark:border-gray-600"></select>
+                                </div>
+                                <div>
+                                    <label for="itemQuantity" class="block text-sm font-medium mb-1">Quantity</label>
+                                    <input type="number" id="itemQuantity" value="1" min="1" class="w-24 bg-gray-50 dark:bg-gray-700 rounded-md p-2 border border-gray-300 dark:border-gray-600">
+                                </div>
+                                <button id="addItemBtn" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-md transition">Add Item</button>
+                            </div>
+                            <div id="itemsList" class="mt-4 space-y-2"></div>
+                        </div>
+                        <div>
+                            <h3 class="text-md font-semibold mb-2">Apply Discount</h3>
+                            <select id="discountSelect" class="w-full bg-gray-50 dark:bg-gray-700 rounded-md p-2 border border-gray-300 dark:border-gray-600"></select>
+                            <div id="discountItemSelectorContainerCreate" class="hidden mt-2">
+                                <label for="discountItemSelectCreate" class="block text-sm font-medium mb-1">Apply to Item</label>
+                                <select id="discountItemSelectCreate" class="w-full bg-gray-50 dark:bg-gray-700 rounded-md p-2 border border-gray-300 dark:border-gray-600"></select>
+                            </div>
+                            <div id="discountDetailsSection" class="hidden mt-2 p-3 bg-gray-100 dark:bg-gray-700 rounded-md border border-gray-200 dark:border-gray-600">
+                                <label for="discountValueInput" id="discountValueLabel" class="block text-sm font-medium mb-1">Discount Value</label>
+                                <input type="number" id="discountValueInput" step="0.01" placeholder="Enter value" class="w-full bg-white dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500">
+                            </div>
+                             <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Note: Check-level and item-level discounts are supported.</p>
+                        </div>
+                        <div>
+                            <h3 class="text-md font-semibold mb-2">Add Custom Fields</h3>
+                            <p class="text-xs text-gray-500 mb-2">Use dot notation for nested objects (e.g., deliveryInfo.address.street). Values are auto-detected as numbers, booleans, or strings.</p>
+                            <div class="flex items-end gap-4 flex-wrap">
+                                <div class="flex-grow">
+                                    <label for="customFieldKey" class="block text-sm font-medium mb-1">Field Path</label>
+                                    <input type="text" id="customFieldKey" placeholder="e.g., deliveryInfo.address.street" class="w-full bg-gray-50 dark:bg-gray-700 rounded-md p-2 border border-gray-300 dark:border-gray-600">
+                                </div>
+                                <div class="flex-grow">
+                                    <label for="customFieldValue" class="block text-sm font-medium mb-1">Value</label>
+                                    <input type="text" id="customFieldValue" placeholder="e.g., 123 Main St" class="w-full bg-gray-50 dark:bg-gray-700 rounded-md p-2 border border-gray-300 dark:border-gray-600">
+                                </div>
+                                <button id="addCustomFieldBtn" class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded-md transition">Add Field</button>
+                            </div>
+                            <div id="customFieldsList" class="mt-4 space-y-2"></div>
+                        </div>
+                        <div class="text-center mt-6">
+                            <button id="sendOrderBtn" class="w-full md:w-1/2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition-transform transform hover:scale-105 shadow-lg flex items-center justify-center mx-auto disabled:bg-gray-400">
+                                <span id="sendOrderBtnText">Create & Send Order</span>
+                                <div id="sendOrderSpinner" class="spinner ml-3 hidden"></div>
+                            </button>
+                            <div id="sendOrderStatus" class="mt-2 text-sm text-center"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="fetchOrderSection" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                     <div class="flex justify-between items-center mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">
+                        <h2 class="text-xl font-semibold">Fetch & Review Order</h2>
+                        <button class="resetWorkflowBtn text-sm text-blue-500 hover:underline">Change Workflow</button>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="font-semibold">Lookup by GUID:</label>
+                            <div class="flex items-center gap-2 mt-1">
+                                <input type="text" id="fetchOrderGuidInput" placeholder="Enter Order GUID" class="w-full bg-gray-50 dark:bg-gray-700 rounded-md p-2 border border-gray-300 dark:border-gray-600">
+                                <button id="fetchOrderByGuidBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition">Fetch</button>
+                            </div>
+                             <div id="fetchOrderByGuidStatus" class="mt-2 text-sm text-center"></div>
+                        </div>
+                        <div class="border-t pt-4 border-gray-200 dark:border-gray-700">
+                            <label class="font-semibold">Batch Lookup by Date:</label>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-1">
+                                <div>
+                                    <label for="startDate" class="block text-sm">Start Date</label>
+                                    <input type="datetime-local" id="startDate" class="w-full bg-gray-50 dark:bg-gray-700 rounded-md p-2 border border-gray-300 dark:border-gray-600">
+                                </div>
+                                 <div>
+                                    <label for="endDate" class="block text-sm">End Date</label>
+                                    <input type="datetime-local" id="endDate" class="w-full bg-gray-50 dark:bg-gray-700 rounded-md p-2 border border-gray-300 dark:border-gray-600">
+                                </div>
+                            </div>
+                            <button id="fetchOrdersByDateBtn" class="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition">Fetch by Date Range</button>
+                            <div id="fetchOrdersByDateStatus" class="mt-2 text-sm text-center"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="updateOrderSection" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                    <div class="flex justify-between items-center mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">
+                        <h2 class="text-xl font-semibold">Update Existing Order</h2>
+                        <button class="resetWorkflowBtn text-sm text-blue-500 hover:underline">Change Workflow</button>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <label class="font-semibold">Load Order to Update:</label>
+                        <div class="flex items-center gap-2 mt-1">
+                            <input type="text" id="updateOrderGuidInput" placeholder="Enter Order GUID" class="w-full bg-gray-50 dark:bg-gray-700 rounded-md p-2 border border-gray-300 dark:border-gray-600">
+                            <button id="loadOrderForUpdateBtn" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-md transition">Load</button>
+                        </div>
+                        <div id="loadOrderForUpdateStatus" class="mt-2 text-sm text-center"></div>
+                    </div>
+                </section>
+
+                <section id="resultsSection" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                     <h2 class="text-xl font-semibold mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">Results</h2>
+                     <div id="resultsContainer" class="space-y-4 max-h-[32rem] overflow-y-auto">
+                         <p class="text-gray-500 dark:text-gray-400">Results will be displayed here.</p>
+                     </div>
+                 </section>
+            </div>
+        </div>
+        
+        <section id="proxySectionWrapper">
+             <section id="proxySection" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md max-w-2xl mx-auto">
+                <h2 class="text-xl font-semibold mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">First Step: Activate CORS Proxy</h2>
+                <p class="mb-4 text-gray-600 dark:text-gray-400">This tool uses a public proxy to communicate with the Toast API from your browser. You must activate it for this session.</p>
+                <ol class="list-decimal list-inside space-y-2 mb-4">
+                    <li>Click the "Activate Proxy" button to open the proxy activation page in a new tab.</li>
+                    <li>On that new page, click the button that says <strong class="font-semibold">"Request temporary access to the demo server"</strong>.</li>
+                    <li>Return to this tab and click the "Test Proxy" button to confirm it's working.</li>
+                </ol>
+                <div class="mt-4 flex flex-wrap items-center gap-4">
+                    <a href="https://cors-anywhere.herokuapp.com/corsdemo" target="_blank" rel="noopener noreferrer" class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded-md transition">1. Activate Proxy</a>
+                    <button id="testProxyBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition flex items-center justify-center">
+                         <span id="testProxyBtnText">2. Test Proxy Connection</span>
+                         <div id="testProxySpinner" class="spinner ml-3 hidden"></div>
+                    </button>
+                </div>
+                <div id="proxyStatus" class="mt-4"></div>
+            </section>
+        </section>
+    </div>
+
+    <button id="toggleConfigBtn" class="fixed top-1/2 -translate-y-1/2 left-0 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-r-lg shadow-lg z-50 hidden">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+    </button>
+    <div id="configOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-30"></div>
+    <div id="configPanel" class="fixed top-0 left-0 h-full w-full md:w-1/3 lg:w-1/4 bg-gray-50 dark:bg-gray-800 shadow-2xl z-40 flex flex-col">
+        <div class="p-6 flex justify-between items-center border-b border-gray-200 dark:border-gray-700">
+            <h2 class="text-xl font-semibold">Configuration</h2>
+            <button id="closeConfigBtn" class="text-gray-500 hover:text-gray-800 dark:hover:text-gray-200">
+                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <div id="configPanelContent" class="p-6 overflow-y-auto flex-grow space-y-6">
+            </div>
+    </div>
+    <button id="toggleTroubleshootingBtn" class="fixed top-1/2 -translate-y-1/2 right-0 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-l-lg shadow-lg z-50">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+    </button>
+    <div id="troubleshootingOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-30"></div>
+    <div id="troubleshootingPanel" class="fixed top-0 right-0 h-full w-full md:w-3/4 lg:w-1/2 bg-white dark:bg-gray-800 shadow-2xl z-40 flex flex-col">
+        <div class="p-6 flex justify-between items-center border-b border-gray-200 dark:border-gray-700">
+            <h2 class="text-xl font-semibold">API Log & Troubleshooting</h2>
+            <button id="closeTroubleshootingBtn" class="text-gray-500 hover:text-gray-800 dark:hover:text-gray-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <div class="p-6 overflow-y-auto flex-grow">
+            <div id="logContainer" class="space-y-2">
+                 <p class="text-gray-500 dark:text-gray-400">No API calls logged yet.</p>
+            </div>
+        </div>
+    </div>
+
+    <select id="alternatePaymentTypeSelect" class="hidden"></select>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- API Configuration ---
+            const CORS_PROXY = 'https://cors-anywhere.herokuapp.com/';
+            const AUTH_PATH = 'authentication/v1/authentication/login';
+            const RESTAURANTS_PATH = 'restaurants/v1/restaurants';
+            const MENUS_PATH = 'menus/v2/menus';
+            const DINING_OPTIONS_PATH = 'config/v2/diningOptions';
+            const EMPLOYEES_PATH = '/labor/v1/employees';
+            const DISCOUNTS_PATH = 'config/v2/discounts';
+            const TAXES_PATH = 'config/v2/taxRates';
+            const ORDERS_PATH = 'orders/v2/orders';
+            const ALTERNATE_PAYMENT_TYPES_PATH = 'config/v2/alternatePaymentTypes';
+            
+            // --- DOM Element References ---
+            const mainContent = document.getElementById('mainContent');
+            const proxySectionWrapper = document.getElementById('proxySectionWrapper');
+            const testProxyBtn = document.getElementById('testProxyBtn');
+            const testProxyBtnText = document.getElementById('testProxyBtnText');
+            const testProxySpinner = document.getElementById('testProxySpinner');
+            const proxyStatus = document.getElementById('proxyStatus');
+            
+            const configWrapper = document.getElementById('configWrapper');
+            const workflowWrapper = document.getElementById('workflowWrapper');
+            const savedLocationsSection = document.getElementById('savedLocationsSection');
+            const savedLocationsSelect = document.getElementById('savedLocationsSelect');
+            const clearLocationsBtn = document.getElementById('clearLocationsBtn');
+
+            const authSection = document.getElementById('authSection');
+            const authForm = document.getElementById('authForm');
+            const authenticatedView = document.getElementById('authenticatedView');
+            const maskedClientId = document.getElementById('maskedClientId');
+            const maskedClientSecret = document.getElementById('maskedClientSecret');
+            const environmentSelect = document.getElementById('environmentSelect');
+            const clientIdInput = document.getElementById('clientId');
+            const clientSecretInput = document.getElementById('clientSecret');
+            const authBtn = document.getElementById('authBtn');
+            const authBtnText = document.getElementById('authBtnText');
+            const authSpinner = document.getElementById('authSpinner');
+            const authStatus = document.getElementById('authStatus');
+            const logoutBtn = document.getElementById('logoutBtn');
+            
+            const dataFetchSection = document.getElementById('dataFetchSection');
+            const restaurantGuidInput = document.getElementById('restaurantGuid');
+            const fetchRestaurantNameBtn = document.getElementById('fetchRestaurantNameBtn');
+            const fetchRestaurantNameBtnText = document.getElementById('fetchRestaurantNameBtnText');
+            const fetchRestaurantNameSpinner = document.getElementById('fetchRestaurantNameSpinner');
+            const restaurantNameStatus = document.getElementById('restaurantNameStatus');
+            const configFetchSection = document.getElementById('configFetchSection');
+            const restaurantName = document.getElementById('restaurantName');
+            
+            const fetchAllConfigBtn = document.getElementById('fetchAllConfigBtn');
+            const allConfigStatus = document.getElementById('allConfigStatus');
+            
+            const diningOptionsSelect = document.getElementById('diningOptionsSelect');
+            const employeeSelect = document.getElementById('employeeSelect');
+            const discountSelect = document.getElementById('discountSelect');
+            const taxSelect = document.getElementById('taxSelect');
+            const alternatePaymentTypeSelect = document.getElementById('alternatePaymentTypeSelect');
+            
+            const orderBuilderSection = document.getElementById('orderBuilderSection');
+            const guestFirstNameInput = document.getElementById('guestFirstName');
+            const guestLastNameInput = document.getElementById('guestLastName');
+            const guestPhoneInput = document.getElementById('guestPhone');
+            const guestEmailInput = document.getElementById('guestEmail');
+            const generateDetailsBtn = document.getElementById('generateDetailsBtn');
+            
+            const deliveryInfoSection = document.getElementById('deliveryInfoSection');
+            const deliveryAddress1Input = document.getElementById('deliveryAddress1');
+            const deliveryCityInput = document.getElementById('deliveryCity');
+            const deliveryStateInput = document.getElementById('deliveryState');
+            const deliveryZipInput = document.getElementById('deliveryZip');
+            const deliveryNotesInput = document.getElementById('deliveryNotes');
+
+            const itemSelectAdd = document.getElementById('itemSelectAdd'); 
+            const itemQuantityInput = document.getElementById('itemQuantity');
+            const addItemBtn = document.getElementById('addItemBtn');
+            const itemsList = document.getElementById('itemsList');
+            const sendOrderBtn = document.getElementById('sendOrderBtn');
+            const sendOrderBtnText = document.getElementById('sendOrderBtnText');
+            const sendOrderSpinner = document.getElementById('sendOrderSpinner');
+            const sendOrderStatus = document.getElementById('sendOrderStatus');
+            
+            const discountDetailsSection = document.getElementById('discountDetailsSection');
+            const discountValueInput = document.getElementById('discountValueInput');
+            const discountValueLabel = document.getElementById('discountValueLabel');
+            
+            // Config Panel Elements
+            const configPanel = document.getElementById('configPanel');
+            const configOverlay = document.getElementById('configOverlay');
+            const toggleConfigBtn = document.getElementById('toggleConfigBtn');
+            const closeConfigBtn = document.getElementById('closeConfigBtn');
+            const configPanelContent = document.getElementById('configPanelContent');
+
+            // Troubleshooting Panel Elements
+            const troubleshootingPanel = document.getElementById('troubleshootingPanel');
+            const troubleshootingOverlay = document.getElementById('troubleshootingOverlay');
+            const toggleTroubleshootingBtn = document.getElementById('toggleTroubleshootingBtn');
+            const closeTroubleshootingBtn = document.getElementById('closeTroubleshootingBtn');
+            const logContainer = document.getElementById('logContainer');
+
+            // Workflow Elements
+            const workflowSelectionSection = document.getElementById('workflowSelectionSection');
+            const createWorkflowBtn = document.getElementById('createWorkflowBtn');
+            const fetchWorkflowBtn = document.getElementById('fetchWorkflowBtn');
+            const updateWorkflowBtn = document.getElementById('updateWorkflowBtn');
+            const resetWorkflowBtns = document.querySelectorAll('.resetWorkflowBtn');
+
+            // Fetch Order Elements
+            const fetchOrderSection = document.getElementById('fetchOrderSection');
+            const fetchOrderGuidInput = document.getElementById('fetchOrderGuidInput');
+            const fetchOrderByGuidBtn = document.getElementById('fetchOrderByGuidBtn');
+            const fetchOrderByGuidStatus = document.getElementById('fetchOrderByGuidStatus');
+            const startDateInput = document.getElementById('startDate');
+            const endDateInput = document.getElementById('endDate');
+            const fetchOrdersByDateBtn = document.getElementById('fetchOrdersByDateBtn');
+            const fetchOrdersByDateStatus = document.getElementById('fetchOrdersByDateStatus');
+            
+            // Update Order Elements
+            const updateOrderSection = document.getElementById('updateOrderSection');
+            const updateOrderGuidInput = document.getElementById('updateOrderGuidInput');
+            const loadOrderForUpdateBtn = document.getElementById('loadOrderForUpdateBtn');
+            const loadOrderForUpdateStatus = document.getElementById('loadOrderForUpdateStatus');
+
+            // Custom Field Elements
+            const addCustomFieldBtn = document.getElementById('addCustomFieldBtn');
+            const customFieldKeyInput = document.getElementById('customFieldKey');
+            const customFieldValueInput = document.getElementById('customFieldValue');
+            const customFieldsList = document.getElementById('customFieldsList');
+
+            const resultsSection = document.getElementById('resultsSection');
+            const resultsContainer = document.getElementById('resultsContainer');
+
+            // --- State Management ---
+            let cartItems = [];
+            let stagedItemsForUpdate = [];
+            let customFields = [];
+            let apiLogHistory = [];
+            let isProxyActive = false;
+            let currentCredentials = { id: '', secret: '' };
+            let currentWorkflow = null; // null, 'create', 'fetch', 'update'
+            let activeUpdateOrder = null; // Store the order being updated
+
+            // --- Authentication & Token Management ---
+            function getAuthToken() {
+                const tokenDataString = localStorage.getItem('toastApiTokenData');
+                if (!tokenDataString) return null;
+
+                const tokenData = JSON.parse(tokenDataString);
+                if (new Date().getTime() > tokenData.expiry) {
+                    localStorage.removeItem('toastApiTokenData');
+                    return null;
+                }
+                return tokenData.token;
+            }
+
+            function setAuthToken(token) {
+                 const now = new Date();
+                const expiry = now.getTime() + 60 * 60 * 1000; // 1 hour in milliseconds
+                const tokenData = { token, expiry };
+                localStorage.setItem('toastApiTokenData', JSON.stringify(tokenData));
+            }
+
+            // --- Local Storage & Saved Locations ---
+            function loadSavedLocations() {
+                const locations = JSON.parse(localStorage.getItem('toastTestClientLocations')) || [];
+                savedLocationsSelect.innerHTML = '<option value="">Load a saved location...</option>'; // Reset
+                
+                if (locations.length > 0) {
+                    locations.forEach((loc, index) => {
+                        const option = document.createElement('option');
+                        option.value = index;
+                        option.textContent = loc.name;
+                        savedLocationsSelect.appendChild(option);
+                    });
+                    configWrapper.insertBefore(savedLocationsSection, configWrapper.firstChild);
+                    savedLocationsSection.style.display = 'block';
+                } else {
+                    savedLocationsSection.style.display = 'none';
+                }
+            }
+
+            function saveLocation(name, guid, id, secret) {
+                let locations = JSON.parse(localStorage.getItem('toastTestClientLocations')) || [];
+                const locationName = `${name} (${guid.substring(0, 8)}...)`;
+                const newLocation = { name: locationName, restaurantGuid: guid, clientId: id, clientSecret: secret };
+                const existingIndex = locations.findIndex(loc => loc.restaurantGuid === guid && loc.clientId === id);
+
+
+                if (existingIndex > -1) {
+                    locations[existingIndex] = newLocation;
+                } else {
+                    locations.push(newLocation);
+                }
+                localStorage.setItem('toastTestClientLocations', JSON.stringify(locations));
+                loadSavedLocations();
+            }
+
+
+            // --- UI Management ---
+            function updateUIState() {
+                if (!isProxyActive) {
+                    mainContent.classList.add('hidden');
+                    proxySectionWrapper.classList.remove('hidden');
+                    return;
+                }
+                
+                mainContent.classList.remove('hidden');
+                proxySectionWrapper.classList.add('hidden');
+                loadSavedLocations(); 
+                
+                const token = getAuthToken();
+                const isRestaurantSelected = !configFetchSection.classList.contains('hidden');
+                
+                // Hide all dynamic sections first
+                workflowWrapper.style.display = 'none';
+                workflowSelectionSection.style.display = 'none';
+                orderBuilderSection.style.display = 'none';
+                fetchOrderSection.style.display = 'none';
+                updateOrderSection.style.display = 'none';
+                resultsSection.style.display = 'none';
+
+                if (token) {
+                    authForm.style.display = 'none';
+                    authenticatedView.style.display = 'block';
+                    maskedClientId.value = '************' + currentCredentials.id.slice(-4);
+                    maskedClientSecret.value = '************' + currentCredentials.secret.slice(-4);
+
+                    if (isRestaurantSelected) {
+                        configWrapper.style.display = 'none';
+                        workflowWrapper.style.display = 'block';
+                        toggleConfigBtn.classList.remove('hidden');
+                        
+                        // Move config sections to the slide-out panel
+                        configPanelContent.appendChild(savedLocationsSection);
+                        configPanelContent.appendChild(authSection);
+                        configPanelContent.appendChild(dataFetchSection);
+                        
+                        workflowSelectionSection.style.display = 'block';
+                        resultsSection.style.display = 'block'; 
+
+                        switch (currentWorkflow) {
+                            case 'create':
+                                orderBuilderSection.style.display = 'block';
+                                break;
+                            case 'fetch':
+                                fetchOrderSection.style.display = 'block';
+                                break;
+                            case 'update':
+                                updateOrderSection.style.display = 'block';
+                                break;
+                            default:
+                                break;
+                        }
+                    } else {
+                        configWrapper.style.display = 'block';
+                        workflowWrapper.style.display = 'none';
+                        toggleConfigBtn.classList.add('hidden');
+                    }
+                } else {
+                    authForm.style.display = 'block';
+                    authenticatedView.style.display = 'none';
+                }
+            }
+
+            function showInlineStatus(element, status, message, isError) {
+                if (!element) return;
+                const colorClass = isError ? 'text-red-500' : 'text-green-500';
+                element.innerHTML = `<p class="${colorClass} font-medium">[${status}] ${message}</p>`;
+                setTimeout(() => { element.innerHTML = ''; }, 5000);
+            }
+            
+            function renderApiLogHistory() {
+                if (apiLogHistory.length === 0) {
+                    logContainer.innerHTML = '<p class="text-gray-500 dark:text-gray-400">No API calls logged yet.</p>';
+                    return;
+                }
+
+                logContainer.innerHTML = apiLogHistory.map(log => {
+                    const reqBodyText = log.reqBody ? JSON.stringify(log.reqBody, null, 2) : 'No request body sent.';
+                    const resBodyText = JSON.stringify(log.resBody, null, 2);
+                    const shortUrl = log.fullUrl.replace(CORS_PROXY, '').replace(environmentSelect.value, '');
+                    
+                    return `
+                    <details class="bg-gray-100 dark:bg-gray-900 rounded-md">
+                        <summary class="p-3 cursor-pointer flex justify-between items-center list-none">
+                            <div class="flex items-center gap-3 overflow-hidden">
+                                <span class="font-bold px-2 py-1 text-xs rounded ${log.statusClass}">${log.status}</span>
+                                <span class="font-mono text-sm flex-shrink-0">${log.method || '...'}</span>
+                                <code class="text-sm truncate">${shortUrl}</code>
+                            </div>
+                            <span class="text-xs text-gray-500 dark:text-gray-400 flex-shrink-0 ml-2">${log.timestamp.toLocaleTimeString()}</span>
+                        </summary>
+                        <div class="p-4 border-t border-gray-200 dark:border-gray-700 space-y-4">
+                            <div>
+                                <h3 class="text-md font-semibold mb-1">Request URL</h3>
+                                <div class="bg-gray-200 dark:bg-gray-800 rounded-md p-2">
+                                    <code class="text-xs break-all">${log.fullUrl}</code>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="text-md font-semibold mb-1">Request Payload</h3>
+                                <div class="bg-gray-200 dark:bg-gray-800 rounded-md p-2 max-h-64 overflow-y-auto">
+                                    <pre><code class="text-sm break-words whitespace-pre-wrap">${reqBodyText}</code></pre>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="text-md font-semibold mb-1">API Response</h3>
+                                <div class="bg-gray-200 dark:bg-gray-800 rounded-md p-2 max-h-64 overflow-y-auto">
+                                    <pre><code class="text-sm break-words whitespace-pre-wrap">${resBodyText}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </details>
+                    `;
+                }).join('');
+            }
+
+
+            function logApiCall(logData) {
+                const timestamp = new Date();
+                apiLogHistory.unshift({ ...logData, timestamp }); // Add to the beginning of the array
+                renderApiLogHistory();
+            }
+
+
+            // --- API Call Functions ---
+            
+            async function testProxyConnection() {
+                testProxyBtn.disabled = true;
+                testProxyBtnText.textContent = "Testing...";
+                testProxySpinner.classList.remove('hidden');
+                proxyStatus.innerHTML = '';
+                
+                const testUrl = CORS_PROXY + environmentSelect.value + AUTH_PATH;
+                try {
+                    const response = await fetch(testUrl, { method: 'HEAD', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                    
+                    if (response.ok || response.status === 405) { // 405 is also a valid proxy response for HEAD
+                        proxyStatus.innerHTML = `<p class="text-green-600 dark:text-green-400 font-medium">Proxy connection successful! You may now authenticate.</p>`;
+                        isProxyActive = true;
+                        updateUIState();
+                    } else {
+                         throw new Error(`Proxy returned status: ${response.status}`);
+                    }
+                } catch (error) {
+                     proxyStatus.innerHTML = `<p class="text-red-500 font-medium">Proxy test failed. Please ensure you have activated it in the other tab.</p>`;
+                } finally {
+                    testProxyBtn.disabled = false;
+                    testProxyBtnText.textContent = "2. Test Proxy Connection";
+                    testProxySpinner.classList.add('hidden');
+                }
+            }
+
+
+            function handleLogout() {
+                localStorage.removeItem('toastApiTokenData');
+                currentCredentials = { id: '', secret: '' };
+                currentWorkflow = null;
+                apiLogHistory = [];
+                renderApiLogHistory();
+                configFetchSection.classList.add('hidden');
+                authSection.open = true;
+                dataFetchSection.open = true;
+
+                // Move config sections back to the main wrapper
+                configWrapper.appendChild(savedLocationsSection);
+                configWrapper.appendChild(authSection);
+                configWrapper.appendChild(dataFetchSection);
+                updateUIState();
+            }
+
+            async function makeApiCall(url, method = 'GET', body = null, statusElement, successMessage = 'Fetch successful.') {
+                try {
+                    const headers = {
+                        'X-Requested-With': 'XMLHttpRequest',
+                    };
+                    
+                    const token = getAuthToken();
+                    // Add auth token if it exists and it's not the login call
+                    if (token && !url.includes(AUTH_PATH)) {
+                        headers['Authorization'] = `Bearer ${token}`;
+                    }
+            
+                    // Add restaurant header if it's not an authentication call
+                    if (!url.includes(AUTH_PATH)) {
+                        const restaurantGuid = restaurantGuidInput.value.trim();
+                        if (restaurantGuid) {
+                           headers['Toast-Restaurant-External-Id'] = restaurantGuid;
+                        }
+                    }
+                    
+                    if (method !== 'GET' && method !== 'DELETE') {
+                       headers['Content-Type'] = 'application/json';
+                    }
+
+                    const options = { method, headers };
+                    if (body) {
+                        options.body = JSON.stringify(body);
+                    }
+
+                    const response = await fetch(url, options);
+                    const responseText = await response.text();
+                    const data = responseText ? JSON.parse(responseText) : null;
+
+
+                    if (response.ok) {
+                        logApiCall({
+                            status: response.status,
+                            statusClass: 'text-green-800 bg-green-100 dark:bg-green-900 dark:text-green-300',
+                            resBody: data, reqBody: body, fullUrl: url, method: method
+                        });
+                        if(statusElement) showInlineStatus(statusElement, response.status, successMessage, false);
+                        return { data, error: null };
+                    } else {
+                        let errorMessage = (data && data.message) || 'An error occurred.';
+                        if (errorMessage.includes('You are not permitted to access this resource')) {
+                            errorMessage += ' You may be missing the required scope for this action.';
+                        }
+
+                        logApiCall({
+                            status: response.status,
+                            statusClass: 'text-red-800 bg-red-100 dark:bg-red-900 dark:text-red-300',
+                            resBody: data, reqBody: body, fullUrl: url, method: method
+                        });
+
+                        if(statusElement) showInlineStatus(statusElement, response.status, errorMessage, true);
+                        return { data: null, error: data };
+                    }
+                } catch(error) {
+                    logApiCall({
+                        status: 'NET',
+                        statusClass: 'text-yellow-800 bg-yellow-100 dark:bg-yellow-900 dark:text-yellow-300',
+                        resBody: { message: error.message }, reqBody: body, fullUrl: url, method: method
+                    });
+                    if(statusElement) showInlineStatus(statusElement, 'NET', 'Network or CORS Proxy Error', true);
+                    return { data: null, error: { message: 'Network or CORS Proxy Error' } };
+                }
+            }
+
+             async function handleAuthentication() {
+                authBtn.disabled = true;
+                authBtnText.textContent = 'Authenticating...';
+                authSpinner.classList.remove('hidden');
+
+                currentCredentials.id = clientIdInput.value.trim();
+                currentCredentials.secret = clientSecretInput.value.trim();
+                
+                if (!currentCredentials.id || !currentCredentials.secret) {
+                    showInlineStatus(authStatus, 'Client Error', 'Client ID and Secret are required.', true);
+                } else {
+                    const apiBase = environmentSelect.value;
+                    const authPayload = { clientId: currentCredentials.id, clientSecret: currentCredentials.secret, userAccessType: "TOAST_MACHINE_CLIENT" };
+                    const fullUrl = CORS_PROXY + apiBase + AUTH_PATH;
+                    
+                    const { data } = await makeApiCall(fullUrl, 'POST', authPayload, authStatus, 'Authentication Successful!');
+
+                    if (data) {
+                        setAuthToken(data.token.accessToken);
+                        authSection.open = false; // Collapse on success
+                        updateUIState();
+                    }
+                }
+                
+                authBtn.disabled = false;
+                authBtnText.textContent = 'Authenticate';
+                authSpinner.classList.add('hidden');
+            }
+
+            async function fetchRestaurantName() {
+                fetchRestaurantNameBtn.disabled = true;
+                fetchRestaurantNameSpinner.classList.remove('hidden');
+                fetchRestaurantNameBtnText.textContent = 'Fetching';
+                
+                const restaurantGuid = restaurantGuidInput.value.trim();
+                if (!getAuthToken()) {
+                    showInlineStatus(restaurantNameStatus, 'Client Error', "Auth token missing. Please re-authenticate.", true);
+                    handleLogout();
+                } else if (!restaurantGuid) {
+                    showInlineStatus(restaurantNameStatus, 'Client Error', "Restaurant GUID is required.", true);
+                } else {
+                    const apiBase = environmentSelect.value;
+                    const fullUrl = CORS_PROXY + apiBase + `${RESTAURANTS_PATH}/${restaurantGuid}`;
+                    const { data } = await makeApiCall(fullUrl, 'GET', null, restaurantNameStatus, "Successfully fetched restaurant.");
+                    
+                    if (data) {
+                        const name = data.general.name;
+                        restaurantName.textContent = name;
+                        configFetchSection.classList.remove('hidden');
+                        saveLocation(name, restaurantGuid, currentCredentials.id, currentCredentials.secret);
+                        dataFetchSection.open = false; // Collapse on success
+                        updateUIState();
+                        fetchAllConfig();
+                    }
+                }
+                
+                fetchRestaurantNameBtn.disabled = false;
+                fetchRestaurantNameSpinner.classList.add('hidden');
+                fetchRestaurantNameBtnText.textContent = 'Fetch Restaurant';
+            }
+
+            
+            async function fetchAllConfig() {
+                 fetchAllConfigBtn.disabled = true;
+                 fetchAllConfigBtnText.textContent = '';
+                 fetchAllConfigSpinner.classList.remove('hidden');
+                 showInlineStatus(allConfigStatus, '...', 'Fetching all config...', false);
+                
+                 const fetches = [
+                    {urlPath: DINING_OPTIONS_PATH, selectElement: diningOptionsSelect, dataParser: parseDiningOptions },
+                    {urlPath: EMPLOYEES_PATH, selectElement: employeeSelect, dataParser: parseEmployees },
+                    {urlPath: MENUS_PATH, selectElement: itemSelectAdd, dataParser: parseMenus },
+                    {urlPath: DISCOUNTS_PATH, selectElement: discountSelect, dataParser: parseDiscounts },
+                    {urlPath: TAXES_PATH, selectElement: taxSelect, dataParser: parseTaxes },
+                    {urlPath: ALTERNATE_PAYMENT_TYPES_PATH, selectElement: alternatePaymentTypeSelect, dataParser: parseAlternatePaymentTypes }
+                 ];
+
+                 try {
+                    await Promise.all(fetches.map(f => fetchAndPopulate(f)));
+                    showInlineStatus(allConfigStatus, '200', "All configuration fetched successfully!", false);
+                 } catch (error) {
+                    showInlineStatus(allConfigStatus, 'Error', "An error occurred during fetch.", true);
+                 } finally {
+                    fetchAllConfigBtn.disabled = false;
+                    fetchAllConfigBtnText.textContent = 'Fetch All';
+                    fetchAllConfigSpinner.classList.add('hidden');
+                 }
+            }
+
+
+             async function fetchAndPopulate(options) {
+                const { urlPath, selectElement, dataParser } = options;
+                
+                const apiBase = environmentSelect.value;
+                const fullUrl = CORS_PROXY + apiBase + urlPath;
+                const { data, error } = await makeApiCall(fullUrl, 'GET', null, null);
+
+                if(data) {
+                    selectElement.innerHTML = dataParser(data);
+                } else {
+                     throw new Error('Failed to fetch ' + urlPath);
+                }
+            }
+
+            // Data Parsers
+            const parseDiningOptions = data => `<option value="">Select Dining Option</option>` + data.map(opt => `<option value="${opt.guid}">${opt.name}</option>`).join('');
+            const parseEmployees = data => `<option value="">Select Employee</option>` + data.map(emp => `<option value="${emp.guid}">${emp.firstName} ${emp.lastName}</option>`).join('');
+            const parseDiscounts = data => `<option value="">Select Discount</option>` + data.map(d => `<option value="${d.guid}" data-type="${d.discountType}" data-selection-type="${d.selectionType}">${d.name}</option>`).join('');
+            const parseTaxes = data => `<option value="">Select Tax</option>` + data.map(t => `<option value="${t.guid}">${t.name} (${t.rate}%)</option>`).join('');
+            const parseAlternatePaymentTypes = data => `<option value="">Select Payment Type</option>` + data.map(p => `<option value="${p.guid}">${p.name}</option>`).join('');
+            const parseMenus = data => {
+                const menuList = data.menus || (Array.isArray(data) ? data : [data]);
+                let optionsHtml = '';
+
+                menuList.forEach(menu => {
+                    (menu.menuGroups || []).forEach(group => {
+                        const itemOptions = (group.menuItems || [])
+                            .map(item => `<option value="${item.guid}|${group.guid}">${item.name}</option>`)
+                            .join('');
+
+                        if (itemOptions) {
+                             optionsHtml += `<optgroup label="${group.name || 'Unnamed Group'}">${itemOptions}</optgroup>`;
+                        }
+                    });
+                });
+
+                if (!optionsHtml) {
+                    return `<option value="">No items found in menu(s).</option>`;
+                }
+                
+                return `<option value="">Select an item</option>` + optionsHtml;
+            };
+
+            // --- Order Management (Create) ---
+            function renderCart() {
+                if (cartItems.length === 0) {
+                    itemsList.innerHTML = '<p class="text-sm text-gray-500 dark:text-gray-400">Cart is empty.</p>';
+                } else {
+                    itemsList.innerHTML = cartItems.map((item, index) => `
+                        <div class="flex justify-between items-center bg-gray-100 dark:bg-gray-700 p-3 rounded-md">
+                            <div>
+                                <p class="font-semibold">${item.quantity}x ${item.name}</p>
+                                <p class="text-xs text-gray-600 dark:text-gray-400 font-mono">${item.guid}</p>
+                            </div>
+                            <button data-index="${index}" class="removeItemBtn bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-3 rounded-md text-sm">Remove</button>
+                        </div>
+                    `).join('');
+                }
+                // When cart changes, re-evaluate discount display
+                handleDiscountSelectChange({ target: discountSelect });
+            }
+            
+            function renderCustomFields() {
+                if (customFields.length === 0) {
+                    customFieldsList.innerHTML = '<p class="text-sm text-gray-500 dark:text-gray-400">No custom fields added.</p>';
+                    return;
+                }
+                customFieldsList.innerHTML = customFields.map((field, index) => `
+                    <div class="flex justify-between items-center bg-gray-100 dark:bg-gray-700 p-3 rounded-md">
+                        <div>
+                            <p class="font-semibold font-mono">${field.key}</p>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Value: <code class="bg-gray-200 dark:bg-gray-600 p-1 rounded">${field.value}</code></p>
+                        </div>
+                        <button data-index="${index}" class="removeCustomFieldBtn bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-3 rounded-md text-sm">Remove</button>
+                    </div>
+                `).join('');
+            }
+
+            function setNestedValue(obj, path, value) {
+                const keys = path.split('.');
+                let current = obj;
+                for (let i = 0; i < keys.length - 1; i++) {
+                    const key = keys[i];
+                    if (!current[key] || typeof current[key] !== 'object') {
+                        current[key] = {};
+                    }
+                    current = current[key];
+                }
+                current[keys[keys.length - 1]] = value;
+            }
+
+            function smartParse(value) {
+                const trimmedValue = value.trim();
+                if (trimmedValue === '') return value;
+
+                if (!isNaN(trimmedValue) && !isNaN(parseFloat(trimmedValue)) && Number.isFinite(Number(trimmedValue))) {
+                    return parseFloat(trimmedValue);
+                }
+                if (trimmedValue.toLowerCase() === 'true') return true;
+                if (trimmedValue.toLowerCase() === 'false') return false;
+                if ((trimmedValue.startsWith('{') && trimmedValue.endsWith('}')) || (trimmedValue.startsWith('[') && trimmedValue.endsWith(']'))) {
+                    try {
+                        return JSON.parse(trimmedValue);
+                    } catch (e) { /* Fallback to string */ }
+                }
+                return value; // Return original string if no other type matches
+            }
+
+
+            async function createAndSendOrder() {
+                sendOrderBtn.disabled = true;
+                sendOrderBtnText.textContent = 'Sending...';
+                sendOrderSpinner.classList.remove('hidden');
+
+                const unhideButton = () => {
+                    sendOrderBtn.disabled = false;
+                    sendOrderBtnText.textContent = 'Create & Send Order';
+                    sendOrderSpinner.classList.add('hidden');
+                };
+
+                if (!diningOptionsSelect.value) {
+                    showInlineStatus(sendOrderStatus, 'Validation Error', 'A Dining Option is required to create an order.', true);
+                    unhideButton();
+                    return;
+                }
+
+                if (cartItems.length === 0) {
+                    showInlineStatus(sendOrderStatus, 'Client Error', 'Cannot send an empty order.', true);
+                    unhideButton();
+                    return;
+                } 
+                
+                const isDelivery = deliveryInfoSection.style.display === 'block';
+                if (isDelivery && (!guestFirstNameInput.value || !guestLastNameInput.value || !guestPhoneInput.value)) {
+                    showInlineStatus(sendOrderStatus, 'Validation Error', 'First Name, Last Name, and Phone are required for delivery.', true);
+                    unhideButton();
+                    return;
+                }
+                
+                const apiBase = environmentSelect.value;
+                 const selections = cartItems.map(item => ({
+                    item: { guid: item.guid },
+                    itemGroup: { guid: item.itemGroupGuid },
+                    quantity: parseInt(item.quantity, 10),
+                    modifiers: []
+                }));
+
+                const orderPayload = {
+                    diningOption: { "guid": diningOptionsSelect.value },
+                    checks: [{
+                        selections: selections
+                    }]
+                };
+
+                const selectedDiscountOption = discountSelect.options[discountSelect.selectedIndex];
+                if (selectedDiscountOption && selectedDiscountOption.value) {
+                    const discountGuid = selectedDiscountOption.value;
+                    const discountType = selectedDiscountOption.dataset.type;
+                    const selectionType = selectedDiscountOption.dataset.selectionType;
+
+                    const appliedDiscount = {
+                        discount: { guid: discountGuid }
+                    };
+
+                    const openTypes = ['OPEN_FIXED', 'OPEN_PERCENT'];
+                    if (openTypes.includes(discountType)) {
+                        const discountValue = parseFloat(discountValueInput.value);
+
+                         if (isNaN(discountValue) || discountValue <= 0) {
+                            showInlineStatus(sendOrderStatus, 'Validation Error', 'Please enter a valid, positive discount value.', true);
+                            unhideButton();
+                            return;
+                        }
+                        if (discountType === 'OPEN_PERCENT') {
+                            appliedDiscount.discountPercent = discountValue;
+                        } else { // OPEN_FIXED
+                            appliedDiscount.discountAmount = discountValue;
+                        }
+                    }
+                    
+                    if (selectionType === 'ITEM') {
+                        const itemSelectCreate = document.getElementById('discountItemSelectCreate');
+                        const selectedItemIndex = itemSelectCreate.value;
+
+                        if (selectedItemIndex === "") {
+                            showInlineStatus(sendOrderStatus, 'Validation Error', 'Please select an item to apply the discount to.', true);
+                            unhideButton();
+                            return;
+                        }
+                        const selectionToDiscount = orderPayload.checks[0].selections[selectedItemIndex];
+                        if (selectionToDiscount) {
+                            if (!selectionToDiscount.appliedDiscounts) {
+                                selectionToDiscount.appliedDiscounts = [];
+                            }
+                            selectionToDiscount.appliedDiscounts.push(appliedDiscount);
+                        }
+                    } else { 
+                        orderPayload.checks[0].appliedDiscounts = [appliedDiscount];
+                    }
+                }
+
+                // Add selected tax to the payload
+                const selectedTaxOption = taxSelect.options[taxSelect.selectedIndex];
+                if (selectedTaxOption && selectedTaxOption.value) {
+                    orderPayload.checks[0].appliedTaxes = [{
+                        taxRate: { guid: selectedTaxOption.value }
+                    }];
+                }
+                
+                const customerFirstName = guestFirstNameInput.value.trim();
+                const customerLastName = guestLastNameInput.value.trim();
+                const customerPhone = guestPhoneInput.value.trim();
+                const customerEmail = guestEmailInput.value.trim();
+
+                if (customerFirstName || customerLastName || customerPhone || customerEmail) {
+                    orderPayload.checks[0].customer = { firstName: customerFirstName, lastName: customerLastName, phone: customerPhone, email: customerEmail };
+                }
+
+                if(isDelivery) {
+                    orderPayload.deliveryInfo = { address1: deliveryAddress1Input.value, city: deliveryCityInput.value, state: deliveryStateInput.value, zipCode: deliveryZipInput.value, notes: deliveryNotesInput.value };
+                }
+                
+                customFields.forEach(field => setNestedValue(orderPayload, field.key, smartParse(field.value)));
+
+                const fullUrl = CORS_PROXY + apiBase + ORDERS_PATH;
+                const { data } = await makeApiCall(fullUrl, 'POST', orderPayload, sendOrderStatus, 'Order created successfully!');
+                
+                if (data) {
+                    resultsContainer.innerHTML = '';
+                    resultsContainer.appendChild(createToggleView(data));
+                }
+
+                unhideButton();
+            }
+            
+            // --- Fetch/Review Order Functions ---
+            async function fetchOrderByGuid() {
+                const orderGuid = fetchOrderGuidInput.value.trim();
+                if(!orderGuid) {
+                    showInlineStatus(fetchOrderByGuidStatus, 'Client Error', 'Please enter an Order GUID.', true);
+                    return;
+                }
+                const apiBase = environmentSelect.value;
+                const fullUrl = `${CORS_PROXY}${apiBase}${ORDERS_PATH}/${orderGuid}`;
+                
+                resultsContainer.innerHTML = `<div class="flex justify-center items-center"><div class="spinner spinner-dark"></div><p class="ml-2">Fetching...</p></div>`;
+                const { data } = await makeApiCall(fullUrl, 'GET', null, fetchOrderByGuidStatus);
+
+                if (data) {
+                    resultsContainer.innerHTML = '';
+                    resultsContainer.appendChild(createToggleView(data));
+                } else {
+                     resultsContainer.innerHTML = `<p class="text-red-500">Failed to fetch. See API log for details.</p>`;
+                }
+            }
+
+            async function fetchOrdersByDate() {
+                const startDate = startDateInput.value;
+                const endDate = endDateInput.value;
+                if (!startDate || !endDate) {
+                    showInlineStatus(fetchOrdersByDateStatus, 'Client Error', 'Please select both a start and end date.', true);
+                    return;
+                }
+                const apiBase = environmentSelect.value;
+                const formattedStartDate = new Date(startDate).toISOString();
+                const formattedEndDate = new Date(endDate).toISOString();
+                
+                const params = new URLSearchParams({ startDate: formattedStartDate, endDate: formattedEndDate, pageSize: 100 });
+                const fullUrl = `${CORS_PROXY}${apiBase}${ORDERS_PATH}Bulk?${params.toString()}`;
+                
+                resultsContainer.innerHTML = `<div class="flex justify-center items-center"><div class="spinner spinner-dark"></div><p class="ml-2">Fetching...</p></div>`;
+                const { data } = await makeApiCall(fullUrl, 'GET', null, fetchOrdersByDateStatus);
+
+                if (data) {
+                    if (data.length > 0) {
+                        resultsContainer.innerHTML = data.map(order => {
+                            const status = getOrderStatus(order);
+                            const statusFlag = `<span class="ml-3 px-2 py-1 text-xs font-bold rounded-full ${status.bgClass} ${status.textClass}">${status.text}</span>`;
+                            
+                            return `
+                            <details class="bg-gray-100 dark:bg-gray-700 rounded-md" data-guid="${order.guid}">
+                                <summary class="p-3 cursor-pointer font-semibold flex justify-between items-center list-none">
+                                    <div class="flex items-center">
+                                      <span>Order GUID: <span class="font-mono">${order.guid}</span></span>
+                                      ${statusFlag}
+                                    </div>
+                                    <div class="text-right">
+                                       <p class="text-sm text-gray-500 dark:text-gray-400">${new Date(order.openedDate).toLocaleString()}</p>
+                                       <p class="text-xs font-normal text-gray-500 dark:text-gray-400">Type: ${order.diningOption ? order.diningOption.name : 'N/A'}</p>
+                                    </div>
+                                </summary>
+                                <div class="p-3 border-t border-gray-200 dark:border-gray-600 order-details-content">
+                                    <p class="text-sm text-gray-500">Loading details...</p>
+                                </div>
+                            </details>
+                        `}).join('');
+                    } else {
+                        resultsContainer.innerHTML = `<p>No orders found in the selected time range.</p>`;
+                    }
+                } else {
+                    resultsContainer.innerHTML = `<p class="text-red-500">Failed to fetch orders. See API log for details.</p>`;
+                }
+            }
+            
+            async function fetchAndDisplayOrderDetails(detailsElement) {
+                const guid = detailsElement.dataset.guid;
+                const contentDiv = detailsElement.querySelector('.order-details-content');
+
+                if (!guid || detailsElement.dataset.loaded === 'true') return;
+
+                const apiBase = environmentSelect.value;
+                const fullUrl = `${CORS_PROXY}${apiBase}${ORDERS_PATH}/${guid}`;
+                
+                const { data } = await makeApiCall(fullUrl, 'GET', null, null);
+                
+                if (data) {
+                    contentDiv.innerHTML = '';
+                    contentDiv.appendChild(createToggleView(data, true));
+                    detailsElement.dataset.loaded = 'true';
+                } else {
+                    contentDiv.innerHTML = `<p class="text-red-500 text-sm">Failed to load order details. See API Log.</p>`;
+                }
+            }
+
+
+            // --- Update Order Functions ---
+            async function loadOrderForUpdate() {
+                const orderGuid = updateOrderGuidInput.value.trim();
+                if(!orderGuid) {
+                    showInlineStatus(loadOrderForUpdateStatus, 'Client Error', 'Please enter an Order GUID.', true);
+                    return;
+                }
+                const apiBase = environmentSelect.value;
+                const fullUrl = `${CORS_PROXY}${apiBase}${ORDERS_PATH}/${orderGuid}`;
+                
+                resultsContainer.innerHTML = `<div class="flex justify-center items-center"><div class="spinner spinner-dark"></div><p class="ml-2">Fetching...</p></div>`;
+                const { data } = await makeApiCall(fullUrl, 'GET', null, loadOrderForUpdateStatus);
+
+                if (data) {
+                    activeUpdateOrder = data;
+                    stagedItemsForUpdate = [];
+                    renderUpdateEditor(data);
+                } else {
+                    resultsContainer.innerHTML = `<p class="text-red-500">Failed to load order for update. See API log.</p>`;
+                }
+            }
+            
+            function renderUpdateEditor(order) {
+                const guestOrderStatus = order.guestOrderStatus;
+                const isVoided = order.voided;
+                
+                // An order is considered editable if its guestOrderStatus is not CLOSED or VOIDED.
+                const isEditable = guestOrderStatus !== 'CLOSED' && guestOrderStatus !== 'VOIDED' && !isVoided;
+
+                const receiptHtml = renderReceipt(order); 
+
+                let modificationHtml = '';
+                if (isEditable) {
+                    modificationHtml = `
+                        <div class="p-4 bg-gray-200 dark:bg-gray-700 rounded-md">
+                            <h4 class="font-semibold">Add Items to Check</h4>
+                            <div class="flex items-end gap-4 flex-wrap mt-2">
+                                <div class="flex-grow">
+                                    <label for="itemSelectUpdate" class="block text-sm font-medium mb-1">Select Item</label>
+                                    <select id="itemSelectUpdate" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500"></select>
+                                </div>
+                                <div>
+                                    <label for="itemQuantityUpdate" class="block text-sm font-medium mb-1">Quantity</label>
+                                    <input type="number" id="itemQuantityUpdate" value="1" min="1" class="w-24 bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500">
+                                </div>
+                                <button id="stageItemBtn" class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded-md transition">Stage Item</button>
+                            </div>
+                            <div id="stagedItemsList" class="mt-4 space-y-2"></div>
+                             <button id="addStagedItemsBtn" class="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition hidden">Add Staged Items to Check</button>
+                        </div>
+                        <div class="p-4 bg-gray-200 dark:bg-gray-700 rounded-md">
+                            <h4 class="font-semibold">Apply Discount</h4>
+                            <div class="mt-2 space-y-2">
+                                <select id="discountSelectUpdate" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500"></select>
+                                <div id="discountItemSelectorContainer" class="hidden mt-2">
+                                    <label for="discountItemSelect" class="block text-sm font-medium mb-1">Apply to Item</label>
+                                    <select id="discountItemSelect" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500"></select>
+                                </div>
+                                <div id="discountDetailsSectionUpdate" class="hidden mt-2 p-3 bg-gray-100 dark:bg-gray-700 rounded-md border border-gray-200 dark:border-gray-600">
+                                    <label for="discountValueInputUpdate" id="discountValueLabelUpdate" class="block text-sm font-medium mb-1">Discount Value</label>
+                                    <input type="number" id="discountValueInputUpdate" step="0.01" placeholder="Enter value" class="w-full bg-white dark:bg-gray-500 rounded-md p-2 border border-gray-300 dark:border-gray-400">
+                                </div>
+                                <button id="applyDiscountBtn" class="w-full mt-2 bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-md transition">Apply Discount</button>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-gray-200 dark:bg-gray-700 rounded-md">
+                            <h4 class="font-semibold">Add Payment</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Target Check GUID: ${order.checks[0].guid}</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                                <div>
+                                    <label for="alternatePaymentTypeSelectUpdate" class="block text-sm font-medium mb-1">Payment Type</label>
+                                    <select id="alternatePaymentTypeSelectUpdate" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500"></select>
+                                </div>
+                                <div>
+                                    <label for="paymentAmountInput" class="block text-sm font-medium mb-1">Amount</label>
+                                    <input type="number" id="paymentAmountInput" placeholder="Amount" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label for="tipAmountInput" class="block text-sm font-medium mb-1">Tip Amount</label>
+                                    <input type="number" id="tipAmountInput" placeholder="Tip" value="0" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500">
+                                </div>
+                            </div>
+                            <button id="addPaymentBtn" class="w-full mt-4 bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-md transition">Add Payment</button>
+                        </div>
+                        <div class="p-4 bg-gray-200 dark:bg-gray-700 rounded-md">
+                             <h4 class="font-semibold">Void Entire Order</h4>
+                            <button id="voidOrderBtn" class="w-full mt-2 bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-md transition">Void Order</button>
+                        </div>
+                    `;
+                } else {
+                     modificationHtml = `
+                        <div class="bg-yellow-100 dark:bg-yellow-900 border-l-4 border-yellow-500 text-yellow-700 dark:text-yellow-300 p-4 rounded-md" role="alert">
+                            <p class="font-bold">Order Not Editable</p>
+                            <p>This order's status is <strong>${isVoided ? 'VOIDED' : guestOrderStatus}</strong> and it cannot be modified through this tool.</p>
+                        </div>
+                    `;
+                }
+
+                 resultsContainer.innerHTML = `
+                    <h3 class="text-lg font-bold">Editing Order: ${order.guid}</h3>
+                    <div class="my-4">${receiptHtml}</div>
+                    <div id="updateActionStatus" class="mt-2 text-sm text-center"></div>
+                    <div class="space-y-4 mt-4">
+                        ${modificationHtml}
+                    </div>
+                `;
+
+                 if (isEditable) {
+                    const itemSelectUpdate = document.getElementById('itemSelectUpdate');
+                    const alternatePaymentTypeSelectUpdate = document.getElementById('alternatePaymentTypeSelectUpdate');
+                    const discountSelectUpdate = document.getElementById('discountSelectUpdate');
+
+                    if (itemSelectUpdate && alternatePaymentTypeSelectUpdate && discountSelectUpdate) {
+                        itemSelectUpdate.innerHTML = itemSelectAdd.innerHTML;
+                        alternatePaymentTypeSelectUpdate.innerHTML = alternatePaymentTypeSelect.innerHTML;
+                        discountSelectUpdate.innerHTML = discountSelect.innerHTML;
+                        discountSelectUpdate.addEventListener('change', handleDiscountSelectChange);
+                        renderStagedItems();
+                    }
+                }
+            }
+            
+            function renderStagedItems() {
+                const stagedItemsList = document.getElementById('stagedItemsList');
+                const addStagedItemsBtn = document.getElementById('addStagedItemsBtn');
+                if (!stagedItemsList || !addStagedItemsBtn) return;
+                
+                if (stagedItemsForUpdate.length === 0) {
+                    stagedItemsList.innerHTML = '<p class="text-sm text-gray-500 dark:text-gray-400">No items staged for addition.</p>';
+                    addStagedItemsBtn.classList.add('hidden');
+                } else {
+                     stagedItemsList.innerHTML = stagedItemsForUpdate.map((item, index) => `
+                        <div class="flex justify-between items-center bg-gray-100 dark:bg-gray-800 p-2 rounded-md">
+                            <span>${item.quantity}x ${item.name}</span>
+                            <button data-index="${index}" class="removeStagedItemBtn bg-red-500 hover:bg-red-600 text-white text-xs py-1 px-2 rounded">Remove</button>
+                        </div>
+                     `).join('');
+                     addStagedItemsBtn.classList.remove('hidden');
+                }
+            }
+
+
+            async function addItemsToCheck(e) {
+                if(e.target.id !== 'addStagedItemsBtn') return;
+                const statusEl = document.getElementById('updateActionStatus');
+
+                if (stagedItemsForUpdate.length === 0) {
+                    showInlineStatus(statusEl, 'Client Error', 'No items are staged to be added.', true);
+                    return;
+                }
+
+                const orderGuid = activeUpdateOrder.guid;
+                const checkGuid = activeUpdateOrder.checks[0].guid;
+
+                const selectionsPayload = stagedItemsForUpdate.map(item => ({
+                    item: { guid: item.guid },
+                    itemGroup: { guid: item.itemGroupGuid },
+                    quantity: item.quantity,
+                    modifiers: []
+                }));
+
+                const apiBase = environmentSelect.value;
+                const fullUrl = `${CORS_PROXY}${apiBase}${ORDERS_PATH}/${orderGuid}/checks/${checkGuid}/selections`;
+                
+                const { data } = await makeApiCall(fullUrl, 'POST', selectionsPayload, statusEl, "Item(s) added! Reloading order...");
+
+                if(data) {
+                    setTimeout(loadOrderForUpdate, 1500);
+                }
+            }
+
+            async function applyDiscountToOrder(e) {
+                if (e.target.id !== 'applyDiscountBtn') return;
+                const statusEl = document.getElementById('updateActionStatus');
+
+                const discountSelectUpdate = document.getElementById('discountSelectUpdate');
+                const discountValueInputUpdate = document.getElementById('discountValueInputUpdate');
+                const itemSelect = document.getElementById('discountItemSelect');
+
+                const selectedOption = discountSelectUpdate.options[discountSelectUpdate.selectedIndex];
+                if (!selectedOption || !selectedOption.value) {
+                    showInlineStatus(statusEl, 'Client Error', 'Please select a discount to apply.', true);
+                    return;
+                }
+
+                const discountGuid = selectedOption.value;
+                const discountType = selectedOption.dataset.type;
+                const selectionType = selectedOption.dataset.selectionType;
+
+                const appliedDiscount = {
+                    discount: { guid: discountGuid }
+                };
+
+                const openTypes = ['OPEN_FIXED', 'OPEN_PERCENT'];
+                if (openTypes.includes(discountType)) {
+                    const discountValue = parseFloat(discountValueInputUpdate.value);
+                    if (isNaN(discountValue) || discountValue <= 0) {
+                        showInlineStatus(statusEl, 'Validation Error', 'Please enter a valid, positive discount value.', true);
+                        return;
+                    }
+                    if (discountType === 'OPEN_PERCENT') {
+                        appliedDiscount.discountPercent = discountValue;
+                    } else { // Handles OPEN_FIXED
+                        appliedDiscount.discountAmount = discountValue;
+                    }
+                }
+                
+                const orderGuid = activeUpdateOrder.guid;
+                const checkGuid = activeUpdateOrder.checks[0].guid;
+                const apiBase = environmentSelect.value;
+                let fullUrl = '';
+                
+                if (selectionType === 'ITEM') {
+                    const selectionGuid = itemSelect.value;
+                    if (!selectionGuid) {
+                        showInlineStatus(statusEl, 'Client Error', 'Please select an item to apply the discount to.', true);
+                        return;
+                    }
+                    fullUrl = `${CORS_PROXY}${apiBase}${ORDERS_PATH}/${orderGuid}/checks/${checkGuid}/selections/${selectionGuid}/appliedDiscounts`;
+                } else { // Defaults to CHECK
+                    fullUrl = `${CORS_PROXY}${apiBase}${ORDERS_PATH}/${orderGuid}/checks/${checkGuid}/appliedDiscounts`;
+                }
+
+                // POSTing an array with a single discount object.
+                const { data } = await makeApiCall(fullUrl, 'POST', [appliedDiscount], statusEl, "Discount applied! Reloading order...");
+
+                if (data) {
+                    setTimeout(loadOrderForUpdate, 1500);
+                }
+            }
+
+            async function addPayment(e) {
+                if(e.target.id !== 'addPaymentBtn') return;
+                const statusEl = document.getElementById('updateActionStatus');
+                const amountInput = document.getElementById('paymentAmountInput');
+                const tipAmountInput = document.getElementById('tipAmountInput');
+                const alternatePaymentTypeSelectUpdate = document.getElementById('alternatePaymentTypeSelectUpdate');
+                
+                const amount = parseFloat(amountInput.value);
+                const tipAmount = parseFloat(tipAmountInput.value) || 0;
+                
+                if (isNaN(amount) || amount <= 0) {
+                     showInlineStatus(statusEl, 'Client Error', 'Please enter a valid payment amount.', true);
+                     return;
+                }
+                
+                const orderGuid = activeUpdateOrder.guid;
+                const checkGuid = activeUpdateOrder.checks[0].guid;
+                
+                const alternatePaymentGuid = alternatePaymentTypeSelectUpdate.value;
+                if (!alternatePaymentGuid) {
+                    showInlineStatus(statusEl, 'Client Error', 'Please select a payment type.', true);
+                    return;
+                }
+
+                const paymentPayload = [{
+                    type: 'OTHER',
+                    otherPayment: { guid: alternatePaymentGuid },
+                    amount: amount,
+                    tipAmount: tipAmount
+                }];
+                
+                const apiBase = environmentSelect.value;
+                const fullUrl = `${CORS_PROXY}${apiBase}${ORDERS_PATH}/${orderGuid}/checks/${checkGuid}/payments`;
+                const { data } = await makeApiCall(fullUrl, 'POST', paymentPayload, statusEl, "Payment added! Reloading...");
+                if(data) {
+                    setTimeout(loadOrderForUpdate, 1500);
+                }
+            }
+
+            async function voidOrder(e) {
+                if (e.target.id !== 'voidOrderBtn') return;
+                const statusEl = document.getElementById('updateActionStatus');
+
+                // Check if all payments are of type 'OTHER'
+                const check = activeUpdateOrder.checks[0];
+                if (check.payments && check.payments.length > 0) {
+                    const hasNonOtherPayment = check.payments.some(p => p.type !== 'OTHER');
+                    if (hasNonOtherPayment) {
+                        showInlineStatus(statusEl, 'Client Error', 'Voiding is only supported for orders paid with an "OTHER" payment type.', true);
+                        return;
+                    }
+                }
+
+                const orderGuid = activeUpdateOrder.guid;
+                const apiBase = environmentSelect.value;
+                const fullUrl = `${CORS_PROXY}${apiBase}${ORDERS_PATH}/${orderGuid}/void`;
+                
+                const voidPayload = {
+                    "selections": { "voidAll": true },
+                    "payments": { "voidAll": true }
+                };
+
+                const { data } = await makeApiCall(fullUrl, 'POST', voidPayload, statusEl, "Order voided successfully! Reloading...");
+                if (data) {
+                    setTimeout(loadOrderForUpdate, 1500);
+                }
+            }
+            
+            async function voidItem(e) {
+                if(!e.target.classList.contains('voidItemBtn')) return;
+                const statusEl = document.getElementById('updateActionStatus');
+                const selectionGuid = e.target.dataset.selectionGuid;
+                const orderGuid = activeUpdateOrder.guid;
+                const checkGuid = activeUpdateOrder.checks[0].guid;
+                const patchPayload = { "selections": [{ "guid": selectionGuid, "void": true, "voidReason": { "guid": "5c069325-18b7-4a6c-94e8-8c54174d1c1c" } }] };
+                const apiBase = environmentSelect.value;
+                const fullUrl = `${CORS_PROXY}${apiBase}${ORDERS_PATH}/${orderGuid}/checks/${checkGuid}`;
+                const { data } = await makeApiCall(fullUrl, 'PATCH', patchPayload, statusEl, "Item voided. Reloading...");
+                if(data) {
+                     setTimeout(loadOrderForUpdate, 1500);
+                }
+            }
+
+            function getOrderStatus(order) {
+                const status = order.guestOrderStatus;
+                const isVoided = order.voided;
+
+                if (isVoided) {
+                    return { text: 'VOIDED', textClass: 'text-red-800 dark:text-red-300', bgClass: 'bg-red-100 dark:bg-red-900' };
+                }
+                if (status === 'CLOSED') {
+                    return { text: 'CLOSED', textClass: 'text-gray-800 dark:text-gray-300', bgClass: 'bg-gray-200 dark:bg-gray-600' };
+                }
+                return { text: 'OPEN', textClass: 'text-green-800 dark:text-green-300', bgClass: 'bg-green-100 dark:bg-green-900' };
+            }
+
+            function renderReceipt(order) {
+                const check = order.checks && order.checks[0];
+                if (!check) return '<p>Check data not available.</p>';
+                
+                const status = getOrderStatus(order);
+                const statusBanner = `
+                    <div class="p-2 mb-4 text-center font-bold text-sm rounded-md ${status.bgClass} ${status.textClass}">
+                        STATUS: ${status.text}
+                    </div>
+                `;
+
+                const formatCurrency = (amount) => `$${(amount || 0).toFixed(2)}`;
+
+                const subtotal = check.selections.reduce((acc, sel) => acc + (sel.voided ? 0 : sel.price), 0);
+                const taxAmount = check.taxAmount || 0;
+                const discountTotal = check.discountAmount || 0;
+                const total = subtotal + taxAmount - discountTotal;
+                const tipAmount = (check.payments || []).reduce((acc, p) => acc + (p.tipAmount || 0), 0);
+                const amountPaid = (check.payments || []).reduce((acc, p) => acc + (p.amount || 0), 0);
+                const balanceDue = total + tipAmount - amountPaid;
+
+                const itemLines = check.selections.map(sel => {
+                    const price = formatCurrency(sel.price);
+                    let itemHtml = `<div class="flex justify-between items-center text-sm">
+                        <span>${sel.quantity} x ${sel.displayName}</span>
+                        <span>${price}</span>
+                    </div>`;
+
+                    if (sel.appliedDiscounts && sel.appliedDiscounts.length > 0) {
+                        const itemDiscountHtml = sel.appliedDiscounts.map(d => `
+                            <div class="flex justify-between items-center text-sm pl-4 text-green-600 dark:text-green-400">
+                                <span>- ${d.discount.name}</span>
+                                <span>-${formatCurrency(d.discountAmount)}</span>
+                            </div>
+                        `).join('');
+                        itemHtml += itemDiscountHtml;
+                    }
+                    return sel.voided ? `<s class="text-red-500">${itemHtml}</s>` : itemHtml;
+                }).join('');
+
+                const checkDiscountLines = (check.appliedDiscounts || []).map(d => `
+                    <div class="flex justify-between items-center text-sm">
+                        <span>Discount (${d.discount.name})</span>
+                        <span class="text-green-600">-${formatCurrency(d.discountAmount)}</span>
+                    </div>
+                `).join('');
+
+                const paymentLines = (check.payments || []).map(p => `
+                    <div class="flex justify-between items-center text-sm">
+                        <span>Payment (${p.otherPayment?.name || p.type})</span>
+                        <span>${formatCurrency(p.amount)}</span>
+                    </div>
+                `).join('');
+                
+                const tipLines = (check.payments || []).filter(p => p.tipAmount > 0).map(p => `
+                    <div class="flex justify-between items-center text-sm">
+                        <span>Tip</span>
+                        <span>${formatCurrency(p.tipAmount)}</span>
+                    </div>
+                `).join('');
+
+                return `
+                    <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-inner font-mono text-gray-800 dark:text-gray-200 text-xs w-full max-w-md mx-auto">
+                        ${statusBanner}
+                        <div class="text-center mb-4">
+                            <h4 class="font-bold text-base">${restaurantName.textContent}</h4>
+                            <p>${order.diningOption?.name || 'Dine-In'}</p>
+                        </div>
+                        <div class="mb-2">
+                            <p><strong>Order:</strong> ${order.guid}</p>
+                            <p><strong>Opened:</strong> ${new Date(order.openedDate).toLocaleString()}</p>
+                            <p><strong>Customer:</strong> ${check.customer?.firstName || ''} ${check.customer?.lastName || 'Guest'}</p>
+                        </div>
+                        <hr class="border-dashed my-2 border-gray-400 dark:border-gray-600"/>
+                        <div class="space-y-1">
+                            ${itemLines}
+                        </div>
+                        <hr class="border-dashed my-2 border-gray-400 dark:border-gray-600"/>
+                        <div class="space-y-1">
+                            <div class="flex justify-between items-center font-semibold">
+                                <span>Subtotal</span>
+                                <span>${formatCurrency(subtotal)}</span>
+                            </div>
+                            ${checkDiscountLines}
+                            <div class="flex justify-between items-center">
+                                <span>Tax</span>
+                                <span>${formatCurrency(taxAmount)}</span>
+                            </div>
+                            ${tipLines}
+                            <div class="flex justify-between items-center font-bold text-base mt-2 pt-2 border-t border-dashed border-gray-400 dark:border-gray-600">
+                                <span>Total</span>
+                                <span>${formatCurrency(total + tipAmount)}</span>
+                            </div>
+                        </div>
+                        ${paymentLines ? `<hr class="border-dashed my-2 border-gray-400 dark:border-gray-600"/>` : ''}
+                        <div class="space-y-1">
+                            ${paymentLines}
+                        </div>
+                        ${paymentLines ? `<hr class="border-dashed my-2 border-gray-400 dark:border-gray-600"/>` : ''}
+                        <div class="space-y-1 font-semibold">
+                             <div class="flex justify-between items-center">
+                                <span>Total Paid</span>
+                                <span>${formatCurrency(amountPaid)}</span>
+                            </div>
+                            <div class="flex justify-between items-center text-base">
+                                <span>Balance Due</span>
+                                <span>${formatCurrency(balanceDue)}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            function createToggleView(order, isNested = false) {
+                const container = document.createElement('div');
+                const receiptHtml = renderReceipt(order);
+
+                container.innerHTML = `
+                    <div class="flex justify-center mb-2">
+                        <div class="inline-flex rounded-md shadow-sm" role="group">
+                            <button type="button" class="toggle-view-btn active-toggle bg-blue-600 text-white py-2 px-4 text-sm font-medium rounded-l-lg">
+                                Receipt View
+                            </button>
+                            <button type="button" class="toggle-view-btn bg-white dark:bg-gray-600 py-2 px-4 text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-500 rounded-r-md">
+                                JSON View
+                            </button>
+                        </div>
+                    </div>
+                    <div class="view-content receipt-view">${receiptHtml}</div>
+                    <div class="view-content json-view hidden">
+                        <pre class="text-xs whitespace-pre-wrap break-all bg-gray-200 dark:bg-gray-800 p-2 rounded">${JSON.stringify(order, null, 2)}</pre>
+                    </div>
+                `;
+
+                const buttons = container.querySelectorAll('.toggle-view-btn');
+                const receiptView = container.querySelector('.receipt-view');
+                const jsonView = container.querySelector('.json-view');
+
+                buttons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        buttons.forEach(btn => {
+                            btn.classList.remove('active-toggle', 'bg-blue-600', 'text-white');
+                            btn.classList.add('bg-white', 'dark:bg-gray-600');
+                        });
+                        button.classList.add('active-toggle', 'bg-blue-600', 'text-white');
+                        button.classList.remove('bg-white', 'dark:bg-gray-600');
+                        
+                        if (button.textContent.includes('Receipt')) {
+                            receiptView.classList.remove('hidden');
+                            jsonView.classList.add('hidden');
+                        } else {
+                            receiptView.classList.add('hidden');
+                            jsonView.classList.remove('hidden');
+                        }
+                    });
+                });
+
+                return container;
+            }
+
+            function handleDiscountSelectChange(e) {
+                const selectEl = e.target;
+                const isUpdateWorkflow = selectEl.id.includes('Update');
+                
+                const detailsSection = document.getElementById(isUpdateWorkflow ? 'discountDetailsSectionUpdate' : 'discountDetailsSection');
+                const valueInput = document.getElementById(isUpdateWorkflow ? 'discountValueInputUpdate' : 'discountValueInput');
+                const valueLabel = document.getElementById(isUpdateWorkflow ? 'discountValueLabelUpdate' : 'discountValueLabel');
+                const itemSelectorContainer = document.getElementById(isUpdateWorkflow ? 'discountItemSelectorContainer' : 'discountItemSelectorContainerCreate');
+                const itemSelect = document.getElementById(isUpdateWorkflow ? 'discountItemSelect' : 'discountItemSelectCreate');
+
+                const selectedOption = selectEl.options[selectEl.selectedIndex];
+                
+                // If no discount is selected, hide both conditional sections and exit
+                if (!selectedOption || !selectedOption.value) {
+                    detailsSection?.classList.add('hidden');
+                    itemSelectorContainer?.classList.add('hidden');
+                    return;
+                }
+
+                const discountType = selectedOption.dataset.type;
+                const selectionType = selectedOption.dataset.selectionType;
+
+                // 1. Handle Item Selector visibility: show only for ITEM discounts with items in the cart
+                itemSelectorContainer.classList.add('hidden'); // Hide by default
+                if (selectionType === 'ITEM') {
+                    const items = isUpdateWorkflow 
+                        ? (activeUpdateOrder?.checks[0]?.selections.filter(sel => !sel.voided) || [])
+                        : cartItems;
+
+                    if (items.length > 0) {
+                        itemSelectorContainer.classList.remove('hidden');
+                        const optionsHtml = isUpdateWorkflow
+                            ? items.map(sel => `<option value="${sel.guid}">${sel.quantity}x ${sel.displayName}</option>`).join('')
+                            : items.map((item, index) => `<option value="${index}">${item.quantity}x ${item.name}</option>`).join('');
+                        itemSelect.innerHTML = `<option value="">Select an item to discount</option>` + optionsHtml;
+                    } 
+                }
+                
+                // 2. Handle Amount Input visibility and state
+                const typesRequiringValue = ['OPEN_FIXED', 'OPEN_PERCENT', 'FIXED_TOTAL'];
+                if (typesRequiringValue.includes(discountType)) {
+                    detailsSection.classList.remove('hidden');
+                    valueInput.disabled = false;
+                    valueInput.value = '';
+                    valueInput.classList.remove('bg-gray-200', 'dark:bg-gray-800', 'cursor-not-allowed');
+                    valueInput.classList.add('bg-white', 'dark:bg-gray-600');
+
+                    if (discountType.includes('PERCENT')) {
+                        valueLabel.textContent = 'Discount Percentage (%)';
+                        valueInput.placeholder = 'e.g., 10';
+                    } else if (discountType === 'FIXED_TOTAL') {
+                        valueLabel.textContent = 'Final Price ($)';
+                        valueInput.placeholder = 'e.g., 5.00';
+                    } else { // OPEN_FIXED
+                        valueLabel.textContent = 'Discount Amount ($)';
+                        valueInput.placeholder = 'e.g., 5.00';
+                    }
+                } else {
+                    // For discounts that don't need a value, hide the input section
+                    detailsSection.classList.add('hidden');
+                }
+            }
+
+            // --- Event Listeners ---
+            testProxyBtn.addEventListener('click', testProxyConnection);
+            authBtn.addEventListener('click', handleAuthentication);
+            logoutBtn.addEventListener('click', handleLogout);
+            fetchRestaurantNameBtn.addEventListener('click', fetchRestaurantName);
+            fetchAllConfigBtn.addEventListener('click', fetchAllConfig);
+
+            // Config panel toggles
+            const toggleConfigPanel = () => {
+                configPanel.classList.toggle('open');
+                configOverlay.classList.toggle('open');
+            };
+            toggleConfigBtn.addEventListener('click', toggleConfigPanel);
+            closeConfigBtn.addEventListener('click', toggleConfigPanel);
+            configOverlay.addEventListener('click', toggleConfigPanel);
+
+            // Troubleshooting panel toggles
+            const toggleTroubleshootingPanel = () => {
+                troubleshootingPanel.classList.toggle('open');
+                troubleshootingOverlay.classList.toggle('open');
+            };
+            toggleTroubleshootingBtn.addEventListener('click', toggleTroubleshootingPanel);
+            closeTroubleshootingBtn.addEventListener('click', toggleTroubleshootingPanel);
+            troubleshootingOverlay.addEventListener('click', toggleTroubleshootingPanel);
+
+            // Workflow Selection
+            createWorkflowBtn.addEventListener('click', () => { 
+                currentWorkflow = 'create'; 
+                updateUIState();
+                renderCart();
+                renderCustomFields();
+                 resultsContainer.innerHTML='<p class="text-gray-500 dark:text-gray-400">Order results will appear here after sending.</p>';
+            });
+            fetchWorkflowBtn.addEventListener('click', () => { currentWorkflow = 'fetch'; updateUIState(); resultsContainer.innerHTML='<p class="text-gray-500 dark:text-gray-400">Results will be displayed here.</p>' });
+            updateWorkflowBtn.addEventListener('click', () => { currentWorkflow = 'update'; updateUIState(); resultsContainer.innerHTML='<p class="text-gray-500 dark:text-gray-400">Load an order to begin editing.</p>' });
+            resetWorkflowBtns.forEach(btn => btn.addEventListener('click', () => { 
+                currentWorkflow = null; 
+                activeUpdateOrder = null; 
+                cartItems = [];
+                customFields = [];
+                stagedItemsForUpdate = [];
+                updateUIState(); 
+            }));
+
+            // Create Order
+            addItemBtn.addEventListener('click', () => {
+                const selectedOption = itemSelectAdd.options[itemSelectAdd.selectedIndex];
+                if(!selectedOption || !selectedOption.value) return;
+                const [guid, itemGroupGuid] = selectedOption.value.split('|');
+                const name = selectedOption.text;
+                const quantity = itemQuantityInput.value;
+                cartItems.push({ guid, itemGroupGuid, name, quantity });
+                renderCart();
+            });
+            itemsList.addEventListener('click', (e) => {
+                if (e.target.classList.contains('removeItemBtn')) {
+                    cartItems.splice(e.target.dataset.index, 1);
+                    renderCart();
+                }
+            });
+            sendOrderBtn.addEventListener('click', createAndSendOrder);
+
+            discountSelect.addEventListener('change', handleDiscountSelectChange);
+            
+            // Custom Fields
+            addCustomFieldBtn.addEventListener('click', () => {
+                const key = customFieldKeyInput.value.trim();
+                const value = customFieldValueInput.value.trim();
+                if (!key) return;
+                customFields.push({ key, value });
+                renderCustomFields();
+                customFieldKeyInput.value = '';
+                customFieldValueInput.value = '';
+            });
+
+            customFieldsList.addEventListener('click', (e) => {
+                if (e.target.classList.contains('removeCustomFieldBtn')) {
+                    customFields.splice(e.target.dataset.index, 1);
+                    renderCustomFields();
+                }
+            });
+
+            diningOptionsSelect.addEventListener('change', (e) => {
+                const selectedOptionText = e.target.options[e.target.selectedIndex].text;
+                const isDelivery = selectedOptionText.toLowerCase().includes('delivery');
+                
+                deliveryInfoSection.style.display = isDelivery ? 'block' : 'none';
+                guestFirstNameInput.required = isDelivery;
+                guestLastNameInput.required = isDelivery;
+                guestPhoneInput.required = isDelivery;
+            });
+
+            function generateRandomDetails() {
+                const firstNames = ['John', 'Jane', 'Peter', 'Mary', 'David', 'Susan'];
+                const lastNames = ['Smith', 'Jones', 'Williams', 'Brown', 'Davis', 'Miller'];
+                const streetNames = ['Main St', 'Highland Ave', 'Maple St', 'Oak Ave', 'Park Ave'];
+                const cities = ['Boston', 'Cambridge', 'Somerville', 'Brookline', 'Newton'];
+                
+                const randomFromArray = (arr) => arr[Math.floor(Math.random() * arr.length)];
+                
+                const firstName = randomFromArray(firstNames);
+                const lastName = randomFromArray(lastNames);
+                
+                guestFirstNameInput.value = firstName;
+                guestLastNameInput.value = lastName;
+                guestPhoneInput.value = `555-${Math.floor(100 + Math.random() * 900)}-${Math.floor(1000 + Math.random() * 9000)}`;
+                guestEmailInput.value = `${firstName.toLowerCase()}.${lastName.toLowerCase()}@example.com`;
+                
+                deliveryAddress1Input.value = `${Math.floor(10 + Math.random() * 899)} ${randomFromArray(streetNames)}`;
+                deliveryCityInput.value = randomFromArray(cities);
+                deliveryStateInput.value = 'MA';
+                deliveryZipInput.value = `02${Math.floor(100 + Math.random() * 900)}`;
+            }
+
+            generateDetailsBtn.addEventListener('click', generateRandomDetails);
+
+
+            // Fetch Order
+            fetchOrderByGuidBtn.addEventListener('click', fetchOrderByGuid);
+            fetchOrdersByDateBtn.addEventListener('click', fetchOrdersByDate);
+            resultsContainer.addEventListener('toggle', (e) => {
+                if (e.target.tagName === 'DETAILS' && e.target.open) {
+                    fetchAndDisplayOrderDetails(e.target);
+                }
+            }, true);
+            
+            // Update Order
+            loadOrderForUpdateBtn.addEventListener('click', loadOrderForUpdate);
+            resultsContainer.addEventListener('click', addPayment);
+            resultsContainer.addEventListener('click', voidOrder);
+            resultsContainer.addEventListener('click', voidItem);
+            resultsContainer.addEventListener('click', addItemsToCheck);
+            resultsContainer.addEventListener('click', applyDiscountToOrder);
+
+            resultsContainer.addEventListener('click', (e) => {
+                if (e.target.id === 'stageItemBtn') {
+                    const itemSelectUpdate = document.getElementById('itemSelectUpdate');
+                    const quantityInput = document.getElementById('itemQuantityUpdate');
+                    const selectedOption = itemSelectUpdate.options[itemSelectUpdate.selectedIndex];
+                    if(!selectedOption || !selectedOption.value) return;
+                    
+                    const [guid, itemGroupGuid] = selectedOption.value.split('|');
+                    const name = selectedOption.text;
+                    const quantity = parseInt(quantityInput.value, 10);
+                    
+                    stagedItemsForUpdate.push({ guid, itemGroupGuid, name, quantity });
+                    renderStagedItems();
+                }
+                if (e.target.classList.contains('removeStagedItemBtn')) {
+                    stagedItemsForUpdate.splice(e.target.dataset.index, 1);
+                    renderStagedItems();
+                }
+            });
+
+            // Saved Locations
+            savedLocationsSelect.addEventListener('change', (e) => {
+                const index = e.target.value;
+                if (index === "") {
+                    clientIdInput.value = '';
+                    clientSecretInput.value = '';
+                    restaurantGuidInput.value = '';
+                    return;
+                }
+                const locations = JSON.parse(localStorage.getItem('toastTestClientLocations')) || [];
+                const selectedLocation = locations[index];
+                if (selectedLocation) {
+                    clientIdInput.value = selectedLocation.clientId;
+                    clientSecretInput.value = selectedLocation.clientSecret;
+                    restaurantGuidInput.value = selectedLocation.restaurantGuid;
+                }
+            });
+
+            clearLocationsBtn.addEventListener('click', () => {
+                localStorage.removeItem('toastTestClientLocations');
+                loadSavedLocations();
+            });
+
+            // --- Initial Load ---
+            updateUIState();
+            renderCart();
+            renderCustomFields();
+            renderApiLogHistory();
+        });
+    </script>
+</body>
+</html>
+
