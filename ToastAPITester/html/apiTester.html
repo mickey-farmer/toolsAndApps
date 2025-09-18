@@ -27,7 +27,7 @@
             to { transform: rotate(360deg); }
         }
         /* Hide sections by default, except proxy */
-        #workflowSelectionSection, #orderBuilderSection, #fetchOrderSection, #updateOrderSection, #resultsSection {
+        #workflowSelectionSection, #orderBuilderSection, #fetchOrderSection, #updateOrderSection, #stockManagementSection, #laborManagementSection, #resultsSection {
             display: none;
         }
         details > summary {
@@ -189,10 +189,12 @@
             <div class="lg:col-span-5 space-y-6" id="workflowWrapper">
                 <section id="workflowSelectionSection" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
                     <h2 class="text-xl font-semibold mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">Step 3: Choose Your Workflow</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
                         <button id="createWorkflowBtn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition text-center">Create New Order</button>
                         <button id="fetchWorkflowBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition text-center">Fetch/Review Order</button>
                         <button id="updateWorkflowBtn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-lg transition text-center">Update Existing Order</button>
+                        <button id="stockWorkflowBtn" class="bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-4 rounded-lg transition text-center">Manage Inventory</button>
+                        <button id="laborWorkflowBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg transition text-center">Manage Labor</button>
                     </div>
                 </section>
 
@@ -334,6 +336,276 @@
                     </div>
                 </section>
 
+                <section id="stockManagementSection" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                    <div class="flex justify-between items-center mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">
+                        <h2 class="text-xl font-semibold">Inventory Management</h2>
+                        <button class="resetWorkflowBtn text-sm text-blue-500 hover:underline">Change Workflow</button>
+                    </div>
+                    
+                    <div class="space-y-6">
+                        <!-- View All Inventory -->
+                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                            <h3 class="text-md font-semibold mb-3">View Current Inventory</h3>
+                            <div class="flex items-center gap-4 mb-3">
+                                <select id="inventoryStatusFilter" class="bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500">
+                                    <option value="">All Items</option>
+                                    <option value="OUT_OF_STOCK">Out of Stock</option>
+                                    <option value="QUANTITY">Limited Quantity</option>
+                                </select>
+                                <button id="viewInventoryBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition flex items-center">
+                                    <span id="viewInventoryBtnText">View Inventory</span>
+                                    <div id="viewInventorySpinner" class="spinner ml-2 hidden"></div>
+                                </button>
+                            </div>
+                            <div id="viewInventoryStatus" class="text-sm text-center"></div>
+                        </div>
+
+                        <!-- Search Specific Items -->
+                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                            <h3 class="text-md font-semibold mb-3">Search Specific Items</h3>
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Menu Item GUIDs (comma-separated)</label>
+                                    <textarea id="searchItemGuids" rows="2" placeholder="Enter menu item GUIDs separated by commas" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500"></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Multi-Location IDs (comma-separated)</label>
+                                    <textarea id="searchItemMLIds" rows="2" placeholder="Enter multi-location IDs separated by commas" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500"></textarea>
+                                </div>
+                                <button id="searchInventoryBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-md transition flex items-center">
+                                    <span id="searchInventoryBtnText">Search Items</span>
+                                    <div id="searchInventorySpinner" class="spinner ml-2 hidden"></div>
+                                </button>
+                                <div id="searchInventoryStatus" class="text-sm text-center"></div>
+                            </div>
+                        </div>
+
+                        <!-- Update Inventory -->
+                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                            <h3 class="text-md font-semibold mb-3">Update Inventory</h3>
+                            <div id="inventoryUpdateList" class="space-y-3 mb-4">
+                                <div class="inventory-update-item bg-white dark:bg-gray-800 p-3 rounded border" id="updateTemplate" style="display: none;">
+                                    <div class="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1">Item GUID/Multi-Location ID</label>
+                                            <input type="text" class="item-identifier w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500" placeholder="Item identifier">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1">Status</label>
+                                            <select class="item-status w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500">
+                                                <option value="IN_STOCK">In Stock</option>
+                                                <option value="OUT_OF_STOCK">Out of Stock</option>
+                                                <option value="QUANTITY">Limited Quantity</option>
+                                            </select>
+                                        </div>
+                                        <div class="quantity-container">
+                                            <label class="block text-sm font-medium mb-1">Quantity</label>
+                                            <input type="number" class="item-quantity w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500" placeholder="0.0" step="0.1" min="0" disabled>
+                                        </div>
+                                        <button type="button" class="remove-item-btn bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-md transition">Remove</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex gap-3 mb-3">
+                                <button id="addUpdateItemBtn" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-md transition">Add Item</button>
+                                <button id="bulkUpdateInventoryBtn" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-md transition flex items-center">
+                                    <span id="bulkUpdateInventoryBtnText">Update All Items</span>
+                                    <div id="bulkUpdateInventorySpinner" class="spinner ml-2 hidden"></div>
+                                </button>
+                            </div>
+                            <div id="bulkUpdateInventoryStatus" class="text-sm text-center"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="laborManagementSection" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                    <div class="flex justify-between items-center mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">
+                        <h2 class="text-xl font-semibold">Labor Management</h2>
+                        <button class="resetWorkflowBtn text-sm text-blue-500 hover:underline">Change Workflow</button>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Employee Management -->
+                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                            <h3 class="text-lg font-semibold mb-3 text-indigo-600 dark:text-indigo-400">👥 Employee Management</h3>
+                            
+                            <!-- Fetch & View Employees -->
+                            <div class="mb-4">
+                                <h4 class="font-medium mb-2">Employees</h4>
+                                <div class="space-y-2">
+                                    <button id="fetchAllEmployeesBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-md transition text-sm flex items-center justify-center">
+                                        <span id="fetchAllEmployeesBtnText">Fetch All Employees</span>
+                                        <div id="fetchAllEmployeesSpinner" class="spinner ml-2 hidden"></div>
+                                    </button>
+                                    <div class="flex gap-2">
+                                        <select id="employeeDropdown" class="flex-1 bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                            <option value="">Select an employee...</option>
+                                        </select>
+                                        <button id="viewSelectedEmployeeBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md transition text-sm" disabled>View Details</button>
+                                    </div>
+                                    <details class="text-xs">
+                                        <summary class="cursor-pointer text-gray-500 hover:text-gray-700">Advanced: View by Employee IDs</summary>
+                                        <div class="mt-2 flex gap-2">
+                                            <input type="text" id="employeeIdsInput" placeholder="Employee IDs (comma-separated)" class="flex-1 bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                            <button id="viewEmployeesBtn" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-md transition text-sm flex items-center">
+                                                <span id="viewEmployeesBtnText">View</span>
+                                                <div id="viewEmployeesSpinner" class="spinner spinner-dark ml-1 hidden"></div>
+                                            </button>
+                                        </div>
+                                    </details>
+                                </div>
+                                <div id="viewEmployeesStatus" class="text-xs text-center mt-2"></div>
+                            </div>
+
+                            <!-- Add Employee -->
+                            <div class="mb-4 border-t pt-3">
+                                <h4 class="font-medium mb-2">Add New Employee</h4>
+                                <div class="space-y-2">
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <input type="text" id="newEmployeeFirstName" placeholder="First Name" class="bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                        <input type="text" id="newEmployeeLastName" placeholder="Last Name" class="bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                    </div>
+                                    <input type="email" id="newEmployeeEmail" placeholder="Email Address" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                    <input type="text" id="newEmployeeExternalId" placeholder="External ID (optional)" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <button id="autoFillEmployeeBtn" class="bg-gray-500 hover:bg-gray-600 text-white py-2 rounded-md transition text-sm">Auto-fill Test Data</button>
+                                        <button id="addEmployeeBtn" class="bg-green-600 hover:bg-green-700 text-white py-2 rounded-md transition text-sm flex items-center justify-center">
+                                            <span id="addEmployeeBtnText">Add Employee</span>
+                                            <div id="addEmployeeSpinner" class="spinner ml-2 hidden"></div>
+                                        </button>
+                                    </div>
+                                    <div id="addEmployeeStatus" class="text-xs text-center"></div>
+                                </div>
+                            </div>
+
+                            <!-- Update Employee -->
+                            <div class="border-t pt-3">
+                                <h4 class="font-medium mb-2">Update Employee</h4>
+                                <div class="space-y-2">
+                                    <select id="updateEmployeeDropdown" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                        <option value="">Select employee to update...</option>
+                                    </select>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <input type="text" id="updateEmployeeFirstName" placeholder="New First Name (optional)" class="bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                        <input type="text" id="updateEmployeeLastName" placeholder="New Last Name (optional)" class="bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                    </div>
+                                    <button id="updateEmployeeBtn" class="w-full bg-yellow-600 hover:bg-yellow-700 text-white py-2 rounded-md transition text-sm flex items-center justify-center" disabled>
+                                        <span id="updateEmployeeBtnText">Update Employee</span>
+                                        <div id="updateEmployeeSpinner" class="spinner ml-2 hidden"></div>
+                                    </button>
+                                    <div id="updateEmployeeStatus" class="text-xs text-center"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Job Management -->
+                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                            <h3 class="text-lg font-semibold mb-3 text-purple-600 dark:text-purple-400">💼 Job Management</h3>
+                            
+                            <!-- View Jobs -->
+                            <div class="mb-4">
+                                <h4 class="font-medium mb-2">View Jobs</h4>
+                                <div class="flex gap-2 mb-2">
+                                    <input type="text" id="jobIdsInput" placeholder="Job IDs (optional, comma-separated)" class="flex-1 bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                    <button id="viewJobsBtn" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-md transition text-sm flex items-center">
+                                        <span id="viewJobsBtnText">View</span>
+                                        <div id="viewJobsSpinner" class="spinner spinner-dark ml-1 hidden"></div>
+                                    </button>
+                                </div>
+                                <div id="viewJobsStatus" class="text-xs text-center"></div>
+                            </div>
+
+                            <!-- Job Assignment -->
+                            <div class="border-t pt-3">
+                                <h4 class="font-medium mb-2">Assign Jobs to Employee</h4>
+                                <div class="space-y-2">
+                                    <input type="text" id="assignJobEmployeeId" placeholder="Employee GUID" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                    <textarea id="assignJobIds" rows="2" placeholder="Job GUIDs (comma-separated)" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm"></textarea>
+                                    <button id="assignJobsBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md transition text-sm flex items-center justify-center">
+                                        <span id="assignJobsBtnText">Assign Jobs</span>
+                                        <div id="assignJobsSpinner" class="spinner ml-2 hidden"></div>
+                                    </button>
+                                    <div id="assignJobsStatus" class="text-xs text-center"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Shift Management -->
+                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                            <h3 class="text-lg font-semibold mb-3 text-green-600 dark:text-green-400">📅 Shift Management</h3>
+                            
+                            <!-- View Shifts -->
+                            <div class="mb-4">
+                                <h4 class="font-medium mb-2">View Shifts</h4>
+                                <div class="space-y-2">
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <input type="date" id="shiftsStartDate" class="bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                        <input type="date" id="shiftsEndDate" class="bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                    </div>
+                                    <button id="viewShiftsBtn" class="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-md transition text-sm flex items-center justify-center">
+                                        <span id="viewShiftsBtnText">View Shifts</span>
+                                        <div id="viewShiftsSpinner" class="spinner ml-2 hidden"></div>
+                                    </button>
+                                    <div id="viewShiftsStatus" class="text-xs text-center"></div>
+                                </div>
+                            </div>
+
+                            <!-- Create Shift -->
+                            <div class="border-t pt-3">
+                                <h4 class="font-medium mb-2">Create New Shift</h4>
+                                <div class="space-y-2">
+                                    <input type="text" id="shiftEmployeeId" placeholder="Employee GUID" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                    <input type="text" id="shiftJobId" placeholder="Job GUID" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <input type="datetime-local" id="shiftStartTime" class="bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                        <input type="datetime-local" id="shiftEndTime" class="bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                    </div>
+                                    <button id="createShiftBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-md transition text-sm flex items-center justify-center">
+                                        <span id="createShiftBtnText">Create Shift</span>
+                                        <div id="createShiftSpinner" class="spinner ml-2 hidden"></div>
+                                    </button>
+                                    <div id="createShiftStatus" class="text-xs text-center"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Time Entry Management -->
+                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                            <h3 class="text-lg font-semibold mb-3 text-orange-600 dark:text-orange-400">⏰ Time Entry Management</h3>
+                            
+                            <!-- View Time Entries -->
+                            <div class="mb-4">
+                                <h4 class="font-medium mb-2">View Time Entries</h4>
+                                <div class="space-y-2">
+                                    <select id="timeEntryQuery" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                        <option value="date">By Date Range</option>
+                                        <option value="businessDate">By Business Date</option>
+                                        <option value="modified">By Modified Date</option>
+                                    </select>
+                                    <div id="timeEntryDateInputs">
+                                        <div class="grid grid-cols-2 gap-2">
+                                            <input type="date" id="timeEntryStartDate" class="bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                            <input type="date" id="timeEntryEndDate" class="bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                        </div>
+                                    </div>
+                                    <div id="timeEntryBusinessDateInput" style="display: none;">
+                                        <input type="date" id="businessDate" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                    </div>
+                                    <label class="flex items-center text-sm">
+                                        <input type="checkbox" id="includeMissedBreaks" class="mr-2">
+                                        Include missed breaks
+                                    </label>
+                                    <button id="viewTimeEntriesBtn" class="w-full bg-orange-600 hover:bg-orange-700 text-white py-2 rounded-md transition text-sm flex items-center justify-center">
+                                        <span id="viewTimeEntriesBtnText">View Time Entries</span>
+                                        <div id="viewTimeEntriesSpinner" class="spinner ml-2 hidden"></div>
+                                    </button>
+                                    <div id="viewTimeEntriesStatus" class="text-xs text-center"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
                 <section id="resultsSection" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
                      <h2 class="text-xl font-semibold mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">Results</h2>
                      <div id="resultsContainer" class="space-y-4 max-h-[32rem] overflow-y-auto">
@@ -421,6 +693,17 @@
             const TAXES_PATH = 'config/v2/taxRates';
             const ORDERS_PATH = 'orders/v2/orders';
             const ALTERNATE_PAYMENT_TYPES_PATH = 'config/v2/alternatePaymentTypes';
+            
+            // --- Stock API Endpoints ---
+            const STOCK_INVENTORY_PATH = 'stock/v1/inventory';
+            const STOCK_SEARCH_PATH = 'stock/v1/inventory/search';
+            const STOCK_UPDATE_PATH = 'stock/v1/inventory/update';
+            
+            // --- Labor API Endpoints ---
+            const EMPLOYEES_PATH_BASE = 'labor/v1/employees';
+            const JOBS_PATH_BASE = 'labor/v1/jobs';
+            const SHIFTS_PATH = 'labor/v1/shifts';
+            const TIME_ENTRIES_PATH = 'labor/v1/timeEntries';
             
             // --- DOM Element References ---
             const mainContent = document.getElementById('mainContent');
@@ -514,6 +797,7 @@
             const createWorkflowBtn = document.getElementById('createWorkflowBtn');
             const fetchWorkflowBtn = document.getElementById('fetchWorkflowBtn');
             const updateWorkflowBtn = document.getElementById('updateWorkflowBtn');
+            const stockWorkflowBtn = document.getElementById('stockWorkflowBtn');
             const resetWorkflowBtns = document.querySelectorAll('.resetWorkflowBtn');
 
             // Fetch Order Elements
@@ -532,6 +816,100 @@
             const loadOrderForUpdateBtn = document.getElementById('loadOrderForUpdateBtn');
             const loadOrderForUpdateStatus = document.getElementById('loadOrderForUpdateStatus');
 
+            // Stock Management Elements
+            const stockManagementSection = document.getElementById('stockManagementSection');
+            const inventoryStatusFilter = document.getElementById('inventoryStatusFilter');
+            const viewInventoryBtn = document.getElementById('viewInventoryBtn');
+            const viewInventoryBtnText = document.getElementById('viewInventoryBtnText');
+            const viewInventorySpinner = document.getElementById('viewInventorySpinner');
+            const viewInventoryStatus = document.getElementById('viewInventoryStatus');
+            const searchItemGuids = document.getElementById('searchItemGuids');
+            const searchItemMLIds = document.getElementById('searchItemMLIds');
+            const searchInventoryBtn = document.getElementById('searchInventoryBtn');
+            const searchInventoryBtnText = document.getElementById('searchInventoryBtnText');
+            const searchInventorySpinner = document.getElementById('searchInventorySpinner');
+            const searchInventoryStatus = document.getElementById('searchInventoryStatus');
+            const inventoryUpdateList = document.getElementById('inventoryUpdateList');
+            const addUpdateItemBtn = document.getElementById('addUpdateItemBtn');
+            const bulkUpdateInventoryBtn = document.getElementById('bulkUpdateInventoryBtn');
+            const bulkUpdateInventoryBtnText = document.getElementById('bulkUpdateInventoryBtnText');
+            const bulkUpdateInventorySpinner = document.getElementById('bulkUpdateInventorySpinner');
+            const bulkUpdateInventoryStatus = document.getElementById('bulkUpdateInventoryStatus');
+
+            // Labor Management Elements
+            const laborManagementSection = document.getElementById('laborManagementSection');
+            const laborWorkflowBtn = document.getElementById('laborWorkflowBtn');
+            
+            // Employee Management
+            const fetchAllEmployeesBtn = document.getElementById('fetchAllEmployeesBtn');
+            const fetchAllEmployeesBtnText = document.getElementById('fetchAllEmployeesBtnText');
+            const fetchAllEmployeesSpinner = document.getElementById('fetchAllEmployeesSpinner');
+            const employeeDropdown = document.getElementById('employeeDropdown');
+            const viewSelectedEmployeeBtn = document.getElementById('viewSelectedEmployeeBtn');
+            const employeeIdsInput = document.getElementById('employeeIdsInput');
+            const viewEmployeesBtn = document.getElementById('viewEmployeesBtn');
+            const viewEmployeesBtnText = document.getElementById('viewEmployeesBtnText');
+            const viewEmployeesSpinner = document.getElementById('viewEmployeesSpinner');
+            const viewEmployeesStatus = document.getElementById('viewEmployeesStatus');
+            const newEmployeeFirstName = document.getElementById('newEmployeeFirstName');
+            const newEmployeeLastName = document.getElementById('newEmployeeLastName');
+            const newEmployeeEmail = document.getElementById('newEmployeeEmail');
+            const newEmployeeExternalId = document.getElementById('newEmployeeExternalId');
+            const autoFillEmployeeBtn = document.getElementById('autoFillEmployeeBtn');
+            const addEmployeeBtn = document.getElementById('addEmployeeBtn');
+            const addEmployeeBtnText = document.getElementById('addEmployeeBtnText');
+            const addEmployeeSpinner = document.getElementById('addEmployeeSpinner');
+            const addEmployeeStatus = document.getElementById('addEmployeeStatus');
+            const updateEmployeeId = document.getElementById('updateEmployeeId');
+            const updateEmployeeFirstName = document.getElementById('updateEmployeeFirstName');
+            const updateEmployeeLastName = document.getElementById('updateEmployeeLastName');
+            const updateEmployeeBtn = document.getElementById('updateEmployeeBtn');
+            const updateEmployeeBtnText = document.getElementById('updateEmployeeBtnText');
+            const updateEmployeeSpinner = document.getElementById('updateEmployeeSpinner');
+            const updateEmployeeStatus = document.getElementById('updateEmployeeStatus');
+            
+            // Job Management
+            const jobIdsInput = document.getElementById('jobIdsInput');
+            const viewJobsBtn = document.getElementById('viewJobsBtn');
+            const viewJobsBtnText = document.getElementById('viewJobsBtnText');
+            const viewJobsSpinner = document.getElementById('viewJobsSpinner');
+            const viewJobsStatus = document.getElementById('viewJobsStatus');
+            const assignJobEmployeeId = document.getElementById('assignJobEmployeeId');
+            const assignJobIds = document.getElementById('assignJobIds');
+            const assignJobsBtn = document.getElementById('assignJobsBtn');
+            const assignJobsBtnText = document.getElementById('assignJobsBtnText');
+            const assignJobsSpinner = document.getElementById('assignJobsSpinner');
+            const assignJobsStatus = document.getElementById('assignJobsStatus');
+            
+            // Shift Management
+            const shiftsStartDate = document.getElementById('shiftsStartDate');
+            const shiftsEndDate = document.getElementById('shiftsEndDate');
+            const viewShiftsBtn = document.getElementById('viewShiftsBtn');
+            const viewShiftsBtnText = document.getElementById('viewShiftsBtnText');
+            const viewShiftsSpinner = document.getElementById('viewShiftsSpinner');
+            const viewShiftsStatus = document.getElementById('viewShiftsStatus');
+            const shiftEmployeeId = document.getElementById('shiftEmployeeId');
+            const shiftJobId = document.getElementById('shiftJobId');
+            const shiftStartTime = document.getElementById('shiftStartTime');
+            const shiftEndTime = document.getElementById('shiftEndTime');
+            const createShiftBtn = document.getElementById('createShiftBtn');
+            const createShiftBtnText = document.getElementById('createShiftBtnText');
+            const createShiftSpinner = document.getElementById('createShiftSpinner');
+            const createShiftStatus = document.getElementById('createShiftStatus');
+            
+            // Time Entry Management
+            const timeEntryQuery = document.getElementById('timeEntryQuery');
+            const timeEntryDateInputs = document.getElementById('timeEntryDateInputs');
+            const timeEntryBusinessDateInput = document.getElementById('timeEntryBusinessDateInput');
+            const timeEntryStartDate = document.getElementById('timeEntryStartDate');
+            const timeEntryEndDate = document.getElementById('timeEntryEndDate');
+            const businessDate = document.getElementById('businessDate');
+            const includeMissedBreaks = document.getElementById('includeMissedBreaks');
+            const viewTimeEntriesBtn = document.getElementById('viewTimeEntriesBtn');
+            const viewTimeEntriesBtnText = document.getElementById('viewTimeEntriesBtnText');
+            const viewTimeEntriesSpinner = document.getElementById('viewTimeEntriesSpinner');
+            const viewTimeEntriesStatus = document.getElementById('viewTimeEntriesStatus');
+
             // Custom Field Elements
             const addCustomFieldBtn = document.getElementById('addCustomFieldBtn');
             const customFieldKeyInput = document.getElementById('customFieldKey');
@@ -548,7 +926,7 @@
             let apiLogHistory = [];
             let isProxyActive = false;
             let currentCredentials = { id: '', secret: '' };
-            let currentWorkflow = null; // null, 'create', 'fetch', 'update'
+            let currentWorkflow = null; // null, 'create', 'fetch', 'update', 'stock', 'labor'
             let activeUpdateOrder = null; // Store the order being updated
 
             // --- Authentication & Token Management ---
@@ -628,6 +1006,8 @@
                 orderBuilderSection.style.display = 'none';
                 fetchOrderSection.style.display = 'none';
                 updateOrderSection.style.display = 'none';
+                stockManagementSection.style.display = 'none';
+                laborManagementSection.style.display = 'none';
                 resultsSection.style.display = 'none';
 
                 if (token) {
@@ -658,6 +1038,12 @@
                                 break;
                             case 'update':
                                 updateOrderSection.style.display = 'block';
+                                break;
+                            case 'stock':
+                                stockManagementSection.style.display = 'block';
+                                break;
+                            case 'labor':
+                                laborManagementSection.style.display = 'block';
                                 break;
                             default:
                                 break;
@@ -1813,6 +2199,806 @@
                 }
             }
 
+            // --- Stock Management Functions ---
+            async function viewInventory() {
+                const statusFilter = inventoryStatusFilter.value;
+                
+                viewInventoryBtnText.textContent = 'Loading...';
+                viewInventorySpinner.classList.remove('hidden');
+                viewInventoryBtn.disabled = true;
+                viewInventoryStatus.innerHTML = '';
+                
+                try {
+                    let url = STOCK_INVENTORY_PATH;
+                    if (statusFilter) {
+                        url += `?status=${statusFilter}`;
+                    }
+                    
+                    const response = await makeRequest(url, {
+                        method: 'GET'
+                    });
+                    
+                    if (response.ok) {
+                        const inventory = await response.json();
+                        viewInventoryStatus.innerHTML = `<span class="text-green-600">✓ Found ${inventory.length} items</span>`;
+                        displayInventoryResults(inventory, 'Current Inventory');
+                    } else {
+                        const error = await response.text();
+                        viewInventoryStatus.innerHTML = `<span class="text-red-600">✗ Failed: ${error}</span>`;
+                    }
+                } catch (error) {
+                    viewInventoryStatus.innerHTML = `<span class="text-red-600">✗ Error: ${error.message}</span>`;
+                } finally {
+                    viewInventoryBtnText.textContent = 'View Inventory';
+                    viewInventorySpinner.classList.add('hidden');
+                    viewInventoryBtn.disabled = false;
+                }
+            }
+            
+            async function searchInventory() {
+                const guidInput = searchItemGuids.value.trim();
+                const mlIdInput = searchItemMLIds.value.trim();
+                
+                if (!guidInput && !mlIdInput) {
+                    searchInventoryStatus.innerHTML = `<span class="text-yellow-600">Please enter at least one identifier</span>`;
+                    return;
+                }
+                
+                searchInventoryBtnText.textContent = 'Searching...';
+                searchInventorySpinner.classList.remove('hidden');
+                searchInventoryBtn.disabled = true;
+                searchInventoryStatus.innerHTML = '';
+                
+                try {
+                    const searchRequest = {};
+                    
+                    if (guidInput) {
+                        searchRequest.guids = guidInput.split(',').map(g => g.trim()).filter(g => g);
+                    }
+                    
+                    if (mlIdInput) {
+                        searchRequest.multiLocationIds = mlIdInput.split(',').map(id => id.trim()).filter(id => id);
+                    }
+                    
+                    const response = await makeRequest(STOCK_SEARCH_PATH, {
+                        method: 'POST',
+                        body: JSON.stringify(searchRequest)
+                    });
+                    
+                    if (response.ok) {
+                        const inventory = await response.json();
+                        searchInventoryStatus.innerHTML = `<span class="text-green-600">✓ Found ${inventory.length} items</span>`;
+                        displayInventoryResults(inventory, 'Search Results');
+                    } else {
+                        const error = await response.text();
+                        searchInventoryStatus.innerHTML = `<span class="text-red-600">✗ Failed: ${error}</span>`;
+                    }
+                } catch (error) {
+                    searchInventoryStatus.innerHTML = `<span class="text-red-600">✗ Error: ${error.message}</span>`;
+                } finally {
+                    searchInventoryBtnText.textContent = 'Search Items';
+                    searchInventorySpinner.classList.add('hidden');
+                    searchInventoryBtn.disabled = false;
+                }
+            }
+            
+            async function bulkUpdateInventory() {
+                const items = [];
+                const itemElements = inventoryUpdateList.querySelectorAll('.inventory-update-item:not(#updateTemplate)');
+                
+                for (const element of itemElements) {
+                    const identifier = element.querySelector('.item-identifier').value.trim();
+                    const status = element.querySelector('.item-status').value;
+                    const quantity = element.querySelector('.item-quantity').value;
+                    
+                    if (!identifier) continue;
+                    
+                    const item = { status };
+                    
+                    // Determine if identifier is GUID or multiLocationId
+                    if (identifier.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
+                        item.guid = identifier;
+                    } else {
+                        item.multiLocationId = identifier;
+                    }
+                    
+                    if (status === 'QUANTITY' && quantity) {
+                        item.quantity = parseFloat(quantity);
+                    }
+                    
+                    items.push(item);
+                }
+                
+                if (items.length === 0) {
+                    bulkUpdateInventoryStatus.innerHTML = `<span class="text-yellow-600">No items to update</span>`;
+                    return;
+                }
+                
+                bulkUpdateInventoryBtnText.textContent = 'Updating...';
+                bulkUpdateInventorySpinner.classList.remove('hidden');
+                bulkUpdateInventoryBtn.disabled = true;
+                bulkUpdateInventoryStatus.innerHTML = '';
+                
+                try {
+                    const response = await makeRequest(STOCK_UPDATE_PATH, {
+                        method: 'PUT',
+                        body: JSON.stringify(items)
+                    });
+                    
+                    if (response.ok) {
+                        const updatedInventory = await response.json();
+                        bulkUpdateInventoryStatus.innerHTML = `<span class="text-green-600">✓ Updated ${updatedInventory.length} items</span>`;
+                        displayInventoryResults(updatedInventory, 'Updated Inventory');
+                    } else {
+                        const error = await response.text();
+                        bulkUpdateInventoryStatus.innerHTML = `<span class="text-red-600">✗ Failed: ${error}</span>`;
+                    }
+                } catch (error) {
+                    bulkUpdateInventoryStatus.innerHTML = `<span class="text-red-600">✗ Error: ${error.message}</span>`;
+                } finally {
+                    bulkUpdateInventoryBtnText.textContent = 'Update All Items';
+                    bulkUpdateInventorySpinner.classList.add('hidden');
+                    bulkUpdateInventoryBtn.disabled = false;
+                }
+            }
+            
+            function addUpdateItem() {
+                const template = document.getElementById('updateTemplate');
+                const newItem = template.cloneNode(true);
+                newItem.id = '';
+                newItem.style.display = 'block';
+                
+                // Set up status change handler for quantity field
+                const statusSelect = newItem.querySelector('.item-status');
+                const quantityInput = newItem.querySelector('.item-quantity');
+                
+                statusSelect.addEventListener('change', function() {
+                    if (this.value === 'QUANTITY') {
+                        quantityInput.disabled = false;
+                        quantityInput.required = true;
+                    } else {
+                        quantityInput.disabled = true;
+                        quantityInput.required = false;
+                        quantityInput.value = '';
+                    }
+                });
+                
+                // Set up remove button
+                const removeBtn = newItem.querySelector('.remove-item-btn');
+                removeBtn.addEventListener('click', function() {
+                    newItem.remove();
+                });
+                
+                inventoryUpdateList.appendChild(newItem);
+            }
+            
+            function displayInventoryResults(inventory, title) {
+                let html = `<div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+                    <h3 class="font-semibold text-lg mb-3">${title}</h3>`;
+                
+                if (inventory.length === 0) {
+                    html += '<p class="text-gray-500">No inventory items found</p>';
+                } else {
+                    html += '<div class="overflow-x-auto"><table class="min-w-full text-sm"><thead class="bg-gray-50 dark:bg-gray-700"><tr>';
+                    html += '<th class="px-3 py-2 text-left font-medium">Item ID</th>';
+                    html += '<th class="px-3 py-2 text-left font-medium">Multi-Location ID</th>';
+                    html += '<th class="px-3 py-2 text-left font-medium">Status</th>';
+                    html += '<th class="px-3 py-2 text-left font-medium">Quantity</th>';
+                    html += '<th class="px-3 py-2 text-left font-medium">Validity</th>';
+                    html += '</tr></thead><tbody class="divide-y divide-gray-200 dark:divide-gray-600">';
+                    
+                    inventory.forEach(item => {
+                        const statusClass = item.status === 'OUT_OF_STOCK' ? 'text-red-600' : 
+                                          item.status === 'QUANTITY' ? 'text-yellow-600' : 'text-green-600';
+                        const validityClass = item.itemGuidValidity === 'INVALID' ? 'text-red-600' : 'text-green-600';
+                        
+                        html += `<tr class="hover:bg-gray-50 dark:hover:bg-gray-700">`;
+                        html += `<td class="px-3 py-2 font-mono text-xs">${item.guid || 'N/A'}</td>`;
+                        html += `<td class="px-3 py-2">${item.multiLocationId || 'N/A'}</td>`;
+                        html += `<td class="px-3 py-2 ${statusClass}">${item.status}</td>`;
+                        html += `<td class="px-3 py-2">${item.quantity !== null ? item.quantity : '-'}</td>`;
+                        html += `<td class="px-3 py-2 ${validityClass}">${item.itemGuidValidity || 'N/A'}</td>`;
+                        html += '</tr>';
+                    });
+                    
+                    html += '</tbody></table></div>';
+                }
+                
+                html += '</div>';
+                resultsContainer.innerHTML = html;
+            }
+
+            // --- Labor Management Functions ---
+            
+            // Store fetched employees for dropdown
+            let allEmployees = [];
+            
+            // Employee Management Functions
+            async function fetchAllEmployees() {
+                fetchAllEmployeesBtnText.textContent = 'Fetching...';
+                fetchAllEmployeesSpinner.classList.remove('hidden');
+                fetchAllEmployeesBtn.disabled = true;
+                viewEmployeesStatus.innerHTML = '';
+                
+                try {
+                    const url = CORS_PROXY + environmentSelect.value + EMPLOYEES_PATH_BASE;
+                    const result = await makeApiCall(url, 'GET');
+                    
+                    if (result.error) {
+                        viewEmployeesStatus.innerHTML = `<span class="text-red-600">✗ Failed: ${result.error}</span>`;
+                    } else {
+                        allEmployees = result.data || [];
+                        viewEmployeesStatus.innerHTML = `<span class="text-green-600">✓ Found ${allEmployees.length} employees</span>`;
+                        
+                        // Populate dropdown
+                        employeeDropdown.innerHTML = '<option value="">Select an employee...</option>';
+                        allEmployees.forEach(emp => {
+                            const fullName = [emp.firstName, emp.chosenName, emp.lastName].filter(n => n).join(' ');
+                            const displayName = fullName || emp.email || emp.guid.slice(-8);
+                            employeeDropdown.innerHTML += `<option value="${emp.guid}">${displayName} (${emp.guid.slice(-8)})</option>`;
+                        });
+                        
+                        // Enable the view details button
+                        viewSelectedEmployeeBtn.disabled = false;
+                        
+                        displayEmployeeResults(allEmployees, 'All Employees');
+                    }
+                } catch (error) {
+                    viewEmployeesStatus.innerHTML = `<span class="text-red-600">✗ Error: ${error.message}</span>`;
+                } finally {
+                    fetchAllEmployeesBtnText.textContent = 'Fetch All Employees';
+                    fetchAllEmployeesSpinner.classList.add('hidden');
+                    fetchAllEmployeesBtn.disabled = false;
+                }
+            }
+            
+            function viewSelectedEmployee() {
+                const selectedGuid = employeeDropdown.value;
+                if (!selectedGuid) {
+                    viewEmployeesStatus.innerHTML = `<span class="text-yellow-600">Please select an employee first</span>`;
+                    return;
+                }
+                
+                const selectedEmployee = allEmployees.find(emp => emp.guid === selectedGuid);
+                if (selectedEmployee) {
+                    displayEmployeeResults([selectedEmployee], 'Selected Employee Details');
+                    viewEmployeesStatus.innerHTML = `<span class="text-green-600">✓ Showing details for selected employee</span>`;
+                }
+            }
+            
+            function autoFillEmployeeData() {
+                // Generate random test data
+                const firstNames = ['Alex', 'Jamie', 'Taylor', 'Morgan', 'Casey', 'Riley', 'Jordan', 'Sage'];
+                const lastNames = ['Johnson', 'Williams', 'Brown', 'Davis', 'Miller', 'Wilson', 'Moore', 'Taylor'];
+                
+                const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+                const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+                const timestamp = Date.now().toString().slice(-4);
+                
+                newEmployeeFirstName.value = firstName;
+                newEmployeeLastName.value = lastName;
+                newEmployeeEmail.value = `${firstName.toLowerCase()}.${lastName.toLowerCase()}${timestamp}@testrestaurant.com`;
+                newEmployeeExternalId.value = `EMP-${timestamp}`;
+                
+                // Show feedback
+                addEmployeeStatus.innerHTML = `<span class="text-blue-600">✓ Test data filled! Ready to add employee.</span>`;
+            }
+            
+            async function viewEmployees() {
+                const employeeIds = employeeIdsInput.value.trim();
+                
+                viewEmployeesBtnText.textContent = 'Loading...';
+                viewEmployeesSpinner.classList.remove('hidden');
+                viewEmployeesBtn.disabled = true;
+                viewEmployeesStatus.innerHTML = '';
+                
+                try {
+                    let url = CORS_PROXY + environmentSelect.value + EMPLOYEES_PATH_BASE;
+                    if (employeeIds) {
+                        const ids = employeeIds.split(',').map(id => id.trim()).filter(id => id);
+                        const params = ids.map(id => `employeeIds=${encodeURIComponent(id)}`).join('&');
+                        url += `?${params}`;
+                    }
+                    
+                    const result = await makeApiCall(url, 'GET');
+                    
+                    if (result.error) {
+                        viewEmployeesStatus.innerHTML = `<span class="text-red-600">✗ Failed: ${result.error}</span>`;
+                    } else {
+                        const employees = result.data || [];
+                        viewEmployeesStatus.innerHTML = `<span class="text-green-600">✓ Found ${employees.length} employees</span>`;
+                        displayEmployeeResults(employees, 'Employees');
+                    }
+                } catch (error) {
+                    viewEmployeesStatus.innerHTML = `<span class="text-red-600">✗ Error: ${error.message}</span>`;
+                } finally {
+                    viewEmployeesBtnText.textContent = 'View';
+                    viewEmployeesSpinner.classList.add('hidden');
+                    viewEmployeesBtn.disabled = false;
+                }
+            }
+            
+            async function addEmployee() {
+                const firstName = newEmployeeFirstName.value.trim();
+                const lastName = newEmployeeLastName.value.trim();
+                const email = newEmployeeEmail.value.trim();
+                const externalId = newEmployeeExternalId.value.trim();
+                
+                if (!firstName || !lastName || !email) {
+                    addEmployeeStatus.innerHTML = `<span class="text-yellow-600">Please fill in first name, last name, and email</span>`;
+                    return;
+                }
+                
+                addEmployeeBtnText.textContent = 'Adding...';
+                addEmployeeSpinner.classList.remove('hidden');
+                addEmployeeBtn.disabled = true;
+                addEmployeeStatus.innerHTML = '';
+                
+                try {
+                    const employeeData = {
+                        entityType: 'RestaurantUser',
+                        firstName,
+                        lastName,
+                        email
+                    };
+                    
+                    if (externalId) {
+                        employeeData.externalId = externalId;
+                    }
+                    
+                    const url = CORS_PROXY + environmentSelect.value + EMPLOYEES_PATH_BASE;
+                    const result = await makeApiCall(url, 'POST', employeeData);
+                    
+                    if (result.error) {
+                        addEmployeeStatus.innerHTML = `<span class="text-red-600">✗ Failed: ${result.error}</span>`;
+                    } else {
+                        const newEmployee = result.data;
+                        addEmployeeStatus.innerHTML = `<span class="text-green-600">✓ Employee created successfully</span>`;
+                        displayEmployeeResults([newEmployee], 'New Employee Created');
+                        
+                        // Clear form
+                        newEmployeeFirstName.value = '';
+                        newEmployeeLastName.value = '';
+                        newEmployeeEmail.value = '';
+                        newEmployeeExternalId.value = '';
+                    }
+                } catch (error) {
+                    addEmployeeStatus.innerHTML = `<span class="text-red-600">✗ Error: ${error.message}</span>`;
+                } finally {
+                    addEmployeeBtnText.textContent = 'Add Employee';
+                    addEmployeeSpinner.classList.add('hidden');
+                    addEmployeeBtn.disabled = false;
+                }
+            }
+            
+            async function updateEmployee() {
+                const employeeId = updateEmployeeId.value.trim();
+                const firstName = updateEmployeeFirstName.value.trim();
+                const lastName = updateEmployeeLastName.value.trim();
+                
+                if (!employeeId) {
+                    updateEmployeeStatus.innerHTML = `<span class="text-yellow-600">Please enter an employee ID</span>`;
+                    return;
+                }
+                
+                if (!firstName && !lastName) {
+                    updateEmployeeStatus.innerHTML = `<span class="text-yellow-600">Please enter at least first or last name to update</span>`;
+                    return;
+                }
+                
+                updateEmployeeBtnText.textContent = 'Updating...';
+                updateEmployeeSpinner.classList.remove('hidden');
+                updateEmployeeBtn.disabled = true;
+                updateEmployeeStatus.innerHTML = '';
+                
+                try {
+                    const updateData = {};
+                    if (firstName) updateData.firstName = firstName;
+                    if (lastName) updateData.lastName = lastName;
+                    
+                    const url = CORS_PROXY + environmentSelect.value + `${EMPLOYEES_PATH_BASE}/${employeeId}`;
+                    const result = await makeApiCall(url, 'PATCH', updateData);
+                    
+                    if (result.error) {
+                        updateEmployeeStatus.innerHTML = `<span class="text-red-600">✗ Failed: ${result.error}</span>`;
+                    } else {
+                        const updatedEmployee = result.data;
+                        updateEmployeeStatus.innerHTML = `<span class="text-green-600">✓ Employee updated successfully</span>`;
+                        displayEmployeeResults([updatedEmployee], 'Updated Employee');
+                    }
+                } catch (error) {
+                    updateEmployeeStatus.innerHTML = `<span class="text-red-600">✗ Error: ${error.message}</span>`;
+                } finally {
+                    updateEmployeeBtnText.textContent = 'Update Employee';
+                    updateEmployeeSpinner.classList.add('hidden');
+                    updateEmployeeBtn.disabled = false;
+                }
+            }
+            
+            // Job Management Functions
+            async function viewJobs() {
+                const jobIds = jobIdsInput.value.trim();
+                
+                viewJobsBtnText.textContent = 'Loading...';
+                viewJobsSpinner.classList.remove('hidden');
+                viewJobsBtn.disabled = true;
+                viewJobsStatus.innerHTML = '';
+                
+                try {
+                    let url = CORS_PROXY + environmentSelect.value + JOBS_PATH_BASE;
+                    if (jobIds) {
+                        const ids = jobIds.split(',').map(id => id.trim()).filter(id => id);
+                        const params = ids.map(id => `jobIds=${encodeURIComponent(id)}`).join('&');
+                        url += `?${params}`;
+                    }
+                    
+                    const result = await makeApiCall(url, 'GET');
+                    
+                    if (result.error) {
+                        viewJobsStatus.innerHTML = `<span class="text-red-600">✗ Failed: ${result.error}</span>`;
+                    } else {
+                        const jobs = result.data || [];
+                        viewJobsStatus.innerHTML = `<span class="text-green-600">✓ Found ${jobs.length} jobs</span>`;
+                        displayJobResults(jobs, 'Jobs');
+                    }
+                } catch (error) {
+                    viewJobsStatus.innerHTML = `<span class="text-red-600">✗ Error: ${error.message}</span>`;
+                } finally {
+                    viewJobsBtnText.textContent = 'View';
+                    viewJobsSpinner.classList.add('hidden');
+                    viewJobsBtn.disabled = false;
+                }
+            }
+            
+            async function assignJobs() {
+                const employeeId = assignJobEmployeeId.value.trim();
+                const jobIds = assignJobIds.value.trim();
+                
+                if (!employeeId || !jobIds) {
+                    assignJobsStatus.innerHTML = `<span class="text-yellow-600">Please enter employee ID and job IDs</span>`;
+                    return;
+                }
+                
+                assignJobsBtnText.textContent = 'Assigning...';
+                assignJobsSpinner.classList.remove('hidden');
+                assignJobsBtn.disabled = true;
+                assignJobsStatus.innerHTML = '';
+                
+                try {
+                    const ids = jobIds.split(',').map(id => id.trim()).filter(id => id);
+                    const jobReferences = ids.map(id => {
+                        // Check if it's a GUID or external ID
+                        if (id.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
+                            return { guid: id };
+                        } else {
+                            return { externalId: id };
+                        }
+                    });
+                    
+                    const url = CORS_PROXY + environmentSelect.value + `${EMPLOYEES_PATH_BASE}/${employeeId}/jobs`;
+                    const result = await makeApiCall(url, 'PUT', jobReferences);
+                    
+                    if (result.error) {
+                        assignJobsStatus.innerHTML = `<span class="text-red-600">✗ Failed: ${result.error}</span>`;
+                    } else {
+                        const updatedEmployee = result.data;
+                        assignJobsStatus.innerHTML = `<span class="text-green-600">✓ Jobs assigned successfully</span>`;
+                        displayEmployeeResults([updatedEmployee], 'Employee with Updated Jobs');
+                    }
+                } catch (error) {
+                    assignJobsStatus.innerHTML = `<span class="text-red-600">✗ Error: ${error.message}</span>`;
+                } finally {
+                    assignJobsBtnText.textContent = 'Assign Jobs';
+                    assignJobsSpinner.classList.add('hidden');
+                    assignJobsBtn.disabled = false;
+                }
+            }
+            
+            // Shift Management Functions
+            async function viewShifts() {
+                const startDate = shiftsStartDate.value;
+                const endDate = shiftsEndDate.value;
+                
+                if (!startDate || !endDate) {
+                    viewShiftsStatus.innerHTML = `<span class="text-yellow-600">Please select start and end dates</span>`;
+                    return;
+                }
+                
+                viewShiftsBtnText.textContent = 'Loading...';
+                viewShiftsSpinner.classList.remove('hidden');
+                viewShiftsBtn.disabled = true;
+                viewShiftsStatus.innerHTML = '';
+                
+                try {
+                    const startISO = new Date(startDate).toISOString();
+                    const endISO = new Date(endDate).toISOString();
+                    const url = CORS_PROXY + environmentSelect.value + `${SHIFTS_PATH}?startDate=${encodeURIComponent(startISO)}&endDate=${encodeURIComponent(endISO)}`;
+                    
+                    const result = await makeApiCall(url, 'GET');
+                    
+                    if (result.error) {
+                        viewShiftsStatus.innerHTML = `<span class="text-red-600">✗ Failed: ${result.error}</span>`;
+                    } else {
+                        const shifts = result.data || [];
+                        viewShiftsStatus.innerHTML = `<span class="text-green-600">✓ Found ${shifts.length} shifts</span>`;
+                        displayShiftResults(shifts, 'Shifts');
+                    }
+                } catch (error) {
+                    viewShiftsStatus.innerHTML = `<span class="text-red-600">✗ Error: ${error.message}</span>`;
+                } finally {
+                    viewShiftsBtnText.textContent = 'View Shifts';
+                    viewShiftsSpinner.classList.add('hidden');
+                    viewShiftsBtn.disabled = false;
+                }
+            }
+            
+            async function createShift() {
+                const employeeId = shiftEmployeeId.value.trim();
+                const jobId = shiftJobId.value.trim();
+                const startTime = shiftStartTime.value;
+                const endTime = shiftEndTime.value;
+                
+                if (!employeeId || !jobId || !startTime || !endTime) {
+                    createShiftStatus.innerHTML = `<span class="text-yellow-600">Please fill in all fields</span>`;
+                    return;
+                }
+                
+                createShiftBtnText.textContent = 'Creating...';
+                createShiftSpinner.classList.remove('hidden');
+                createShiftBtn.disabled = true;
+                createShiftStatus.innerHTML = '';
+                
+                try {
+                    const shiftData = {
+                        entityType: 'Shift',
+                        employeeReference: {
+                            guid: employeeId,
+                            entityType: 'RestaurantUser'
+                        },
+                        jobReference: {
+                            guid: jobId,
+                            entityType: 'RestaurantJob'
+                        },
+                        inDate: new Date(startTime).toISOString(),
+                        outDate: new Date(endTime).toISOString()
+                    };
+                    
+                    const url = CORS_PROXY + environmentSelect.value + SHIFTS_PATH;
+                    const result = await makeApiCall(url, 'POST', shiftData);
+                    
+                    if (result.error) {
+                        createShiftStatus.innerHTML = `<span class="text-red-600">✗ Failed: ${result.error}</span>`;
+                    } else {
+                        const newShift = result.data;
+                        createShiftStatus.innerHTML = `<span class="text-green-600">✓ Shift created successfully</span>`;
+                        displayShiftResults([newShift], 'New Shift Created');
+                        
+                        // Clear form
+                        shiftEmployeeId.value = '';
+                        shiftJobId.value = '';
+                        shiftStartTime.value = '';
+                        shiftEndTime.value = '';
+                    }
+                } catch (error) {
+                    createShiftStatus.innerHTML = `<span class="text-red-600">✗ Error: ${error.message}</span>`;
+                } finally {
+                    createShiftBtnText.textContent = 'Create Shift';
+                    createShiftSpinner.classList.add('hidden');
+                    createShiftBtn.disabled = false;
+                }
+            }
+            
+            // Time Entry Management Functions
+            async function viewTimeEntries() {
+                const queryType = timeEntryQuery.value;
+                const includeMissed = includeMissedBreaks.checked;
+                
+                let url = TIME_ENTRIES_PATH + '?';
+                const params = [];
+                
+                if (queryType === 'date') {
+                    const startDate = timeEntryStartDate.value;
+                    const endDate = timeEntryEndDate.value;
+                    if (!startDate || !endDate) {
+                        viewTimeEntriesStatus.innerHTML = `<span class="text-yellow-600">Please select start and end dates</span>`;
+                        return;
+                    }
+                    params.push(`startDate=${encodeURIComponent(new Date(startDate).toISOString())}`);
+                    params.push(`endDate=${encodeURIComponent(new Date(endDate).toISOString())}`);
+                } else if (queryType === 'businessDate') {
+                    const bizDate = businessDate.value;
+                    if (!bizDate) {
+                        viewTimeEntriesStatus.innerHTML = `<span class="text-yellow-600">Please select a business date</span>`;
+                        return;
+                    }
+                    const formattedDate = bizDate.replace(/-/g, '');
+                    params.push(`businessDate=${formattedDate}`);
+                } else if (queryType === 'modified') {
+                    const startDate = timeEntryStartDate.value;
+                    const endDate = timeEntryEndDate.value;
+                    if (!startDate || !endDate) {
+                        viewTimeEntriesStatus.innerHTML = `<span class="text-yellow-600">Please select modified start and end dates</span>`;
+                        return;
+                    }
+                    params.push(`modifiedStartDate=${encodeURIComponent(new Date(startDate).toISOString())}`);
+                    params.push(`modifiedEndDate=${encodeURIComponent(new Date(endDate).toISOString())}`);
+                }
+                
+                if (includeMissed) {
+                    params.push('includeMissedBreaks=true');
+                }
+                
+                url += params.join('&');
+                
+                viewTimeEntriesBtnText.textContent = 'Loading...';
+                viewTimeEntriesSpinner.classList.remove('hidden');
+                viewTimeEntriesBtn.disabled = true;
+                viewTimeEntriesStatus.innerHTML = '';
+                
+                try {
+                    const fullUrl = CORS_PROXY + environmentSelect.value + url.replace(TIME_ENTRIES_PATH + '?', TIME_ENTRIES_PATH + '?');
+                    const result = await makeApiCall(fullUrl, 'GET');
+                    
+                    if (result.error) {
+                        viewTimeEntriesStatus.innerHTML = `<span class="text-red-600">✗ Failed: ${result.error}</span>`;
+                    } else {
+                        const timeEntries = result.data || [];
+                        viewTimeEntriesStatus.innerHTML = `<span class="text-green-600">✓ Found ${timeEntries.length} time entries</span>`;
+                        displayTimeEntryResults(timeEntries, 'Time Entries');
+                    }
+                } catch (error) {
+                    viewTimeEntriesStatus.innerHTML = `<span class="text-red-600">✗ Error: ${error.message}</span>`;
+                } finally {
+                    viewTimeEntriesBtnText.textContent = 'View Time Entries';
+                    viewTimeEntriesSpinner.classList.add('hidden');
+                    viewTimeEntriesBtn.disabled = false;
+                }
+            }
+            
+            // Display functions for Labor Management results
+            function displayEmployeeResults(employees, title) {
+                let html = `<div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+                    <h3 class="font-semibold text-lg mb-3">${title}</h3>`;
+                
+                if (employees.length === 0) {
+                    html += '<p class="text-gray-500">No employees found</p>';
+                } else {
+                    html += '<div class="overflow-x-auto"><table class="min-w-full text-sm"><thead class="bg-gray-50 dark:bg-gray-700"><tr>';
+                    html += '<th class="px-3 py-2 text-left font-medium">Name</th>';
+                    html += '<th class="px-3 py-2 text-left font-medium">Email</th>';
+                    html += '<th class="px-3 py-2 text-left font-medium">GUID</th>';
+                    html += '<th class="px-3 py-2 text-left font-medium">External ID</th>';
+                    html += '<th class="px-3 py-2 text-left font-medium">Status</th>';
+                    html += '</tr></thead><tbody class="divide-y divide-gray-200 dark:divide-gray-600">';
+                    
+                    employees.forEach(emp => {
+                        const fullName = [emp.firstName, emp.chosenName, emp.lastName].filter(n => n).join(' ');
+                        const statusClass = emp.deleted ? 'text-red-600' : 'text-green-600';
+                        const status = emp.deleted ? 'Deleted' : 'Active';
+                        
+                        html += `<tr class="hover:bg-gray-50 dark:hover:bg-gray-700">`;
+                        html += `<td class="px-3 py-2">${fullName || 'N/A'}</td>`;
+                        html += `<td class="px-3 py-2">${emp.email || 'N/A'}</td>`;
+                        html += `<td class="px-3 py-2 font-mono text-xs">${emp.guid || 'N/A'}</td>`;
+                        html += `<td class="px-3 py-2">${emp.externalId || 'N/A'}</td>`;
+                        html += `<td class="px-3 py-2 ${statusClass}">${status}</td>`;
+                        html += '</tr>';
+                    });
+                    
+                    html += '</tbody></table></div>';
+                }
+                
+                html += '</div>';
+                resultsContainer.innerHTML = html;
+            }
+            
+            function displayJobResults(jobs, title) {
+                let html = `<div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+                    <h3 class="font-semibold text-lg mb-3">${title}</h3>`;
+                
+                if (jobs.length === 0) {
+                    html += '<p class="text-gray-500">No jobs found</p>';
+                } else {
+                    html += '<div class="overflow-x-auto"><table class="min-w-full text-sm"><thead class="bg-gray-50 dark:bg-gray-700"><tr>';
+                    html += '<th class="px-3 py-2 text-left font-medium">Title</th>';
+                    html += '<th class="px-3 py-2 text-left font-medium">GUID</th>';
+                    html += '<th class="px-3 py-2 text-left font-medium">Default Wage</th>';
+                    html += '<th class="px-3 py-2 text-left font-medium">Tipped</th>';
+                    html += '<th class="px-3 py-2 text-left font-medium">Status</th>';
+                    html += '</tr></thead><tbody class="divide-y divide-gray-200 dark:divide-gray-600">';
+                    
+                    jobs.forEach(job => {
+                        const statusClass = job.deleted ? 'text-red-600' : 'text-green-600';
+                        const status = job.deleted ? 'Deleted' : 'Active';
+                        const wage = job.defaultWage ? `$${job.defaultWage}/${job.wageFrequency?.toLowerCase() || 'hr'}` : 'N/A';
+                        
+                        html += `<tr class="hover:bg-gray-50 dark:hover:bg-gray-700">`;
+                        html += `<td class="px-3 py-2">${job.title || 'N/A'}</td>`;
+                        html += `<td class="px-3 py-2 font-mono text-xs">${job.guid || 'N/A'}</td>`;
+                        html += `<td class="px-3 py-2">${wage}</td>`;
+                        html += `<td class="px-3 py-2">${job.tipped ? 'Yes' : 'No'}</td>`;
+                        html += `<td class="px-3 py-2 ${statusClass}">${status}</td>`;
+                        html += '</tr>';
+                    });
+                    
+                    html += '</tbody></table></div>';
+                }
+                
+                html += '</div>';
+                resultsContainer.innerHTML = html;
+            }
+            
+            function displayShiftResults(shifts, title) {
+                let html = `<div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+                    <h3 class="font-semibold text-lg mb-3">${title}</h3>`;
+                
+                if (shifts.length === 0) {
+                    html += '<p class="text-gray-500">No shifts found</p>';
+                } else {
+                    html += '<div class="overflow-x-auto"><table class="min-w-full text-sm"><thead class="bg-gray-50 dark:bg-gray-700"><tr>';
+                    html += '<th class="px-3 py-2 text-left font-medium">Employee</th>';
+                    html += '<th class="px-3 py-2 text-left font-medium">Job</th>';
+                    html += '<th class="px-3 py-2 text-left font-medium">Start</th>';
+                    html += '<th class="px-3 py-2 text-left font-medium">End</th>';
+                    html += '<th class="px-3 py-2 text-left font-medium">GUID</th>';
+                    html += '</tr></thead><tbody class="divide-y divide-gray-200 dark:divide-gray-600">';
+                    
+                    shifts.forEach(shift => {
+                        const startDate = new Date(shift.inDate).toLocaleDateString() + ' ' + new Date(shift.inDate).toLocaleTimeString();
+                        const endDate = new Date(shift.outDate).toLocaleDateString() + ' ' + new Date(shift.outDate).toLocaleTimeString();
+                        
+                        html += `<tr class="hover:bg-gray-50 dark:hover:bg-gray-700">`;
+                        html += `<td class="px-3 py-2">${shift.employeeReference?.guid?.slice(-8) || 'N/A'}</td>`;
+                        html += `<td class="px-3 py-2">${shift.jobReference?.guid?.slice(-8) || 'N/A'}</td>`;
+                        html += `<td class="px-3 py-2">${startDate}</td>`;
+                        html += `<td class="px-3 py-2">${endDate}</td>`;
+                        html += `<td class="px-3 py-2 font-mono text-xs">${shift.guid || 'N/A'}</td>`;
+                        html += '</tr>';
+                    });
+                    
+                    html += '</tbody></table></div>';
+                }
+                
+                html += '</div>';
+                resultsContainer.innerHTML = html;
+            }
+            
+            function displayTimeEntryResults(timeEntries, title) {
+                let html = `<div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+                    <h3 class="font-semibold text-lg mb-3">${title}</h3>`;
+                
+                if (timeEntries.length === 0) {
+                    html += '<p class="text-gray-500">No time entries found</p>';
+                } else {
+                    html += '<div class="overflow-x-auto"><table class="min-w-full text-sm"><thead class="bg-gray-50 dark:bg-gray-700"><tr>';
+                    html += '<th class="px-3 py-2 text-left font-medium">Employee</th>';
+                    html += '<th class="px-3 py-2 text-left font-medium">In Date</th>';
+                    html += '<th class="px-3 py-2 text-left font-medium">Out Date</th>';
+                    html += '<th class="px-3 py-2 text-left font-medium">Regular Hours</th>';
+                    html += '<th class="px-3 py-2 text-left font-medium">Tips</th>';
+                    html += '</tr></thead><tbody class="divide-y divide-gray-200 dark:divide-gray-600">';
+                    
+                    timeEntries.forEach(entry => {
+                        const inDate = entry.inDate ? new Date(entry.inDate).toLocaleDateString() + ' ' + new Date(entry.inDate).toLocaleTimeString() : 'N/A';
+                        const outDate = entry.outDate ? new Date(entry.outDate).toLocaleDateString() + ' ' + new Date(entry.outDate).toLocaleTimeString() : 'Still clocked in';
+                        const totalTips = ((entry.declaredCashTips || 0) + (entry.nonCashTips || 0)).toFixed(2);
+                        
+                        html += `<tr class="hover:bg-gray-50 dark:hover:bg-gray-700">`;
+                        html += `<td class="px-3 py-2">${entry.employeeReference?.guid?.slice(-8) || 'N/A'}</td>`;
+                        html += `<td class="px-3 py-2">${inDate}</td>`;
+                        html += `<td class="px-3 py-2">${outDate}</td>`;
+                        html += `<td class="px-3 py-2">${entry.regularHours || 0} hrs</td>`;
+                        html += `<td class="px-3 py-2">$${totalTips}</td>`;
+                        html += '</tr>';
+                    });
+                    
+                    html += '</tbody></table></div>';
+                }
+                
+                html += '</div>';
+                resultsContainer.innerHTML = html;
+            }
+
             // --- Event Listeners ---
             testProxyBtn.addEventListener('click', testProxyConnection);
             authBtn.addEventListener('click', handleAuthentication);
@@ -1848,6 +3034,8 @@
             });
             fetchWorkflowBtn.addEventListener('click', () => { currentWorkflow = 'fetch'; updateUIState(); resultsContainer.innerHTML='<p class="text-gray-500 dark:text-gray-400">Results will be displayed here.</p>' });
             updateWorkflowBtn.addEventListener('click', () => { currentWorkflow = 'update'; updateUIState(); resultsContainer.innerHTML='<p class="text-gray-500 dark:text-gray-400">Load an order to begin editing.</p>' });
+            stockWorkflowBtn.addEventListener('click', () => { currentWorkflow = 'stock'; updateUIState(); resultsContainer.innerHTML='<p class="text-gray-500 dark:text-gray-400">Inventory results will be displayed here.</p>' });
+            laborWorkflowBtn.addEventListener('click', () => { currentWorkflow = 'labor'; updateUIState(); resultsContainer.innerHTML='<p class="text-gray-500 dark:text-gray-400">Labor management results will be displayed here.</p>' });
             resetWorkflowBtns.forEach(btn => btn.addEventListener('click', () => { 
                 currentWorkflow = null; 
                 activeUpdateOrder = null; 
@@ -1946,6 +3134,36 @@
             resultsContainer.addEventListener('click', voidItem);
             resultsContainer.addEventListener('click', addItemsToCheck);
             resultsContainer.addEventListener('click', applyDiscountToOrder);
+            
+            // Stock Management
+            viewInventoryBtn.addEventListener('click', viewInventory);
+            searchInventoryBtn.addEventListener('click', searchInventory);
+            bulkUpdateInventoryBtn.addEventListener('click', bulkUpdateInventory);
+            addUpdateItemBtn.addEventListener('click', addUpdateItem);
+            
+            // Labor Management
+            fetchAllEmployeesBtn.addEventListener('click', fetchAllEmployees);
+            viewSelectedEmployeeBtn.addEventListener('click', viewSelectedEmployee);
+            autoFillEmployeeBtn.addEventListener('click', autoFillEmployeeData);
+            viewEmployeesBtn.addEventListener('click', viewEmployees);
+            addEmployeeBtn.addEventListener('click', addEmployee);
+            updateEmployeeBtn.addEventListener('click', updateEmployee);
+            viewJobsBtn.addEventListener('click', viewJobs);
+            assignJobsBtn.addEventListener('click', assignJobs);
+            viewShiftsBtn.addEventListener('click', viewShifts);
+            createShiftBtn.addEventListener('click', createShift);
+            viewTimeEntriesBtn.addEventListener('click', viewTimeEntries);
+            
+            // Time Entry Query Type Handler
+            timeEntryQuery.addEventListener('change', function() {
+                if (this.value === 'businessDate') {
+                    timeEntryDateInputs.style.display = 'none';
+                    timeEntryBusinessDateInput.style.display = 'block';
+                } else {
+                    timeEntryDateInputs.style.display = 'block';
+                    timeEntryBusinessDateInput.style.display = 'none';
+                }
+            });
 
             resultsContainer.addEventListener('click', (e) => {
                 if (e.target.id === 'stageItemBtn') {
