@@ -27,7 +27,7 @@
             to { transform: rotate(360deg); }
         }
         /* Hide sections by default, except proxy */
-        #workflowSelectionSection, #orderBuilderSection, #fetchOrderSection, #updateOrderSection, #stockManagementSection, #laborManagementSection, #resultsSection {
+        #workflowSelectionSection, #orderBuilderSection, #fetchOrderSection, #updateOrderSection, #stockManagementSection, #laborManagementSection, #menuManagementSection, #resultsSection {
             display: none;
         }
         details > summary {
@@ -1286,6 +1286,7 @@
                 updateOrderSection.style.display = 'none';
                 stockManagementSection.style.display = 'none';
                 laborManagementSection.style.display = 'none';
+                menuManagementSection.style.display = 'none';
                 resultsSection.style.display = 'none';
 
                 if (token) {
@@ -1348,6 +1349,9 @@
                                 break;
                             case 'labor':
                                 laborManagementSection.style.display = 'block';
+                                break;
+                            case 'menu':
+                                menuManagementSection.style.display = 'block';
                                 break;
                             default:
                                 break;
@@ -4311,6 +4315,12 @@
                 updateUIState(); 
                 toggleNavPanel(); // Close nav panel
                 resultsContainer.innerHTML='<p class="text-gray-500 dark:text-gray-400 text-sm">Labor management results will appear here...</p>' 
+            });
+            navMenuBtn.addEventListener('click', () => { 
+                currentWorkflow = 'menu'; 
+                updateUIState(); 
+                toggleNavPanel(); // Close nav panel
+                resultsContainer.innerHTML='<p class="text-gray-500 dark:text-gray-400 text-sm">Menu management results will appear here...</p>' 
             });
 
             // Config panel toggles
