@@ -750,6 +750,175 @@
                     </div>
                 </section>
 
+                <section id="menuManagementSection" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                    <div class="flex justify-between items-center mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">
+                        <h2 class="text-xl font-semibold">Menu Management</h2>
+                        <button class="resetWorkflowBtn text-sm text-blue-500 hover:underline">Change Workflow</button>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                        <!-- Menu Structure Management -->
+                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                            <h3 class="text-lg font-semibold mb-3 text-amber-600 dark:text-amber-400">📋 Menu Structure</h3>
+                            
+                            <!-- View All Menus -->
+                            <div class="mb-4">
+                                <h4 class="font-medium mb-2">Menus & Categories</h4>
+                                <div class="space-y-2">
+                                    <button id="fetchAllMenusBtn" class="w-full bg-amber-600 hover:bg-amber-700 text-white py-2 rounded-md transition text-sm flex items-center justify-center">
+                                        <span id="fetchAllMenusBtnText">Fetch All Menus</span>
+                                        <div id="fetchAllMenusSpinner" class="spinner ml-2 hidden"></div>
+                                    </button>
+                                    <div class="flex gap-2">
+                                        <select id="menuDropdown" class="flex-1 bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                            <option value="">Select a menu...</option>
+                                        </select>
+                                        <button id="viewSelectedMenuBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md transition text-sm" disabled>View Details</button>
+                                    </div>
+                                    <div id="viewMenusStatus" class="text-xs text-center mt-2"></div>
+                                </div>
+                            </div>
+
+                            <!-- Menu Groups Management -->
+                            <div class="border-t pt-3">
+                                <h4 class="font-medium mb-2">Menu Categories/Groups</h4>
+                                <div class="space-y-2">
+                                    <select id="menuGroupDropdown" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                        <option value="">Select a category...</option>
+                                    </select>
+                                    <div class="flex gap-2">
+                                        <button id="viewMenuGroupBtn" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-md transition text-sm flex items-center justify-center" disabled>
+                                            <span id="viewMenuGroupBtnText">View Category</span>
+                                            <div id="viewMenuGroupSpinner" class="spinner ml-2 hidden"></div>
+                                        </button>
+                                        <button id="createMenuGroupBtn" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-md transition text-sm">Create New</button>
+                                    </div>
+                                    <div id="viewMenuGroupStatus" class="text-xs text-center"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Menu Items Management -->
+                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                            <h3 class="text-lg font-semibold mb-3 text-emerald-600 dark:text-emerald-400">🍽️ Menu Items</h3>
+                            
+                            <!-- View & Search Items -->
+                            <div class="mb-4">
+                                <h4 class="font-medium mb-2">Items Management</h4>
+                                <div class="space-y-2">
+                                    <div class="flex gap-2">
+                                        <select id="menuItemDropdown" class="flex-1 bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                            <option value="">Select an item...</option>
+                                        </select>
+                                        <button id="viewSelectedItemBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md transition text-sm" disabled>View Details</button>
+                                    </div>
+                                    <input type="text" id="itemSearchInput" placeholder="Search items by name..." class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                    <div class="flex gap-2">
+                                        <button id="searchMenuItemsBtn" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-md transition text-sm flex items-center justify-center">
+                                            <span id="searchMenuItemsBtnText">Search Items</span>
+                                            <div id="searchMenuItemsSpinner" class="spinner ml-2 hidden"></div>
+                                        </button>
+                                        <button id="createMenuItemBtn" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-md transition text-sm">Create New</button>
+                                    </div>
+                                    <div id="searchMenuItemsStatus" class="text-xs text-center"></div>
+                                </div>
+                            </div>
+
+                            <!-- Item Operations -->
+                            <div class="border-t pt-3">
+                                <h4 class="font-medium mb-2">Item Operations</h4>
+                                <div class="space-y-2">
+                                    <select id="itemOperationDropdown" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                        <option value="">Select item for operations...</option>
+                                    </select>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <button id="updateItemPriceBtn" class="bg-yellow-600 hover:bg-yellow-700 text-white py-2 rounded-md transition text-sm" disabled>Update Price</button>
+                                        <button id="toggleItemAvailabilityBtn" class="bg-orange-600 hover:bg-orange-700 text-white py-2 rounded-md transition text-sm" disabled>Toggle Available</button>
+                                    </div>
+                                    <div id="itemOperationsStatus" class="text-xs text-center"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Modifier Management -->
+                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                            <h3 class="text-lg font-semibold mb-3 text-teal-600 dark:text-teal-400">🔧 Modifiers</h3>
+                            
+                            <!-- Modifier Groups -->
+                            <div class="mb-4">
+                                <h4 class="font-medium mb-2">Modifier Groups</h4>
+                                <div class="space-y-2">
+                                    <button id="fetchModifierGroupsBtn" class="w-full bg-teal-600 hover:bg-teal-700 text-white py-2 rounded-md transition text-sm flex items-center justify-center">
+                                        <span id="fetchModifierGroupsBtnText">Fetch Modifier Groups</span>
+                                        <div id="fetchModifierGroupsSpinner" class="spinner ml-2 hidden"></div>
+                                    </button>
+                                    <div class="flex gap-2">
+                                        <select id="modifierGroupDropdown" class="flex-1 bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                            <option value="">Select modifier group...</option>
+                                        </select>
+                                        <button id="viewModifierGroupBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md transition text-sm" disabled>View</button>
+                                    </div>
+                                    <div id="fetchModifierGroupsStatus" class="text-xs text-center"></div>
+                                </div>
+                            </div>
+
+                            <!-- Modifier Options -->
+                            <div class="border-t pt-3">
+                                <h4 class="font-medium mb-2">Modifier Options</h4>
+                                <div class="space-y-2">
+                                    <select id="modifierOptionDropdown" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                        <option value="">Select modifier option...</option>
+                                    </select>
+                                    <div class="flex gap-2">
+                                        <button id="viewModifierOptionsBtn" class="flex-1 bg-cyan-600 hover:bg-cyan-700 text-white py-2 rounded-md transition text-sm flex items-center justify-center">
+                                            <span id="viewModifierOptionsBtnText">View Options</span>
+                                            <div id="viewModifierOptionsSpinner" class="spinner ml-2 hidden"></div>
+                                        </button>
+                                        <button id="createModifierOptionBtn" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-md transition text-sm">Create</button>
+                                    </div>
+                                    <div id="viewModifierOptionsStatus" class="text-xs text-center"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bulk Operations -->
+                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                            <h3 class="text-lg font-semibold mb-3 text-rose-600 dark:text-rose-400">⚡ Bulk Operations</h3>
+                            
+                            <!-- Batch Updates -->
+                            <div class="mb-4">
+                                <h4 class="font-medium mb-2">Batch Operations</h4>
+                                <div class="space-y-2">
+                                    <select id="bulkOperationTypeSelect" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                        <option value="">Select operation type...</option>
+                                        <option value="price-update">Bulk Price Update</option>
+                                        <option value="availability-toggle">Bulk Availability Toggle</option>
+                                        <option value="category-move">Move Items to Category</option>
+                                    </select>
+                                    <textarea id="bulkItemsList" rows="3" placeholder="Enter item GUIDs or names (one per line)" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm"></textarea>
+                                    <button id="executeBulkOperationBtn" class="w-full bg-rose-600 hover:bg-rose-700 text-white py-2 rounded-md transition text-sm flex items-center justify-center" disabled>
+                                        <span id="executeBulkOperationBtnText">Execute Bulk Operation</span>
+                                        <div id="executeBulkOperationSpinner" class="spinner ml-2 hidden"></div>
+                                    </button>
+                                    <div id="bulkOperationStatus" class="text-xs text-center"></div>
+                                </div>
+                            </div>
+
+                            <!-- Menu Publishing -->
+                            <div class="border-t pt-3">
+                                <h4 class="font-medium mb-2">Menu Publishing</h4>
+                                <div class="space-y-2">
+                                    <div class="flex gap-2">
+                                        <button id="validateMenuBtn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md transition text-sm">Validate Menu</button>
+                                        <button id="publishMenuBtn" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-md transition text-sm">Publish Menu</button>
+                                    </div>
+                                    <div id="menuPublishingStatus" class="text-xs text-center"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
                 <section id="resultsSection" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
                      <h2 class="text-xl font-semibold mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">Results</h2>
                      <div id="resultsContainer" class="space-y-4 max-h-[32rem] overflow-y-auto">
@@ -1193,6 +1362,69 @@
             const customFieldKeyInput = document.getElementById('customFieldKey');
             const customFieldValueInput = document.getElementById('customFieldValue');
             const customFieldsList = document.getElementById('customFieldsList');
+
+            // Menu Management Elements
+            const menuManagementSection = document.getElementById('menuManagementSection');
+            
+            // Menu Structure
+            const fetchAllMenusBtn = document.getElementById('fetchAllMenusBtn');
+            const fetchAllMenusBtnText = document.getElementById('fetchAllMenusBtnText');
+            const fetchAllMenusSpinner = document.getElementById('fetchAllMenusSpinner');
+            const menuDropdown = document.getElementById('menuDropdown');
+            const viewSelectedMenuBtn = document.getElementById('viewSelectedMenuBtn');
+            const viewMenusStatus = document.getElementById('viewMenusStatus');
+            
+            // Menu Groups
+            const menuGroupDropdown = document.getElementById('menuGroupDropdown');
+            const viewMenuGroupBtn = document.getElementById('viewMenuGroupBtn');
+            const viewMenuGroupBtnText = document.getElementById('viewMenuGroupBtnText');
+            const viewMenuGroupSpinner = document.getElementById('viewMenuGroupSpinner');
+            const createMenuGroupBtn = document.getElementById('createMenuGroupBtn');
+            const viewMenuGroupStatus = document.getElementById('viewMenuGroupStatus');
+            
+            // Menu Items
+            const menuItemDropdown = document.getElementById('menuItemDropdown');
+            const viewSelectedItemBtn = document.getElementById('viewSelectedItemBtn');
+            const itemSearchInput = document.getElementById('itemSearchInput');
+            const searchMenuItemsBtn = document.getElementById('searchMenuItemsBtn');
+            const searchMenuItemsBtnText = document.getElementById('searchMenuItemsBtnText');
+            const searchMenuItemsSpinner = document.getElementById('searchMenuItemsSpinner');
+            const createMenuItemBtn = document.getElementById('createMenuItemBtn');
+            const searchMenuItemsStatus = document.getElementById('searchMenuItemsStatus');
+            
+            // Item Operations
+            const itemOperationDropdown = document.getElementById('itemOperationDropdown');
+            const updateItemPriceBtn = document.getElementById('updateItemPriceBtn');
+            const toggleItemAvailabilityBtn = document.getElementById('toggleItemAvailabilityBtn');
+            const itemOperationsStatus = document.getElementById('itemOperationsStatus');
+            
+            // Modifier Management
+            const fetchModifierGroupsBtn = document.getElementById('fetchModifierGroupsBtn');
+            const fetchModifierGroupsBtnText = document.getElementById('fetchModifierGroupsBtnText');
+            const fetchModifierGroupsSpinner = document.getElementById('fetchModifierGroupsSpinner');
+            const modifierGroupDropdown = document.getElementById('modifierGroupDropdown');
+            const viewModifierGroupBtn = document.getElementById('viewModifierGroupBtn');
+            const fetchModifierGroupsStatus = document.getElementById('fetchModifierGroupsStatus');
+            
+            const modifierOptionDropdown = document.getElementById('modifierOptionDropdown');
+            const viewModifierOptionsBtn = document.getElementById('viewModifierOptionsBtn');
+            const viewModifierOptionsBtnText = document.getElementById('viewModifierOptionsBtnText');
+            const viewModifierOptionsSpinner = document.getElementById('viewModifierOptionsSpinner');
+            const createModifierOptionBtn = document.getElementById('createModifierOptionBtn');
+            const viewModifierOptionsStatus = document.getElementById('viewModifierOptionsStatus');
+            
+            // Bulk Operations
+            const bulkOperationTypeSelect = document.getElementById('bulkOperationTypeSelect');
+            const bulkItemsList = document.getElementById('bulkItemsList');
+            const executeBulkOperationBtn = document.getElementById('executeBulkOperationBtn');
+            const executeBulkOperationBtnText = document.getElementById('executeBulkOperationBtnText');
+            const executeBulkOperationSpinner = document.getElementById('executeBulkOperationSpinner');
+            const bulkOperationStatus = document.getElementById('bulkOperationStatus');
+            
+            // Menu Publishing
+            const validateMenuBtn = document.getElementById('validateMenuBtn');
+            const publishMenuBtn = document.getElementById('publishMenuBtn');
+            const menuPublishingStatus = document.getElementById('menuPublishingStatus');
 
             const resultsSection = document.getElementById('resultsSection');
             const resultsContainer = document.getElementById('resultsContainer');
@@ -2786,6 +3018,13 @@
             // Store fetched employees and jobs for dropdowns
             let allEmployees = [];
             let allJobs = [];
+            
+            // Store fetched menu data for dropdowns
+            let allMenus = [];
+            let allMenuGroups = [];
+            let allMenuItems = [];
+            let allModifierGroups = [];
+            let allModifierOptions = [];
             
             // Employee Management Functions
             async function fetchAllEmployees() {
