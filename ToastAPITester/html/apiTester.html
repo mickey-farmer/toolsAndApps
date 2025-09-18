@@ -64,6 +64,24 @@
             opacity: 1;
             visibility: visible;
         }
+        
+        /* Navigation Panel Styles */
+        #navPanel {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        #navPanel.open {
+            transform: translateX(0);
+        }
+        #navOverlay {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+        #navOverlay.open {
+            opacity: 1;
+            visibility: visible;
+        }
 
         /* Troubleshooting Panel Styles */
         #troubleshootingPanel {
@@ -502,26 +520,48 @@
                         <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
                             <h3 class="text-lg font-semibold mb-3 text-purple-600 dark:text-purple-400">💼 Job Management</h3>
                             
-                            <!-- View Jobs -->
+                            <!-- Fetch & View Jobs -->
                             <div class="mb-4">
-                                <h4 class="font-medium mb-2">View Jobs</h4>
-                                <div class="flex gap-2 mb-2">
-                                    <input type="text" id="jobIdsInput" placeholder="Job IDs (optional, comma-separated)" class="flex-1 bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
-                                    <button id="viewJobsBtn" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-md transition text-sm flex items-center">
-                                        <span id="viewJobsBtnText">View</span>
-                                        <div id="viewJobsSpinner" class="spinner spinner-dark ml-1 hidden"></div>
+                                <h4 class="font-medium mb-2">Jobs</h4>
+                                <div class="space-y-2">
+                                    <button id="fetchAllJobsBtn" class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-md transition text-sm flex items-center justify-center">
+                                        <span id="fetchAllJobsBtnText">Fetch All Jobs</span>
+                                        <div id="fetchAllJobsSpinner" class="spinner ml-2 hidden"></div>
                                     </button>
+                                    <div class="flex gap-2">
+                                        <select id="jobDropdown" class="flex-1 bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                            <option value="">Select a job...</option>
+                                        </select>
+                                        <button id="viewSelectedJobBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md transition text-sm" disabled>View Details</button>
+                                    </div>
+                                    <details class="text-xs">
+                                        <summary class="cursor-pointer text-gray-500 hover:text-gray-700">Advanced: View by Job IDs</summary>
+                                        <div class="mt-2 flex gap-2">
+                                            <input type="text" id="jobIdsInput" placeholder="Job IDs (comma-separated)" class="flex-1 bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                            <button id="viewJobsBtn" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-md transition text-sm flex items-center">
+                                                <span id="viewJobsBtnText">View</span>
+                                                <div id="viewJobsSpinner" class="spinner spinner-dark ml-1 hidden"></div>
+                                            </button>
+                                        </div>
+                                    </details>
                                 </div>
-                                <div id="viewJobsStatus" class="text-xs text-center"></div>
+                                <div id="viewJobsStatus" class="text-xs text-center mt-2"></div>
                             </div>
 
                             <!-- Job Assignment -->
                             <div class="border-t pt-3">
                                 <h4 class="font-medium mb-2">Assign Jobs to Employee</h4>
                                 <div class="space-y-2">
-                                    <input type="text" id="assignJobEmployeeId" placeholder="Employee GUID" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
-                                    <textarea id="assignJobIds" rows="2" placeholder="Job GUIDs (comma-separated)" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm"></textarea>
-                                    <button id="assignJobsBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md transition text-sm flex items-center justify-center">
+                                    <select id="assignJobEmployeeDropdown" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                        <option value="">Select employee...</option>
+                                    </select>
+                                    <div class="space-y-1">
+                                        <label class="text-xs text-gray-600 dark:text-gray-400">Select Jobs to Assign:</label>
+                                        <div id="jobSelectionArea" class="max-h-32 overflow-y-auto border border-gray-300 dark:border-gray-500 rounded p-2 bg-white dark:bg-gray-600">
+                                            <p class="text-xs text-gray-500">Fetch jobs first to see available options</p>
+                                        </div>
+                                    </div>
+                                    <button id="assignJobsBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md transition text-sm flex items-center justify-center" disabled>
                                         <span id="assignJobsBtnText">Assign Jobs</span>
                                         <div id="assignJobsSpinner" class="spinner ml-2 hidden"></div>
                                     </button>
@@ -554,13 +594,42 @@
                             <div class="border-t pt-3">
                                 <h4 class="font-medium mb-2">Create New Shift</h4>
                                 <div class="space-y-2">
-                                    <input type="text" id="shiftEmployeeId" placeholder="Employee GUID" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
-                                    <input type="text" id="shiftJobId" placeholder="Job GUID" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
-                                    <div class="grid grid-cols-2 gap-2">
-                                        <input type="datetime-local" id="shiftStartTime" class="bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
-                                        <input type="datetime-local" id="shiftEndTime" class="bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                    <select id="shiftEmployeeDropdown" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                        <option value="">Select employee...</option>
+                                    </select>
+                                    <select id="shiftJobDropdown" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm" disabled>
+                                        <option value="">Select employee first...</option>
+                                    </select>
+                                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                        💡 Jobs will be filtered to show only positions assigned to the selected employee
                                     </div>
-                                    <button id="createShiftBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-md transition text-sm flex items-center justify-center">
+                                    <div class="space-y-2">
+                                        <div class="grid grid-cols-2 gap-2">
+                                            <div>
+                                                <label class="text-xs text-gray-600 dark:text-gray-400">Shift Start</label>
+                                                <input type="datetime-local" id="shiftStartTime" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                            </div>
+                                            <div>
+                                                <label class="text-xs text-gray-600 dark:text-gray-400">Shift End</label>
+                                                <input type="datetime-local" id="shiftEndTime" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex space-x-3 text-xs">
+                                                <button type="button" onclick="setTodayShiftTimes()" class="text-blue-600 dark:text-blue-400 hover:underline">
+                                                    📅 Today 9AM-5PM
+                                                </button>
+                                                <button type="button" onclick="setTomorrowMorningShift()" class="text-purple-600 dark:text-purple-400 hover:underline">
+                                                    🌅 Tomorrow 8AM-12PM
+                                                </button>
+                                                <button type="button" onclick="setSimpleTestShift()" class="text-green-600 dark:text-green-400 hover:underline">
+                                                    ⚡ Simple Test
+                                                </button>
+                                            </div>
+                                            <span class="text-xs text-gray-500" id="shiftDurationDisplay"></span>
+                                        </div>
+                                    </div>
+                                    <button id="createShiftBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-md transition text-sm flex items-center justify-center" disabled>
                                         <span id="createShiftBtnText">Create Shift</span>
                                         <div id="createShiftSpinner" class="spinner ml-2 hidden"></div>
                                     </button>
@@ -602,6 +671,81 @@
                                     <div id="viewTimeEntriesStatus" class="text-xs text-center"></div>
                                 </div>
                             </div>
+                            
+                            <!-- Create Time Entry -->
+                            <div class="border-t pt-3">
+                                <h4 class="font-medium mb-2">Create Time Entry</h4>
+                                <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-2 mb-3">
+                                    <div class="text-xs text-yellow-800 dark:text-yellow-200">
+                                        <strong>⚠️ Note:</strong> Time entry creation may be restricted by the Toast API for security reasons. 
+                                        If it fails, use the test scenarios to understand the data structure.
+                                    </div>
+                                </div>
+                                <div class="space-y-2">
+                                    <!-- Quick Test Scenarios -->
+                                    <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mb-3">
+                                        <h5 class="text-sm font-semibold text-blue-800 dark:text-blue-200 mb-2">🎯 Quick Test Scenarios</h5>
+                                        <div class="grid grid-cols-2 gap-2 text-xs">
+                                            <button type="button" onclick="setTimeEntryScenario('perfect')" class="bg-green-100 hover:bg-green-200 dark:bg-green-900/40 dark:hover:bg-green-900/60 text-green-800 dark:text-green-200 px-2 py-1 rounded">
+                                                ✅ Perfect Day
+                                            </button>
+                                            <button type="button" onclick="setTimeEntryScenario('late')" class="bg-yellow-100 hover:bg-yellow-200 dark:bg-yellow-900/40 dark:hover:bg-yellow-900/60 text-yellow-800 dark:text-yellow-200 px-2 py-1 rounded">
+                                                ⏰ Late Start
+                                            </button>
+                                            <button type="button" onclick="setTimeEntryScenario('overtime')" class="bg-orange-100 hover:bg-orange-200 dark:bg-orange-900/40 dark:hover:bg-orange-900/60 text-orange-800 dark:text-orange-200 px-2 py-1 rounded">
+                                                🔥 Overtime Shift
+                                            </button>
+                                            <button type="button" onclick="setTimeEntryScenario('short')" class="bg-red-100 hover:bg-red-200 dark:bg-red-900/40 dark:hover:bg-red-900/60 text-red-800 dark:text-red-200 px-2 py-1 rounded">
+                                                🏃 Left Early
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Employee & Job Selection -->
+                                    <select id="timeEntryEmployeeDropdown" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                        <option value="">Select employee...</option>
+                                    </select>
+                                    <select id="timeEntryJobDropdown" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm" disabled>
+                                        <option value="">Select employee first...</option>
+                                    </select>
+                                    
+                                    <!-- Work Period -->
+                                    <div class="space-y-2">
+                                        <div class="grid grid-cols-2 gap-2">
+                                            <div>
+                                                <label class="text-xs text-gray-600 dark:text-gray-400">Clock In</label>
+                                                <input type="datetime-local" id="timeEntryClockIn" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                            </div>
+                                            <div>
+                                                <label class="text-xs text-gray-600 dark:text-gray-400">Clock Out</label>
+                                                <input type="datetime-local" id="timeEntryClockOut" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-xs text-gray-500" id="timeEntryHoursDisplay"></span>
+                                            <span class="text-xs" id="timeEntryOvertimeWarning"></span>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Tips & Breaks -->
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label class="text-xs text-gray-600 dark:text-gray-400">Cash Tips ($)</label>
+                                            <input type="number" id="timeEntryCashTips" placeholder="0.00" step="0.01" min="0" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                        </div>
+                                        <div>
+                                            <label class="text-xs text-gray-600 dark:text-gray-400">Break Minutes</label>
+                                            <input type="number" id="timeEntryBreakMinutes" placeholder="30" min="0" max="480" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                        </div>
+                                    </div>
+                                    
+                                    <button id="createTimeEntryBtn" class="w-full bg-orange-600 hover:bg-orange-700 text-white py-2 rounded-md transition text-sm flex items-center justify-center" disabled>
+                                        <span id="createTimeEntryBtnText">Create Time Entry</span>
+                                        <div id="createTimeEntrySpinner" class="spinner ml-2 hidden"></div>
+                                    </button>
+                                    <div id="createTimeEntryStatus" class="text-xs text-center"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -636,12 +780,114 @@
         </section>
     </div>
 
-    <button id="toggleConfigBtn" class="fixed top-1/2 -translate-y-1/2 left-0 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-r-lg shadow-lg z-50 hidden">
+    <!-- Navigation Panel Toggle Button -->
+    <button id="toggleNavBtn" class="fixed top-1/3 -translate-y-1/2 left-0 bg-purple-600 hover:bg-purple-700 text-white p-3 rounded-r-lg shadow-lg z-50 hidden" title="API Workflows">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+    </button>
+    
+    <!-- Configuration Panel Toggle Button -->
+    <button id="toggleConfigBtn" class="fixed top-2/3 -translate-y-1/2 left-0 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-r-lg shadow-lg z-50 hidden" title="Configuration">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
             <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
         </svg>
     </button>
+    
+    <!-- Navigation Panel -->
+    <div id="navOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-30"></div>
+    <div id="navPanel" class="fixed top-0 left-0 h-full w-full md:w-1/3 lg:w-1/4 bg-white dark:bg-gray-800 shadow-2xl z-40 flex flex-col">
+        <div class="p-6 flex justify-between items-center border-b border-gray-200 dark:border-gray-700">
+            <h2 class="text-xl font-semibold">API Workflows</h2>
+            <button id="closeNavBtn" class="text-gray-500 hover:text-gray-800 dark:hover:text-gray-200">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <div class="flex-1 overflow-y-auto p-6">
+            <!-- Orders API Section -->
+            <div class="mb-6">
+                <div class="flex items-center mb-3">
+                    <div class="w-8 h-8 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center mr-3">
+                        <svg class="w-4 h-4 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Orders API</h3>
+                </div>
+                <div class="space-y-2 ml-11">
+                    <button id="navCreateOrderBtn" class="w-full text-left px-4 py-2 rounded-lg bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30 text-green-700 dark:text-green-300 transition">
+                        Create New Order
+                    </button>
+                    <button id="navFetchOrderBtn" class="w-full text-left px-4 py-2 rounded-lg bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 text-blue-700 dark:text-blue-300 transition">
+                        Fetch/Review Order
+                    </button>
+                    <button id="navUpdateOrderBtn" class="w-full text-left px-4 py-2 rounded-lg bg-purple-50 dark:bg-purple-900/20 hover:bg-purple-100 dark:hover:bg-purple-900/30 text-purple-700 dark:text-purple-300 transition">
+                        Update Existing Order
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Stock API Section -->
+            <div class="mb-6">
+                <div class="flex items-center mb-3">
+                    <div class="w-8 h-8 bg-orange-100 dark:bg-orange-900 rounded-lg flex items-center justify-center mr-3">
+                        <svg class="w-4 h-4 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Stock API</h3>
+                </div>
+                <div class="space-y-2 ml-11">
+                    <button id="navStockBtn" class="w-full text-left px-4 py-2 rounded-lg bg-orange-50 dark:bg-orange-900/20 hover:bg-orange-100 dark:hover:bg-orange-900/30 text-orange-700 dark:text-orange-300 transition">
+                        Manage Inventory
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Labor API Section -->
+            <div class="mb-6">
+                <div class="flex items-center mb-3">
+                    <div class="w-8 h-8 bg-indigo-100 dark:bg-indigo-900 rounded-lg flex items-center justify-center mr-3">
+                        <svg class="w-4 h-4 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Labor API</h3>
+                </div>
+                <div class="space-y-2 ml-11">
+                    <button id="navLaborBtn" class="w-full text-left px-4 py-2 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 transition">
+                        Manage Labor
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Future APIs placeholder -->
+            <div class="text-center py-8 text-gray-400">
+                <svg class="w-12 h-12 mx-auto mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                <p class="text-sm mb-4">More APIs coming soon...</p>
+                
+                <!-- Quick Help -->
+                <div class="text-left bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 text-xs">
+                    <div class="flex items-center mb-2">
+                        <span class="text-blue-600 dark:text-blue-400">💡</span>
+                        <span class="ml-2 font-medium text-blue-800 dark:text-blue-200">Getting Permission Errors?</span>
+                    </div>
+                    <p class="text-blue-700 dark:text-blue-300 mb-2">Your API client may need additional scopes to access certain resources.</p>
+                    <a href="https://doc.toasttab.com/doc/devguide/apiScopes.html" target="_blank" rel="noopener noreferrer" 
+                       class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium underline">
+                        View API Scopes Documentation →
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Configuration Panel -->
     <div id="configOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-30"></div>
     <div id="configPanel" class="fixed top-0 left-0 h-full w-full md:w-1/3 lg:w-1/4 bg-gray-50 dark:bg-gray-800 shadow-2xl z-40 flex flex-col">
         <div class="p-6 flex justify-between items-center border-b border-gray-200 dark:border-gray-700">
@@ -778,6 +1024,19 @@
             const discountValueInput = document.getElementById('discountValueInput');
             const discountValueLabel = document.getElementById('discountValueLabel');
             
+            // Navigation Panel Elements
+            const navPanel = document.getElementById('navPanel');
+            const navOverlay = document.getElementById('navOverlay');
+            const toggleNavBtn = document.getElementById('toggleNavBtn');
+            const closeNavBtn = document.getElementById('closeNavBtn');
+            
+            // Navigation Workflow Buttons
+            const navCreateOrderBtn = document.getElementById('navCreateOrderBtn');
+            const navFetchOrderBtn = document.getElementById('navFetchOrderBtn');
+            const navUpdateOrderBtn = document.getElementById('navUpdateOrderBtn');
+            const navStockBtn = document.getElementById('navStockBtn');
+            const navLaborBtn = document.getElementById('navLaborBtn');
+            
             // Config Panel Elements
             const configPanel = document.getElementById('configPanel');
             const configOverlay = document.getElementById('configOverlay');
@@ -860,7 +1119,7 @@
             const addEmployeeBtnText = document.getElementById('addEmployeeBtnText');
             const addEmployeeSpinner = document.getElementById('addEmployeeSpinner');
             const addEmployeeStatus = document.getElementById('addEmployeeStatus');
-            const updateEmployeeId = document.getElementById('updateEmployeeId');
+            const updateEmployeeDropdown = document.getElementById('updateEmployeeDropdown');
             const updateEmployeeFirstName = document.getElementById('updateEmployeeFirstName');
             const updateEmployeeLastName = document.getElementById('updateEmployeeLastName');
             const updateEmployeeBtn = document.getElementById('updateEmployeeBtn');
@@ -869,13 +1128,18 @@
             const updateEmployeeStatus = document.getElementById('updateEmployeeStatus');
             
             // Job Management
+            const fetchAllJobsBtn = document.getElementById('fetchAllJobsBtn');
+            const fetchAllJobsBtnText = document.getElementById('fetchAllJobsBtnText');
+            const fetchAllJobsSpinner = document.getElementById('fetchAllJobsSpinner');
+            const jobDropdown = document.getElementById('jobDropdown');
+            const viewSelectedJobBtn = document.getElementById('viewSelectedJobBtn');
             const jobIdsInput = document.getElementById('jobIdsInput');
             const viewJobsBtn = document.getElementById('viewJobsBtn');
             const viewJobsBtnText = document.getElementById('viewJobsBtnText');
             const viewJobsSpinner = document.getElementById('viewJobsSpinner');
             const viewJobsStatus = document.getElementById('viewJobsStatus');
-            const assignJobEmployeeId = document.getElementById('assignJobEmployeeId');
-            const assignJobIds = document.getElementById('assignJobIds');
+            const assignJobEmployeeDropdown = document.getElementById('assignJobEmployeeDropdown');
+            const jobSelectionArea = document.getElementById('jobSelectionArea');
             const assignJobsBtn = document.getElementById('assignJobsBtn');
             const assignJobsBtnText = document.getElementById('assignJobsBtnText');
             const assignJobsSpinner = document.getElementById('assignJobsSpinner');
@@ -888,8 +1152,8 @@
             const viewShiftsBtnText = document.getElementById('viewShiftsBtnText');
             const viewShiftsSpinner = document.getElementById('viewShiftsSpinner');
             const viewShiftsStatus = document.getElementById('viewShiftsStatus');
-            const shiftEmployeeId = document.getElementById('shiftEmployeeId');
-            const shiftJobId = document.getElementById('shiftJobId');
+            const shiftEmployeeDropdown = document.getElementById('shiftEmployeeDropdown');
+            const shiftJobDropdown = document.getElementById('shiftJobDropdown');
             const shiftStartTime = document.getElementById('shiftStartTime');
             const shiftEndTime = document.getElementById('shiftEndTime');
             const createShiftBtn = document.getElementById('createShiftBtn');
@@ -909,6 +1173,20 @@
             const viewTimeEntriesBtnText = document.getElementById('viewTimeEntriesBtnText');
             const viewTimeEntriesSpinner = document.getElementById('viewTimeEntriesSpinner');
             const viewTimeEntriesStatus = document.getElementById('viewTimeEntriesStatus');
+            
+            // Time Entry Creation
+            const timeEntryEmployeeDropdown = document.getElementById('timeEntryEmployeeDropdown');
+            const timeEntryJobDropdown = document.getElementById('timeEntryJobDropdown');
+            const timeEntryClockIn = document.getElementById('timeEntryClockIn');
+            const timeEntryClockOut = document.getElementById('timeEntryClockOut');
+            const timeEntryHoursDisplay = document.getElementById('timeEntryHoursDisplay');
+            const timeEntryOvertimeWarning = document.getElementById('timeEntryOvertimeWarning');
+            const timeEntryCashTips = document.getElementById('timeEntryCashTips');
+            const timeEntryBreakMinutes = document.getElementById('timeEntryBreakMinutes');
+            const createTimeEntryBtn = document.getElementById('createTimeEntryBtn');
+            const createTimeEntryBtnText = document.getElementById('createTimeEntryBtnText');
+            const createTimeEntrySpinner = document.getElementById('createTimeEntrySpinner');
+            const createTimeEntryStatus = document.getElementById('createTimeEntryStatus');
 
             // Custom Field Elements
             const addCustomFieldBtn = document.getElementById('addCustomFieldBtn');
@@ -1020,14 +1298,40 @@
                         configWrapper.style.display = 'none';
                         workflowWrapper.style.display = 'block';
                         toggleConfigBtn.classList.remove('hidden');
+                        toggleNavBtn.classList.remove('hidden');
                         
                         // Move config sections to the slide-out panel
                         configPanelContent.appendChild(savedLocationsSection);
                         configPanelContent.appendChild(authSection);
                         configPanelContent.appendChild(dataFetchSection);
                         
-                        workflowSelectionSection.style.display = 'block';
+                        // workflowSelectionSection.style.display = 'block'; // Now using navigation panel
                         resultsSection.style.display = 'block'; 
+                        
+                        // Show welcome message if no workflow is selected
+                        if (!currentWorkflow) {
+                            resultsContainer.innerHTML = `
+                                <div class="text-center py-12">
+                                    <div class="mb-6">
+                                        <svg class="w-16 h-16 mx-auto text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                                        </svg>
+                                    </div>
+                                    <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-3">Welcome to Toast API Test Client</h3>
+                                    <p class="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
+                                        Use the navigation menu (☰) on the left to select an API workflow and start testing Toast API endpoints.
+                                    </p>
+                                    <div class="flex justify-center">
+                                        <button id="welcomeNavBtn" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg transition inline-flex items-center">
+                                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                                            </svg>
+                                            Open API Workflows
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                        }
 
                         switch (currentWorkflow) {
                             case 'create':
@@ -1052,6 +1356,7 @@
                         configWrapper.style.display = 'block';
                         workflowWrapper.style.display = 'none';
                         toggleConfigBtn.classList.add('hidden');
+                        toggleNavBtn.classList.add('hidden');
                     }
                 } else {
                     authForm.style.display = 'block';
@@ -1062,8 +1367,22 @@
             function showInlineStatus(element, status, message, isError) {
                 if (!element) return;
                 const colorClass = isError ? 'text-red-500' : 'text-green-500';
-                element.innerHTML = `<p class="${colorClass} font-medium">[${status}] ${message}</p>`;
-                setTimeout(() => { element.innerHTML = ''; }, 5000);
+                
+                // Check if message contains HTML (for enhanced error messages like scope errors)
+                if (message.includes('<div') || message.includes('<p') || message.includes('<a')) {
+                    // For HTML messages, display them directly with just a status prefix
+                    element.innerHTML = `
+                        <div class="border-l-4 ${isError ? 'border-red-500 bg-red-50 dark:bg-red-900/10' : 'border-green-500 bg-green-50 dark:bg-green-900/10'} p-4 rounded-r-lg">
+                            <div class="text-xs font-mono ${colorClass} mb-2">[${status}]</div>
+                            ${message}
+                        </div>
+                    `;
+                    setTimeout(() => { element.innerHTML = ''; }, 15000); // Longer timeout for detailed messages
+                } else {
+                    // For simple text messages, use the original format
+                    element.innerHTML = `<p class="${colorClass} font-medium">[${status}] ${message}</p>`;
+                    setTimeout(() => { element.innerHTML = ''; }, 5000);
+                }
             }
             
             function renderApiLogHistory() {
@@ -1195,9 +1514,37 @@
                         options.body = JSON.stringify(body);
                     }
 
+                    // Debug logging for shift creation requests
+                    if (url.includes('shifts') && method === 'POST') {
+                        console.log('=== HTTP REQUEST DEBUG ===');
+                        console.log('URL:', url);
+                        console.log('Method:', method);
+                        console.log('Headers:', JSON.stringify(headers, null, 2));
+                        console.log('Body:', options.body);
+                        console.log('Request options:', JSON.stringify(options, null, 2));
+                    }
+
                     const response = await fetch(url, options);
                     const responseText = await response.text();
                     const data = responseText ? JSON.parse(responseText) : null;
+
+                    // Debug logging for POST responses
+                    if ((url.includes('shifts') || url.includes('timeEntries')) && method === 'POST') {
+                        console.log('=== HTTP RESPONSE DEBUG ===');
+                        console.log('Status:', response.status);
+                        console.log('Status Text:', response.statusText);
+                        console.log('Response Headers:', Object.fromEntries(response.headers.entries()));
+                        console.log('Allow Header:', response.headers.get('Allow')); // Shows allowed methods
+                        console.log('Response Body (raw):', responseText);
+                        console.log('Response Body (parsed):', data);
+                        console.log('Response OK:', response.ok);
+                        
+                        if (response.status === 405) {
+                            console.log('=== 405 METHOD NOT ALLOWED DEBUG ===');
+                            console.log('This endpoint does not support POST method');
+                            console.log('Allowed methods:', response.headers.get('Allow') || 'Not specified');
+                        }
+                    }
 
 
                     if (response.ok) {
@@ -1211,7 +1558,29 @@
                     } else {
                         let errorMessage = (data && data.message) || 'An error occurred.';
                         if (errorMessage.includes('You are not permitted to access this resource')) {
-                            errorMessage += ' You may be missing the required scope for this action.';
+                            errorMessage = `
+                                <div class="space-y-3">
+                                    <div class="font-semibold text-red-700 dark:text-red-300">🔒 Permission Denied</div>
+                                    <div class="text-sm">
+                                        <p class="mb-2">You don't have the required API scopes to access this resource.</p>
+                                        <p class="mb-3"><strong>What this means:</strong> Your Toast API client credentials may not be configured with the correct permissions for this operation.</p>
+                                        <div class="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 p-3 mb-3">
+                                            <p class="text-yellow-800 dark:text-yellow-200 text-xs">
+                                                <strong>💡 Next Steps:</strong><br>
+                                                • Contact your Toast integration team to request the required scopes<br>
+                                                • Review the scopes documentation to understand what permissions you need<br>
+                                                • Verify your API client has the correct scopes for this functionality
+                                            </p>
+                                        </div>
+                                        <div class="flex items-center space-x-2">
+                                            <span class="text-xs">📖</span>
+                                            <a href="https://doc.toasttab.com/doc/devguide/apiScopes.html" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium underline">
+                                                View Toast API Scopes Documentation
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
                         }
 
                         logApiCall({
@@ -2410,8 +2779,9 @@
 
             // --- Labor Management Functions ---
             
-            // Store fetched employees for dropdown
+            // Store fetched employees and jobs for dropdowns
             let allEmployees = [];
+            let allJobs = [];
             
             // Employee Management Functions
             async function fetchAllEmployees() {
@@ -2428,18 +2798,18 @@
                         viewEmployeesStatus.innerHTML = `<span class="text-red-600">✗ Failed: ${result.error}</span>`;
                     } else {
                         allEmployees = result.data || [];
+                        
+                        console.log('=== EMPLOYEE FETCH SUCCESS ===');
+                        console.log('Total employees fetched:', allEmployees.length);
+                        if (allEmployees.length > 0) {
+                            console.log('Sample employee data structure:', allEmployees[0]);
+                            console.log('Sample employee properties:', Object.keys(allEmployees[0]));
+                        }
+                        
                         viewEmployeesStatus.innerHTML = `<span class="text-green-600">✓ Found ${allEmployees.length} employees</span>`;
                         
                         // Populate dropdown
-                        employeeDropdown.innerHTML = '<option value="">Select an employee...</option>';
-                        allEmployees.forEach(emp => {
-                            const fullName = [emp.firstName, emp.chosenName, emp.lastName].filter(n => n).join(' ');
-                            const displayName = fullName || emp.email || emp.guid.slice(-8);
-                            employeeDropdown.innerHTML += `<option value="${emp.guid}">${displayName} (${emp.guid.slice(-8)})</option>`;
-                        });
-                        
-                        // Enable the view details button
-                        viewSelectedEmployeeBtn.disabled = false;
+                        populateEmployeeDropdowns();
                         
                         displayEmployeeResults(allEmployees, 'All Employees');
                     }
@@ -2482,6 +2852,104 @@
                 
                 // Show feedback
                 addEmployeeStatus.innerHTML = `<span class="text-blue-600">✓ Test data filled! Ready to add employee.</span>`;
+            }
+            
+            function populateEmployeeDropdowns() {
+                const dropdowns = [employeeDropdown, updateEmployeeDropdown, assignJobEmployeeDropdown, shiftEmployeeDropdown, timeEntryEmployeeDropdown];
+                
+                dropdowns.forEach(dropdown => {
+                    if (dropdown) {
+                        dropdown.innerHTML = '<option value="">Select an employee...</option>';
+                        allEmployees.forEach(emp => {
+                            const fullName = [emp.firstName, emp.chosenName, emp.lastName].filter(n => n).join(' ');
+                            const displayName = fullName || emp.email || emp.guid.slice(-8);
+                            dropdown.innerHTML += `<option value="${emp.guid}">${displayName} (${emp.guid.slice(-8)})</option>`;
+                        });
+                    }
+                });
+                
+                // Enable buttons that depend on employee data
+                viewSelectedEmployeeBtn.disabled = false;
+                updateEmployeeBtn.disabled = false;
+                assignJobsBtn.disabled = (allJobs.length === 0); // Only enable if jobs are also fetched
+                createShiftBtn.disabled = (allJobs.length === 0); // Only enable if jobs are also fetched
+            }
+            
+            function populateJobDropdowns() {
+                // Populate regular job dropdown (for viewing jobs)
+                if (jobDropdown) {
+                    jobDropdown.innerHTML = '<option value="">Select a job...</option>';
+                    allJobs.forEach(job => {
+                        const displayName = job.title || job.guid.slice(-8);
+                        jobDropdown.innerHTML += `<option value="${job.guid}">${displayName} (${job.guid.slice(-8)})</option>`;
+                    });
+                }
+                
+                // For shift job dropdown, use the employee-aware filtering
+                updateShiftJobDropdownForEmployee();
+                
+                // Populate job selection area for assignment
+                if (jobSelectionArea && allJobs.length > 0) {
+                    jobSelectionArea.innerHTML = '';
+                    allJobs.forEach(job => {
+                        const displayName = job.title || job.guid.slice(-8);
+                        jobSelectionArea.innerHTML += `
+                            <label class="flex items-center text-sm mb-1">
+                                <input type="checkbox" value="${job.guid}" class="mr-2 job-checkbox">
+                                ${displayName} (${job.guid.slice(-8)})
+                            </label>`;
+                    });
+                }
+                
+                // Enable buttons that depend on job data
+                viewSelectedJobBtn.disabled = false;
+                assignJobsBtn.disabled = (allEmployees.length === 0); // Only enable if employees are also fetched
+                createShiftBtn.disabled = (allEmployees.length === 0); // Only enable if employees are also fetched
+            }
+            
+            // Job Management Functions
+            async function fetchAllJobs() {
+                fetchAllJobsBtnText.textContent = 'Fetching...';
+                fetchAllJobsSpinner.classList.remove('hidden');
+                fetchAllJobsBtn.disabled = true;
+                viewJobsStatus.innerHTML = '';
+                
+                try {
+                    const url = CORS_PROXY + environmentSelect.value + JOBS_PATH_BASE;
+                    const result = await makeApiCall(url, 'GET');
+                    
+                    if (result.error) {
+                        viewJobsStatus.innerHTML = `<span class="text-red-600">✗ Failed: ${result.error}</span>`;
+                    } else {
+                        allJobs = result.data || [];
+                        viewJobsStatus.innerHTML = `<span class="text-green-600">✓ Found ${allJobs.length} jobs</span>`;
+                        
+                        // Populate dropdowns
+                        populateJobDropdowns();
+                        
+                        displayJobResults(allJobs, 'All Jobs');
+                    }
+                } catch (error) {
+                    viewJobsStatus.innerHTML = `<span class="text-red-600">✗ Error: ${error.message}</span>`;
+                } finally {
+                    fetchAllJobsBtnText.textContent = 'Fetch All Jobs';
+                    fetchAllJobsSpinner.classList.add('hidden');
+                    fetchAllJobsBtn.disabled = false;
+                }
+            }
+            
+            function viewSelectedJob() {
+                const selectedGuid = jobDropdown.value;
+                if (!selectedGuid) {
+                    viewJobsStatus.innerHTML = `<span class="text-yellow-600">Please select a job first</span>`;
+                    return;
+                }
+                
+                const selectedJob = allJobs.find(job => job.guid === selectedGuid);
+                if (selectedJob) {
+                    displayJobResults([selectedJob], 'Selected Job Details');
+                    viewJobsStatus.innerHTML = `<span class="text-green-600">✓ Showing details for selected job</span>`;
+                }
             }
             
             async function viewEmployees() {
@@ -2572,12 +3040,12 @@
             }
             
             async function updateEmployee() {
-                const employeeId = updateEmployeeId.value.trim();
+                const employeeId = updateEmployeeDropdown.value;
                 const firstName = updateEmployeeFirstName.value.trim();
                 const lastName = updateEmployeeLastName.value.trim();
                 
                 if (!employeeId) {
-                    updateEmployeeStatus.innerHTML = `<span class="text-yellow-600">Please enter an employee ID</span>`;
+                    updateEmployeeStatus.innerHTML = `<span class="text-yellow-600">Please select an employee first</span>`;
                     return;
                 }
                 
@@ -2651,11 +3119,16 @@
             }
             
             async function assignJobs() {
-                const employeeId = assignJobEmployeeId.value.trim();
-                const jobIds = assignJobIds.value.trim();
+                const employeeId = assignJobEmployeeDropdown.value;
+                const selectedJobCheckboxes = jobSelectionArea.querySelectorAll('.job-checkbox:checked');
                 
-                if (!employeeId || !jobIds) {
-                    assignJobsStatus.innerHTML = `<span class="text-yellow-600">Please enter employee ID and job IDs</span>`;
+                if (!employeeId) {
+                    assignJobsStatus.innerHTML = `<span class="text-yellow-600">Please select an employee</span>`;
+                    return;
+                }
+                
+                if (selectedJobCheckboxes.length === 0) {
+                    assignJobsStatus.innerHTML = `<span class="text-yellow-600">Please select at least one job</span>`;
                     return;
                 }
                 
@@ -2665,7 +3138,7 @@
                 assignJobsStatus.innerHTML = '';
                 
                 try {
-                    const ids = jobIds.split(',').map(id => id.trim()).filter(id => id);
+                    const ids = Array.from(selectedJobCheckboxes).map(checkbox => checkbox.value);
                     const jobReferences = ids.map(id => {
                         // Check if it's a GUID or external ID
                         if (id.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
@@ -2682,6 +3155,26 @@
                         assignJobsStatus.innerHTML = `<span class="text-red-600">✗ Failed: ${result.error}</span>`;
                     } else {
                         const updatedEmployee = result.data;
+                        
+                        console.log('=== JOB ASSIGNMENT SUCCESS ===');
+                        console.log('Updated employee data:', updatedEmployee);
+                        console.log('Updated employee properties:', Object.keys(updatedEmployee));
+                        
+                        // Update the employee in the allEmployees array
+                        const employeeIndex = allEmployees.findIndex(emp => emp.guid === employeeId);
+                        if (employeeIndex !== -1) {
+                            console.log('Updating employee in allEmployees array at index:', employeeIndex);
+                            console.log('Old employee data:', allEmployees[employeeIndex]);
+                            allEmployees[employeeIndex] = updatedEmployee;
+                            console.log('New employee data:', allEmployees[employeeIndex]);
+                            
+                            // Repopulate dropdowns with updated data
+                            populateEmployeeDropdowns();
+                            updateShiftJobDropdownForEmployee();
+                        } else {
+                            console.warn('Could not find employee in allEmployees array to update');
+                        }
+                        
                         assignJobsStatus.innerHTML = `<span class="text-green-600">✓ Jobs assigned successfully</span>`;
                         displayEmployeeResults([updatedEmployee], 'Employee with Updated Jobs');
                     }
@@ -2721,7 +3214,12 @@
                     } else {
                         const shifts = result.data || [];
                         viewShiftsStatus.innerHTML = `<span class="text-green-600">✓ Found ${shifts.length} shifts</span>`;
-                        displayShiftResults(shifts, 'Shifts');
+                        displayShiftResults(shifts, 'Shifts', { 
+                            startDate: startDate, 
+                            endDate: endDate, 
+                            startISO: startISO, 
+                            endISO: endISO 
+                        });
                     }
                 } catch (error) {
                     viewShiftsStatus.innerHTML = `<span class="text-red-600">✗ Error: ${error.message}</span>`;
@@ -2733,13 +3231,38 @@
             }
             
             async function createShift() {
-                const employeeId = shiftEmployeeId.value.trim();
-                const jobId = shiftJobId.value.trim();
+                const employeeId = shiftEmployeeDropdown.value;
+                const jobId = shiftJobDropdown.value;
                 const startTime = shiftStartTime.value;
                 const endTime = shiftEndTime.value;
                 
                 if (!employeeId || !jobId || !startTime || !endTime) {
                     createShiftStatus.innerHTML = `<span class="text-yellow-600">Please fill in all fields</span>`;
+                    return;
+                }
+                
+                // Validate dates
+                const startDate = new Date(startTime);
+                const endDate = new Date(endTime);
+                
+                if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+                    createShiftStatus.innerHTML = `<span class="text-red-600">Invalid date/time format</span>`;
+                    return;
+                }
+                
+                if (endDate <= startDate) {
+                    createShiftStatus.innerHTML = `<span class="text-red-600">End time must be after start time</span>`;
+                    return;
+                }
+                
+                // Validate GUIDs format (basic check)
+                const guidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+                if (!guidRegex.test(employeeId)) {
+                    createShiftStatus.innerHTML = `<span class="text-red-600">Invalid employee GUID format</span>`;
+                    return;
+                }
+                if (!guidRegex.test(jobId)) {
+                    createShiftStatus.innerHTML = `<span class="text-red-600">Invalid job GUID format</span>`;
                     return;
                 }
                 
@@ -2749,35 +3272,54 @@
                 createShiftStatus.innerHTML = '';
                 
                 try {
+                    // Always use +0000 date format (confirmed working)
                     const shiftData = {
                         entityType: 'Shift',
-                        employeeReference: {
-                            guid: employeeId,
-                            entityType: 'RestaurantUser'
-                        },
                         jobReference: {
                             guid: jobId,
                             entityType: 'RestaurantJob'
                         },
-                        inDate: new Date(startTime).toISOString(),
-                        outDate: new Date(endTime).toISOString()
+                        employeeReference: {
+                            guid: employeeId,
+                            entityType: 'RestaurantUser'
+                        },
+                        inDate: startDate.toISOString().replace('Z', '+0000'),
+                        outDate: endDate.toISOString().replace('Z', '+0000')
                     };
                     
                     const url = CORS_PROXY + environmentSelect.value + SHIFTS_PATH;
+                    
+                    // Debug logging to help troubleshoot
+                    console.log('=== SHIFT CREATION DEBUG ===');
+                    console.log('Full URL:', url);
+                    console.log('Method: POST');
+                    console.log('Employee GUID:', employeeId);
+                    console.log('Job GUID:', jobId);
+                    console.log('Raw start time:', startTime);
+                    console.log('Raw end time:', endTime);
+                    console.log('Parsed start date:', startDate);
+                    console.log('Parsed end date:', endDate);
+                    console.log('Final payload (using +0000 format):', JSON.stringify(shiftData, null, 2));
+                    
                     const result = await makeApiCall(url, 'POST', shiftData);
                     
                     if (result.error) {
-                        createShiftStatus.innerHTML = `<span class="text-red-600">✗ Failed: ${result.error}</span>`;
+                        const errorMessage = typeof result.error === 'object' ? 
+                            result.error.message || JSON.stringify(result.error) : 
+                            result.error;
+                        console.error('Shift creation failed:', result.error);
+                        createShiftStatus.innerHTML = `<span class="text-red-600">✗ Failed: ${errorMessage}</span>`;
                     } else {
                         const newShift = result.data;
                         createShiftStatus.innerHTML = `<span class="text-green-600">✓ Shift created successfully</span>`;
                         displayShiftResults([newShift], 'New Shift Created');
                         
                         // Clear form
-                        shiftEmployeeId.value = '';
-                        shiftJobId.value = '';
+                        shiftEmployeeDropdown.value = '';
+                        shiftJobDropdown.value = '';
                         shiftStartTime.value = '';
                         shiftEndTime.value = '';
+                        updateShiftDurationDisplay();
                     }
                 } catch (error) {
                     createShiftStatus.innerHTML = `<span class="text-red-600">✗ Error: ${error.message}</span>`;
@@ -2855,7 +3397,405 @@
                 }
             }
             
+            // Time Entry Creation Functions
+            window.setTimeEntryScenario = function(scenario) {
+                if (!allEmployees || allEmployees.length === 0) {
+                    createTimeEntryStatus.innerHTML = `<span class="text-yellow-600">Please fetch employees first</span>`;
+                    return;
+                }
+                
+                // Set employee to first available
+                const firstEmployee = allEmployees.find(emp => !emp.deleted);
+                if (firstEmployee) {
+                    timeEntryEmployeeDropdown.value = firstEmployee.guid;
+                    updateTimeEntryJobDropdown();
+                }
+                
+                const now = new Date();
+                let clockIn, clockOut, tips = 0, breakMinutes = 30;
+                
+                switch(scenario) {
+                    case 'perfect':
+                        // Perfect 8-hour shift: 9 AM - 5 PM today
+                        clockIn = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 9, 0);
+                        clockOut = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 17, 0);
+                        tips = 45.50;
+                        breakMinutes = 30;
+                        break;
+                        
+                    case 'late':
+                        // Late start: 9:20 AM - 5:00 PM (20 minutes late)
+                        clockIn = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 9, 20);
+                        clockOut = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 17, 0);
+                        tips = 38.25;
+                        breakMinutes = 30;
+                        break;
+                        
+                    case 'overtime':
+                        // Long day: 8 AM - 7 PM (11 hours, 3 hours overtime)
+                        clockIn = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 8, 0);
+                        clockOut = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 19, 0);
+                        tips = 125.75;
+                        breakMinutes = 45; // Longer break for longer shift
+                        break;
+                        
+                    case 'short':
+                        // Left early: 10 AM - 2:30 PM (4.5 hours, slow day)
+                        clockIn = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 10, 0);
+                        clockOut = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 14, 30);
+                        tips = 18.50;
+                        breakMinutes = 15; // Short break for short shift
+                        break;
+                }
+                
+                timeEntryClockIn.value = clockIn.toISOString().slice(0, 16);
+                timeEntryClockOut.value = clockOut.toISOString().slice(0, 16);
+                timeEntryCashTips.value = tips.toFixed(2);
+                timeEntryBreakMinutes.value = breakMinutes;
+                
+                updateTimeEntryHours();
+                updateCreateTimeEntryButtonState();
+                
+                // Show scenario info
+                const scenarioNames = {
+                    'perfect': '✅ Perfect Day - 8 hours, on time',
+                    'late': '⏰ Late Start - Started 20 min late', 
+                    'overtime': '🔥 Overtime Shift - 11 hours worked',
+                    'short': '🏃 Left Early - Short 4.5 hour shift'
+                };
+                createTimeEntryStatus.innerHTML = `<span class="text-blue-600">${scenarioNames[scenario]} scenario loaded</span>`;
+            };
+            
+            function updateTimeEntryJobDropdown() {
+                const selectedEmployeeGuid = timeEntryEmployeeDropdown.value;
+                
+                // Clear the job dropdown first
+                timeEntryJobDropdown.innerHTML = '<option value="">Select job...</option>';
+                
+                if (!selectedEmployeeGuid) {
+                    timeEntryJobDropdown.disabled = true;
+                    timeEntryJobDropdown.innerHTML = '<option value="">Select employee first...</option>';
+                    return;
+                }
+                
+                // Get jobs assigned to this employee
+                const assignedJobGuids = getEmployeeJobGuids(selectedEmployeeGuid);
+                
+                if (assignedJobGuids.length === 0) {
+                    // Employee has no assigned jobs, show all jobs with warning
+                    timeEntryJobDropdown.disabled = false;
+                    timeEntryJobDropdown.innerHTML = '<option value="">⚠️ Employee has no assigned jobs</option>';
+                    if (allJobs && allJobs.length > 0) {
+                        allJobs.forEach(job => {
+                            if (!job.deleted) {
+                                timeEntryJobDropdown.innerHTML += `<option value="${job.guid}">⚠️ ${job.title} (not assigned)</option>`;
+                            }
+                        });
+                    }
+                } else {
+                    // Show only assigned jobs
+                    timeEntryJobDropdown.disabled = false;
+                    assignedJobGuids.forEach(jobGuid => {
+                        const job = allJobs?.find(j => j.guid === jobGuid);
+                        if (job && !job.deleted) {
+                            timeEntryJobDropdown.innerHTML += `<option value="${job.guid}">✅ ${job.title}</option>`;
+                        }
+                    });
+                }
+                
+                updateCreateTimeEntryButtonState();
+            }
+            
+            function updateTimeEntryHours() {
+                const clockIn = timeEntryClockIn.value;
+                const clockOut = timeEntryClockOut.value;
+                
+                if (!clockIn || !clockOut) {
+                    timeEntryHoursDisplay.textContent = '';
+                    timeEntryOvertimeWarning.textContent = '';
+                    return;
+                }
+                
+                const startTime = new Date(clockIn);
+                const endTime = new Date(clockOut);
+                
+                if (endTime <= startTime) {
+                    timeEntryHoursDisplay.textContent = 'Invalid times';
+                    timeEntryHoursDisplay.className = 'text-xs text-red-600 dark:text-red-400';
+                    timeEntryOvertimeWarning.textContent = '';
+                    return;
+                }
+                
+                const totalHours = (endTime - startTime) / (1000 * 60 * 60);
+                const breakMinutes = parseInt(timeEntryBreakMinutes.value) || 0;
+                const workHours = totalHours - (breakMinutes / 60);
+                
+                timeEntryHoursDisplay.textContent = `${workHours.toFixed(1)} work hours (${totalHours.toFixed(1)} total)`;
+                timeEntryHoursDisplay.className = 'text-xs text-green-600 dark:text-green-400 font-medium';
+                
+                // Show overtime warning
+                if (workHours > 8) {
+                    const overtimeHours = workHours - 8;
+                    timeEntryOvertimeWarning.textContent = `⚠️ ${overtimeHours.toFixed(1)}h OT`;
+                    timeEntryOvertimeWarning.className = 'text-xs text-orange-600 dark:text-orange-400 font-bold';
+                } else {
+                    timeEntryOvertimeWarning.textContent = '';
+                }
+            }
+            
+            function updateCreateTimeEntryButtonState() {
+                const hasEmployee = timeEntryEmployeeDropdown.value !== '';
+                const hasJob = timeEntryJobDropdown.value !== '';
+                const hasClockIn = timeEntryClockIn.value !== '';
+                const hasClockOut = timeEntryClockOut.value !== '';
+                
+                createTimeEntryBtn.disabled = !(hasEmployee && hasJob && hasClockIn && hasClockOut);
+            }
+            
+            async function createTimeEntry() {
+                const employeeId = timeEntryEmployeeDropdown.value;
+                const jobId = timeEntryJobDropdown.value;
+                const clockInTime = timeEntryClockIn.value;
+                const clockOutTime = timeEntryClockOut.value;
+                
+                if (!employeeId || !jobId || !clockInTime || !clockOutTime) {
+                    createTimeEntryStatus.innerHTML = `<span class="text-yellow-600">Please fill in all required fields</span>`;
+                    return;
+                }
+                
+                // Validate times
+                const startDate = new Date(clockInTime);
+                const endDate = new Date(clockOutTime);
+                
+                if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+                    createTimeEntryStatus.innerHTML = `<span class="text-red-600">Invalid date/time format</span>`;
+                    return;
+                }
+                
+                if (endDate <= startDate) {
+                    createTimeEntryStatus.innerHTML = `<span class="text-red-600">Clock out time must be after clock in time</span>`;
+                    return;
+                }
+                
+                // Validate GUIDs format
+                const guidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+                if (!guidRegex.test(employeeId)) {
+                    createTimeEntryStatus.innerHTML = `<span class="text-red-600">Invalid employee GUID format</span>`;
+                    return;
+                }
+                if (!guidRegex.test(jobId)) {
+                    createTimeEntryStatus.innerHTML = `<span class="text-red-600">Invalid job GUID format</span>`;
+                    return;
+                }
+                
+                createTimeEntryBtnText.textContent = 'Creating...';
+                createTimeEntrySpinner.classList.remove('hidden');
+                createTimeEntryBtn.disabled = true;
+                createTimeEntryStatus.innerHTML = '';
+                
+                try {
+                    // Calculate work hours
+                    const totalHours = (endDate - startDate) / (1000 * 60 * 60);
+                    const breakMinutes = parseInt(timeEntryBreakMinutes.value) || 0;
+                    const regularHours = totalHours - (breakMinutes / 60);
+                    
+                    const timeEntryData = {
+                        entityType: 'TimeEntry',
+                        employeeReference: {
+                            guid: employeeId,
+                            entityType: 'RestaurantUser'
+                        },
+                        jobReference: {
+                            guid: jobId,
+                            entityType: 'RestaurantJob'
+                        },
+                        inDate: startDate.toISOString().replace('Z', '+0000'),
+                        outDate: endDate.toISOString().replace('Z', '+0000'),
+                        regularHours: parseFloat(regularHours.toFixed(2)),
+                        declaredCashTips: parseFloat(timeEntryCashTips.value) || 0
+                    };
+                    
+                    // Add break information if specified
+                    if (breakMinutes > 0) {
+                        // Calculate break start time (middle of shift)
+                        const breakStart = new Date(startDate.getTime() + (endDate - startDate) / 2 - (breakMinutes * 60 * 1000) / 2);
+                        const breakEnd = new Date(breakStart.getTime() + breakMinutes * 60 * 1000);
+                        
+                        timeEntryData.breaks = [{
+                            startTime: breakStart.toISOString().replace('Z', '+0000'),
+                            endTime: breakEnd.toISOString().replace('Z', '+0000')
+                        }];
+                    }
+                    
+                    const url = CORS_PROXY + environmentSelect.value + TIME_ENTRIES_PATH;
+                    
+                    // Debug logging
+                    console.log('=== TIME ENTRY CREATION DEBUG ===');
+                    console.log('Full URL:', url);
+                    console.log('Employee GUID:', employeeId);
+                    console.log('Job GUID:', jobId);
+                    console.log('Clock in time:', clockInTime);
+                    console.log('Clock out time:', clockOutTime);
+                    console.log('Calculated regular hours:', regularHours);
+                    console.log('Final payload:', JSON.stringify(timeEntryData, null, 2));
+                    
+                    const result = await makeApiCall(url, 'POST', timeEntryData);
+                    
+                    if (result.error) {
+                        const errorMessage = typeof result.error === 'object' ? 
+                            result.error.message || JSON.stringify(result.error) : 
+                            result.error;
+                        console.error('Time entry creation failed:', result.error);
+                        
+                        // Special handling for 405 Method Not Allowed
+                        if (errorMessage.includes('405') || errorMessage.toLowerCase().includes('method not allowed')) {
+                            createTimeEntryStatus.innerHTML = `
+                                <div class="space-y-2 text-left">
+                                    <div class="text-red-600 font-semibold">⛔ Time Entry Creation Not Supported</div>
+                                    <div class="text-xs text-gray-600 dark:text-gray-400">
+                                        <p class="mb-2">The Toast API doesn't allow creating time entries via POST requests.</p>
+                                        <p class="mb-2"><strong>Likely reasons:</strong></p>
+                                        <ul class="list-disc list-inside mb-2 text-xs space-y-1">
+                                            <li>Time entries must be created by physical clock-in/out</li>
+                                            <li>Security restriction to prevent time fraud</li>
+                                            <li>Integration with POS terminals required</li>
+                                        </ul>
+                                        <p class="text-blue-600 dark:text-blue-400">💡 You can still view existing time entries to analyze labor data!</p>
+                                    </div>
+                                </div>
+                            `;
+                        } else {
+                            createTimeEntryStatus.innerHTML = `<span class="text-red-600">✗ Failed: ${errorMessage}</span>`;
+                        }
+                    } else {
+                        const newTimeEntry = result.data;
+                        createTimeEntryStatus.innerHTML = `<span class="text-green-600">✓ Time entry created successfully</span>`;
+                        displayTimeEntryResults([newTimeEntry], 'New Time Entry Created');
+                        
+                        // Clear form
+                        timeEntryEmployeeDropdown.value = '';
+                        timeEntryJobDropdown.value = '';
+                        timeEntryClockIn.value = '';
+                        timeEntryClockOut.value = '';
+                        timeEntryCashTips.value = '';
+                        timeEntryBreakMinutes.value = '';
+                        updateTimeEntryHours();
+                        updateTimeEntryJobDropdown();
+                    }
+                } catch (error) {
+                    createTimeEntryStatus.innerHTML = `<span class="text-red-600">✗ Error: ${error.message}</span>`;
+                } finally {
+                    createTimeEntryBtnText.textContent = 'Create Time Entry';
+                    createTimeEntrySpinner.classList.add('hidden');
+                    createTimeEntryBtn.disabled = false;
+                }
+            }
+            
             // Display functions for Labor Management results
+            function getEmployeeAssignedJobs(employee) {
+                // Debug: Log the employee object to see its structure
+                console.log('Employee data structure:', employee);
+                console.log('Employee properties:', Object.keys(employee));
+                
+                // Check various possible property names for job assignments
+                const jobsProperty = employee.jobs || employee.jobReferences || employee.assignedJobs || employee.jobAssignments;
+                
+                console.log('Jobs property found:', jobsProperty);
+                
+                if (!jobsProperty || jobsProperty.length === 0) {
+                    return '<span class="text-gray-400 text-xs">No jobs assigned</span>';
+                }
+                
+                let jobsList = '';
+                jobsProperty.forEach((jobRef, index) => {
+                    // Find the job title from allJobs if available
+                    const jobGuid = jobRef.guid || jobRef.id || jobRef;
+                    const job = allJobs?.find(j => j.guid === jobGuid);
+                    const jobTitle = job ? job.title : (jobGuid?.slice(-8) || 'Unknown');
+                    
+                    console.log('Processing job reference:', jobRef, 'Found job:', job);
+                    
+                    if (index > 0) jobsList += ', ';
+                    jobsList += `<span class="inline-block bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs px-2 py-1 rounded-full mr-1 mb-1">${jobTitle}</span>`;
+                });
+                
+                return jobsList || '<span class="text-gray-400 text-xs">No jobs assigned</span>';
+            }
+            
+            function getEmployeeJobGuids(employeeGuid) {
+                const employee = allEmployees?.find(emp => emp.guid === employeeGuid);
+                console.log('Getting job GUIDs for employee:', employeeGuid, 'Found employee:', employee);
+                
+                if (!employee) {
+                    return [];
+                }
+                
+                // Check various possible property names for job assignments
+                const jobsProperty = employee.jobs || employee.jobReferences || employee.assignedJobs || employee.jobAssignments;
+                
+                console.log('Jobs property for filtering:', jobsProperty);
+                
+                if (!jobsProperty || jobsProperty.length === 0) {
+                    return [];
+                }
+                
+                const jobGuids = jobsProperty.map(jobRef => jobRef.guid || jobRef.id || jobRef);
+                console.log('Extracted job GUIDs:', jobGuids);
+                
+                return jobGuids;
+            }
+            
+            function updateShiftJobDropdownForEmployee() {
+                const selectedEmployeeGuid = shiftEmployeeDropdown.value;
+                
+                // Clear the job dropdown first
+                shiftJobDropdown.innerHTML = '<option value="">Select job...</option>';
+                
+                if (!selectedEmployeeGuid) {
+                    // If no employee selected, disable job dropdown
+                    shiftJobDropdown.disabled = true;
+                    shiftJobDropdown.innerHTML = '<option value="">Select employee first...</option>';
+                    return;
+                }
+                
+                // Get jobs assigned to this employee
+                const assignedJobGuids = getEmployeeJobGuids(selectedEmployeeGuid);
+                
+                if (assignedJobGuids.length === 0) {
+                    // Employee has no assigned jobs, show all jobs with warning
+                    shiftJobDropdown.disabled = false;
+                    shiftJobDropdown.innerHTML = '<option value="">⚠️ Employee has no assigned jobs</option>';
+                    if (allJobs && allJobs.length > 0) {
+                        allJobs.forEach(job => {
+                            if (!job.deleted) {
+                                shiftJobDropdown.innerHTML += `<option value="${job.guid}">⚠️ ${job.title} (not assigned)</option>`;
+                            }
+                        });
+                    }
+                } else {
+                    // Show only assigned jobs
+                    shiftJobDropdown.disabled = false;
+                    assignedJobGuids.forEach(jobGuid => {
+                        const job = allJobs?.find(j => j.guid === jobGuid);
+                        if (job && !job.deleted) {
+                            shiftJobDropdown.innerHTML += `<option value="${job.guid}">✅ ${job.title}</option>`;
+                        }
+                    });
+                }
+                
+                // Update create shift button state
+                updateCreateShiftButtonState();
+            }
+            
+            function updateCreateShiftButtonState() {
+                const hasEmployee = shiftEmployeeDropdown.value !== '';
+                const hasJob = shiftJobDropdown.value !== '';
+                const hasStartTime = shiftStartTime.value !== '';
+                const hasEndTime = shiftEndTime.value !== '';
+                
+                createShiftBtn.disabled = !(hasEmployee && hasJob && hasStartTime && hasEndTime);
+            }
+            
             function displayEmployeeResults(employees, title) {
                 let html = `<div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
                     <h3 class="font-semibold text-lg mb-3">${title}</h3>`;
@@ -2866,8 +3806,8 @@
                     html += '<div class="overflow-x-auto"><table class="min-w-full text-sm"><thead class="bg-gray-50 dark:bg-gray-700"><tr>';
                     html += '<th class="px-3 py-2 text-left font-medium">Name</th>';
                     html += '<th class="px-3 py-2 text-left font-medium">Email</th>';
+                    html += '<th class="px-3 py-2 text-left font-medium">Assigned Jobs</th>';
                     html += '<th class="px-3 py-2 text-left font-medium">GUID</th>';
-                    html += '<th class="px-3 py-2 text-left font-medium">External ID</th>';
                     html += '<th class="px-3 py-2 text-left font-medium">Status</th>';
                     html += '</tr></thead><tbody class="divide-y divide-gray-200 dark:divide-gray-600">';
                     
@@ -2876,11 +3816,14 @@
                         const statusClass = emp.deleted ? 'text-red-600' : 'text-green-600';
                         const status = emp.deleted ? 'Deleted' : 'Active';
                         
+                        // Get assigned jobs for this employee
+                        const assignedJobs = getEmployeeAssignedJobs(emp);
+                        
                         html += `<tr class="hover:bg-gray-50 dark:hover:bg-gray-700">`;
                         html += `<td class="px-3 py-2">${fullName || 'N/A'}</td>`;
                         html += `<td class="px-3 py-2">${emp.email || 'N/A'}</td>`;
+                        html += `<td class="px-3 py-2">${assignedJobs}</td>`;
                         html += `<td class="px-3 py-2 font-mono text-xs">${emp.guid || 'N/A'}</td>`;
-                        html += `<td class="px-3 py-2">${emp.externalId || 'N/A'}</td>`;
                         html += `<td class="px-3 py-2 ${statusClass}">${status}</td>`;
                         html += '</tr>';
                     });
@@ -2928,40 +3871,356 @@
                 resultsContainer.innerHTML = html;
             }
             
-            function displayShiftResults(shifts, title) {
+            function displayShiftResults(shifts, title, reportData = null) {
+                const reportId = `shift-report-${Date.now()}`;
+                
                 let html = `<div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
-                    <h3 class="font-semibold text-lg mb-3">${title}</h3>`;
+                    <h3 class="font-semibold text-lg mb-4">${title}</h3>`;
                 
                 if (shifts.length === 0) {
                     html += '<p class="text-gray-500">No shifts found</p>';
                 } else {
-                    html += '<div class="overflow-x-auto"><table class="min-w-full text-sm"><thead class="bg-gray-50 dark:bg-gray-700"><tr>';
-                    html += '<th class="px-3 py-2 text-left font-medium">Employee</th>';
-                    html += '<th class="px-3 py-2 text-left font-medium">Job</th>';
-                    html += '<th class="px-3 py-2 text-left font-medium">Start</th>';
-                    html += '<th class="px-3 py-2 text-left font-medium">End</th>';
-                    html += '<th class="px-3 py-2 text-left font-medium">GUID</th>';
-                    html += '</tr></thead><tbody class="divide-y divide-gray-200 dark:divide-gray-600">';
+                    // Tab navigation
+                    html += `
+                        <div class="mb-4 border-b border-gray-200 dark:border-gray-600">
+                            <nav class="-mb-px flex space-x-8">
+                                <button onclick="showShiftTab('${reportId}', 'report')" 
+                                        id="${reportId}-report-tab" 
+                                        class="shift-tab-btn py-2 px-1 border-b-2 border-blue-500 text-blue-600 dark:text-blue-400 font-medium text-sm">
+                                    📊 Labor Cost Report
+                                </button>
+                                <button onclick="showShiftTab('${reportId}', 'raw')" 
+                                        id="${reportId}-raw-tab" 
+                                        class="shift-tab-btn py-2 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 font-medium text-sm">
+                                    📋 Raw Shift Data
+                                </button>
+                            </nav>
+                        </div>`;
                     
-                    shifts.forEach(shift => {
-                        const startDate = new Date(shift.inDate).toLocaleDateString() + ' ' + new Date(shift.inDate).toLocaleTimeString();
-                        const endDate = new Date(shift.outDate).toLocaleDateString() + ' ' + new Date(shift.outDate).toLocaleTimeString();
-                        
-                        html += `<tr class="hover:bg-gray-50 dark:hover:bg-gray-700">`;
-                        html += `<td class="px-3 py-2">${shift.employeeReference?.guid?.slice(-8) || 'N/A'}</td>`;
-                        html += `<td class="px-3 py-2">${shift.jobReference?.guid?.slice(-8) || 'N/A'}</td>`;
-                        html += `<td class="px-3 py-2">${startDate}</td>`;
-                        html += `<td class="px-3 py-2">${endDate}</td>`;
-                        html += `<td class="px-3 py-2 font-mono text-xs">${shift.guid || 'N/A'}</td>`;
-                        html += '</tr>';
-                    });
+                    // Labor Cost Report Tab
+                    html += `<div id="${reportId}-report-content" class="shift-tab-content">`;
+                    html += generateLaborCostReport(shifts, reportData);
+                    html += '</div>';
                     
-                    html += '</tbody></table></div>';
+                    // Raw Data Tab
+                    html += `<div id="${reportId}-raw-content" class="shift-tab-content hidden">`;
+                    html += generateRawShiftTable(shifts);
+                    html += '</div>';
                 }
                 
                 html += '</div>';
                 resultsContainer.innerHTML = html;
             }
+            
+            function generateLaborCostReport(shifts, reportData) {
+                let html = '';
+                
+                // Report Header
+                if (reportData) {
+                    const startFormatted = new Date(reportData.startDate).toLocaleDateString();
+                    const endFormatted = new Date(reportData.endDate).toLocaleDateString();
+                    
+                    html += `
+                        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
+                            <h4 class="text-lg font-bold text-blue-900 dark:text-blue-100 mb-2">📈 Labor Cost Analysis</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                <div>
+                                    <span class="font-semibold text-blue-800 dark:text-blue-200">Report Period:</span>
+                                    <span class="ml-2 text-blue-700 dark:text-blue-300">${startFormatted} - ${endFormatted}</span>
+                                </div>
+                                <div>
+                                    <span class="font-semibold text-blue-800 dark:text-blue-200">Total Shifts:</span>
+                                    <span class="ml-2 text-blue-700 dark:text-blue-300">${shifts.length}</span>
+                                </div>
+                            </div>
+                        </div>`;
+                }
+                
+                // Calculate labor data
+                const laborData = calculateLaborCosts(shifts);
+                
+                // Summary Cards
+                html += `
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                        <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+                            <div class="text-green-600 dark:text-green-400 text-sm font-medium">Total Hours</div>
+                            <div class="text-2xl font-bold text-green-900 dark:text-green-100">${laborData.totalHours.toFixed(1)}</div>
+                        </div>
+                        <div class="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4">
+                            <div class="text-purple-600 dark:text-purple-400 text-sm font-medium">Employees</div>
+                            <div class="text-2xl font-bold text-purple-900 dark:text-purple-100">${laborData.uniqueEmployees}</div>
+                        </div>
+                        <div class="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg p-4">
+                            <div class="text-orange-600 dark:text-orange-400 text-sm font-medium">Job Types</div>
+                            <div class="text-2xl font-bold text-orange-900 dark:text-orange-100">${laborData.uniqueJobs}</div>
+                        </div>
+                        <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                            <div class="text-blue-600 dark:text-blue-400 text-sm font-medium">Est. Labor Cost</div>
+                            <div class="text-2xl font-bold text-blue-900 dark:text-blue-100">$${laborData.totalCost.toFixed(2)}</div>
+                        </div>
+                    </div>`;
+                
+                // Detailed Employee Breakdown
+                html += `
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                        <h5 class="font-semibold text-gray-900 dark:text-gray-100 mb-4">💼 Employee Breakdown</h5>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full text-sm">
+                                <thead class="bg-gray-100 dark:bg-gray-600">
+                                    <tr>
+                                        <th class="px-3 py-2 text-left font-semibold text-gray-900 dark:text-gray-100">Employee</th>
+                                        <th class="px-3 py-2 text-left font-semibold text-gray-900 dark:text-gray-100">Job Position</th>
+                                        <th class="px-3 py-2 text-right font-semibold text-gray-900 dark:text-gray-100">Hours</th>
+                                        <th class="px-3 py-2 text-right font-semibold text-gray-900 dark:text-gray-100">Hourly Rate</th>
+                                        <th class="px-3 py-2 text-right font-semibold text-gray-900 dark:text-gray-100">Labor Cost</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200 dark:divide-gray-600">`;
+                
+                laborData.employeeBreakdown.forEach(emp => {
+                    html += `
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-600">
+                            <td class="px-3 py-2">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white text-xs font-bold mr-3">
+                                        ${emp.employeeName.charAt(0).toUpperCase()}
+                                    </div>
+                                    <div>
+                                        <div class="font-medium text-gray-900 dark:text-gray-100">${emp.employeeName}</div>
+                                        <div class="text-xs text-gray-500 dark:text-gray-400">${emp.employeeId}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-3 py-2">
+                                <div>
+                                    <div class="font-medium text-gray-900 dark:text-gray-100">${emp.jobTitle}</div>
+                                    <div class="text-xs text-gray-500 dark:text-gray-400">${emp.jobId}</div>
+                                </div>
+                            </td>
+                            <td class="px-3 py-2 text-right font-mono">${emp.hours.toFixed(1)}h</td>
+                            <td class="px-3 py-2 text-right font-mono">${emp.hourlyRate}</td>
+                            <td class="px-3 py-2 text-right font-bold text-green-600 dark:text-green-400 font-mono">$${emp.laborCost.toFixed(2)}</td>
+                        </tr>`;
+                });
+                
+                html += `
+                                </tbody>
+                                <tfoot class="bg-gray-100 dark:bg-gray-600">
+                                    <tr class="font-bold">
+                                        <td colspan="2" class="px-3 py-3 text-gray-900 dark:text-gray-100">TOTALS</td>
+                                        <td class="px-3 py-3 text-right text-gray-900 dark:text-gray-100 font-mono">${laborData.totalHours.toFixed(1)}h</td>
+                                        <td class="px-3 py-3 text-right text-gray-500 dark:text-gray-400">—</td>
+                                        <td class="px-3 py-3 text-right text-green-600 dark:text-green-400 font-mono text-lg">$${laborData.totalCost.toFixed(2)}</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>`;
+                
+                // Add disclaimer
+                html += `
+                    <div class="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                        <div class="flex items-start">
+                            <span class="text-yellow-600 dark:text-yellow-400 mr-2">⚠️</span>
+                            <div class="text-xs text-yellow-800 dark:text-yellow-200">
+                                <strong>Note:</strong> This report uses estimated hourly rates where actual job pay rates are not available. 
+                                Labor costs are calculated based on shift duration and may not reflect actual payroll including overtime, 
+                                benefits, or other compensation factors.
+                            </div>
+                        </div>
+                    </div>`;
+                
+                return html;
+            }
+            
+            function generateRawShiftTable(shifts) {
+                let html = '<div class="overflow-x-auto"><table class="min-w-full text-sm"><thead class="bg-gray-50 dark:bg-gray-700"><tr>';
+                html += '<th class="px-3 py-2 text-left font-medium">Employee ID</th>';
+                html += '<th class="px-3 py-2 text-left font-medium">Job ID</th>';
+                html += '<th class="px-3 py-2 text-left font-medium">Start Time</th>';
+                html += '<th class="px-3 py-2 text-left font-medium">End Time</th>';
+                html += '<th class="px-3 py-2 text-left font-medium">Duration</th>';
+                html += '<th class="px-3 py-2 text-left font-medium">Shift GUID</th>';
+                html += '</tr></thead><tbody class="divide-y divide-gray-200 dark:divide-gray-600">';
+                
+                shifts.forEach(shift => {
+                    const startDate = new Date(shift.inDate);
+                    const endDate = new Date(shift.outDate);
+                    const duration = ((endDate - startDate) / (1000 * 60 * 60)).toFixed(1);
+                    const startFormatted = startDate.toLocaleDateString() + ' ' + startDate.toLocaleTimeString();
+                    const endFormatted = endDate.toLocaleDateString() + ' ' + endDate.toLocaleTimeString();
+                    
+                    html += `<tr class="hover:bg-gray-50 dark:hover:bg-gray-700">`;
+                    html += `<td class="px-3 py-2 font-mono text-xs">${shift.employeeReference?.guid || 'N/A'}</td>`;
+                    html += `<td class="px-3 py-2 font-mono text-xs">${shift.jobReference?.guid || 'N/A'}</td>`;
+                    html += `<td class="px-3 py-2">${startFormatted}</td>`;
+                    html += `<td class="px-3 py-2">${endFormatted}</td>`;
+                    html += `<td class="px-3 py-2 font-mono font-bold">${duration}h</td>`;
+                    html += `<td class="px-3 py-2 font-mono text-xs">${shift.guid || 'N/A'}</td>`;
+                    html += '</tr>';
+                });
+                
+                html += '</tbody></table></div>';
+                return html;
+            }
+            
+            function calculateLaborCosts(shifts) {
+                const employeeMap = new Map();
+                let totalHours = 0;
+                let totalCost = 0;
+                
+                shifts.forEach(shift => {
+                    const employeeId = shift.employeeReference?.guid || 'Unknown';
+                    const jobId = shift.jobReference?.guid || 'Unknown';
+                    const startDate = new Date(shift.inDate);
+                    const endDate = new Date(shift.outDate);
+                    const hours = (endDate - startDate) / (1000 * 60 * 60);
+                    
+                    totalHours += hours;
+                    
+                    const key = `${employeeId}-${jobId}`;
+                    if (!employeeMap.has(key)) {
+                        // Look up employee name from allEmployees if available
+                        const employee = allEmployees?.find(emp => emp.guid === employeeId);
+                        const job = allJobs?.find(j => j.guid === jobId);
+                        
+                        const employeeName = employee ? 
+                            [employee.firstName, employee.lastName].filter(n => n).join(' ') || 
+                            employee.email || 
+                            `Employee ${employeeId.slice(-8)}` 
+                            : `Employee ${employeeId.slice(-8)}`;
+                        
+                        const jobTitle = job?.title || `Job ${jobId.slice(-8)}`;
+                        
+                        // Estimate hourly rate based on job title or use default
+                        const hourlyRate = estimateHourlyRate(jobTitle);
+                        
+                        employeeMap.set(key, {
+                            employeeId: employeeId.slice(-8),
+                            employeeName: employeeName,
+                            jobId: jobId.slice(-8),
+                            jobTitle: jobTitle,
+                            hours: 0,
+                            hourlyRate: hourlyRate,
+                            laborCost: 0
+                        });
+                    }
+                    
+                    const emp = employeeMap.get(key);
+                    emp.hours += hours;
+                    emp.laborCost = emp.hours * parseFloat(emp.hourlyRate.replace('$', ''));
+                    totalCost += hours * parseFloat(emp.hourlyRate.replace('$', ''));
+                });
+                
+                const employeeBreakdown = Array.from(employeeMap.values())
+                    .sort((a, b) => b.laborCost - a.laborCost);
+                
+                return {
+                    totalHours: totalHours,
+                    totalCost: totalCost,
+                    uniqueEmployees: new Set(shifts.map(s => s.employeeReference?.guid)).size,
+                    uniqueJobs: new Set(shifts.map(s => s.jobReference?.guid)).size,
+                    employeeBreakdown: employeeBreakdown
+                };
+            }
+            
+            function estimateHourlyRate(jobTitle) {
+                const title = jobTitle.toLowerCase();
+                
+                // Estimate rates based on common restaurant positions
+                if (title.includes('manager') || title.includes('supervisor')) return '$22.00';
+                if (title.includes('chef') || title.includes('cook')) return '$18.00';
+                if (title.includes('server') || title.includes('waiter') || title.includes('waitress')) return '$15.00';
+                if (title.includes('bartender') || title.includes('bar')) return '$16.00';
+                if (title.includes('host') || title.includes('hostess')) return '$14.00';
+                if (title.includes('cashier') || title.includes('register')) return '$15.00';
+                if (title.includes('dishwasher') || title.includes('prep')) return '$13.00';
+                if (title.includes('driver') || title.includes('delivery')) return '$16.00';
+                
+                // Default rate for unknown positions
+                return '$15.50';
+            }
+            
+            // Helper functions for shift creation
+            window.setTodayShiftTimes = function() {
+                const today = new Date();
+                const startTime = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 9, 0); // 9:00 AM
+                const endTime = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 17, 0); // 5:00 PM
+                
+                shiftStartTime.value = startTime.toISOString().slice(0, 16); // Format for datetime-local
+                shiftEndTime.value = endTime.toISOString().slice(0, 16);
+                
+                updateShiftDurationDisplay();
+            };
+            
+            window.setTomorrowMorningShift = function() {
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                const startTime = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate(), 8, 0); // 8:00 AM
+                const endTime = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate(), 12, 0); // 12:00 PM
+                
+                shiftStartTime.value = startTime.toISOString().slice(0, 16);
+                shiftEndTime.value = endTime.toISOString().slice(0, 16);
+                
+                updateShiftDurationDisplay();
+            };
+            
+            window.setSimpleTestShift = function() {
+                // Set a very simple 2-hour shift starting in 1 hour from now
+                const now = new Date();
+                const startTime = new Date(now.getTime() + 60 * 60 * 1000); // 1 hour from now
+                const endTime = new Date(startTime.getTime() + 2 * 60 * 60 * 1000); // 2 hours later
+                
+                shiftStartTime.value = startTime.toISOString().slice(0, 16);
+                shiftEndTime.value = endTime.toISOString().slice(0, 16);
+                
+                updateShiftDurationDisplay();
+            };
+            
+            function updateShiftDurationDisplay() {
+                const shiftDurationDisplay = document.getElementById('shiftDurationDisplay');
+                if (!shiftDurationDisplay) return;
+                
+                const startTime = shiftStartTime.value;
+                const endTime = shiftEndTime.value;
+                
+                if (startTime && endTime) {
+                    const start = new Date(startTime);
+                    const end = new Date(endTime);
+                    
+                    if (end > start) {
+                        const duration = (end - start) / (1000 * 60 * 60); // Hours
+                        shiftDurationDisplay.textContent = `${duration.toFixed(1)} hours`;
+                        shiftDurationDisplay.className = 'text-xs text-green-600 dark:text-green-400 font-medium';
+                    } else {
+                        shiftDurationDisplay.textContent = 'Invalid times';
+                        shiftDurationDisplay.className = 'text-xs text-red-600 dark:text-red-400';
+                    }
+                } else {
+                    shiftDurationDisplay.textContent = '';
+                }
+            }
+            
+            // Tab switching function for shift results
+            window.showShiftTab = function(reportId, tabType) {
+                // Hide all tab contents
+                document.getElementById(`${reportId}-report-content`).classList.add('hidden');
+                document.getElementById(`${reportId}-raw-content`).classList.add('hidden');
+                
+                // Remove active styles from all tabs
+                document.querySelectorAll('.shift-tab-btn').forEach(btn => {
+                    btn.classList.remove('border-blue-500', 'text-blue-600', 'dark:text-blue-400');
+                    btn.classList.add('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'dark:hover:text-gray-300');
+                });
+                
+                // Show selected tab content
+                document.getElementById(`${reportId}-${tabType}-content`).classList.remove('hidden');
+                
+                // Add active styles to selected tab
+                const activeTab = document.getElementById(`${reportId}-${tabType}-tab`);
+                activeTab.classList.add('border-blue-500', 'text-blue-600', 'dark:text-blue-400');
+                activeTab.classList.remove('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'dark:hover:text-gray-300');
+            };
             
             function displayTimeEntryResults(timeEntries, title) {
                 let html = `<div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
@@ -3006,6 +4265,54 @@
             fetchRestaurantNameBtn.addEventListener('click', fetchRestaurantName);
             fetchAllConfigBtn.addEventListener('click', fetchAllConfig);
 
+            // Navigation panel toggles
+            const toggleNavPanel = () => {
+                navPanel.classList.toggle('open');
+                navOverlay.classList.toggle('open');
+            };
+            toggleNavBtn.addEventListener('click', toggleNavPanel);
+            closeNavBtn.addEventListener('click', toggleNavPanel);
+            navOverlay.addEventListener('click', toggleNavPanel);
+            
+            // Welcome button click handler (using event delegation)
+            document.addEventListener('click', (e) => {
+                if (e.target && e.target.id === 'welcomeNavBtn') {
+                    toggleNavPanel();
+                }
+            });
+            
+            // Navigation workflow buttons
+            navCreateOrderBtn.addEventListener('click', () => { 
+                currentWorkflow = 'create'; 
+                updateUIState(); 
+                toggleNavPanel(); // Close nav panel
+                resultsContainer.innerHTML='<p class="text-gray-500 dark:text-gray-400">Order results will appear here after sending.</p>';
+            });
+            navFetchOrderBtn.addEventListener('click', () => { 
+                currentWorkflow = 'fetch'; 
+                updateUIState(); 
+                toggleNavPanel(); // Close nav panel
+                resultsContainer.innerHTML='<p class="text-gray-500 dark:text-gray-400">Results will be displayed here.</p>' 
+            });
+            navUpdateOrderBtn.addEventListener('click', () => { 
+                currentWorkflow = 'update'; 
+                updateUIState(); 
+                toggleNavPanel(); // Close nav panel
+                resultsContainer.innerHTML='<p class="text-gray-500 dark:text-gray-400">Load an order to begin editing.</p>' 
+            });
+            navStockBtn.addEventListener('click', () => { 
+                currentWorkflow = 'stock'; 
+                updateUIState(); 
+                toggleNavPanel(); // Close nav panel
+                resultsContainer.innerHTML='<p class="text-gray-500 dark:text-gray-400">Inventory results will be displayed here.</p>' 
+            });
+            navLaborBtn.addEventListener('click', () => { 
+                currentWorkflow = 'labor'; 
+                updateUIState(); 
+                toggleNavPanel(); // Close nav panel
+                resultsContainer.innerHTML='<p class="text-gray-500 dark:text-gray-400 text-sm">Labor management results will appear here...</p>' 
+            });
+
             // Config panel toggles
             const toggleConfigPanel = () => {
                 configPanel.classList.toggle('open');
@@ -3035,7 +4342,7 @@
             fetchWorkflowBtn.addEventListener('click', () => { currentWorkflow = 'fetch'; updateUIState(); resultsContainer.innerHTML='<p class="text-gray-500 dark:text-gray-400">Results will be displayed here.</p>' });
             updateWorkflowBtn.addEventListener('click', () => { currentWorkflow = 'update'; updateUIState(); resultsContainer.innerHTML='<p class="text-gray-500 dark:text-gray-400">Load an order to begin editing.</p>' });
             stockWorkflowBtn.addEventListener('click', () => { currentWorkflow = 'stock'; updateUIState(); resultsContainer.innerHTML='<p class="text-gray-500 dark:text-gray-400">Inventory results will be displayed here.</p>' });
-            laborWorkflowBtn.addEventListener('click', () => { currentWorkflow = 'labor'; updateUIState(); resultsContainer.innerHTML='<p class="text-gray-500 dark:text-gray-400">Labor management results will be displayed here.</p>' });
+            laborWorkflowBtn.addEventListener('click', () => { currentWorkflow = 'labor'; updateUIState(); resultsContainer.innerHTML='<p class="text-gray-500 dark:text-gray-400 text-sm">Labor management results will appear here...</p>' });
             resetWorkflowBtns.forEach(btn => btn.addEventListener('click', () => { 
                 currentWorkflow = null; 
                 activeUpdateOrder = null; 
@@ -3148,11 +4455,40 @@
             viewEmployeesBtn.addEventListener('click', viewEmployees);
             addEmployeeBtn.addEventListener('click', addEmployee);
             updateEmployeeBtn.addEventListener('click', updateEmployee);
+            fetchAllJobsBtn.addEventListener('click', fetchAllJobs);
+            viewSelectedJobBtn.addEventListener('click', viewSelectedJob);
             viewJobsBtn.addEventListener('click', viewJobs);
             assignJobsBtn.addEventListener('click', assignJobs);
             viewShiftsBtn.addEventListener('click', viewShifts);
             createShiftBtn.addEventListener('click', createShift);
             viewTimeEntriesBtn.addEventListener('click', viewTimeEntries);
+            createTimeEntryBtn.addEventListener('click', createTimeEntry);
+            
+            // Add event listeners for shift creation form
+            shiftEmployeeDropdown.addEventListener('change', updateShiftJobDropdownForEmployee);
+            shiftJobDropdown.addEventListener('change', updateCreateShiftButtonState);
+            shiftStartTime.addEventListener('input', function() {
+                updateShiftDurationDisplay();
+                updateCreateShiftButtonState();
+            });
+            shiftEndTime.addEventListener('input', function() {
+                updateShiftDurationDisplay(); 
+                updateCreateShiftButtonState();
+            });
+            
+            // Add event listeners for time entry creation form
+            timeEntryEmployeeDropdown.addEventListener('change', updateTimeEntryJobDropdown);
+            timeEntryJobDropdown.addEventListener('change', updateCreateTimeEntryButtonState);
+            timeEntryClockIn.addEventListener('input', function() {
+                updateTimeEntryHours();
+                updateCreateTimeEntryButtonState();
+            });
+            timeEntryClockOut.addEventListener('input', function() {
+                updateTimeEntryHours();
+                updateCreateTimeEntryButtonState();
+            });
+            timeEntryBreakMinutes.addEventListener('input', updateTimeEntryHours);
+            timeEntryCashTips.addEventListener('input', updateCreateTimeEntryButtonState);
             
             // Time Entry Query Type Handler
             timeEntryQuery.addEventListener('change', function() {
