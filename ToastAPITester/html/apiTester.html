@@ -847,21 +847,76 @@
                             <!-- View & Search Items -->
                             <div class="mb-4">
                                 <h4 class="font-medium mb-2">Items Management</h4>
-                                <div class="space-y-2">
+                                <div class="space-y-3">
+                                    <!-- Quick Actions -->
+                                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-2">
+                                        <button id="fetchAllItemsBtn" class="bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-md transition text-sm flex items-center justify-center">
+                                            <span id="fetchAllItemsBtnText">📋 Fetch All Items</span>
+                                            <div id="fetchAllItemsSpinner" class="spinner ml-2 hidden"></div>
+                                        </button>
+                                        <button id="createMenuItemBtn" class="bg-green-600 hover:bg-green-700 text-white py-2 rounded-md transition text-sm flex items-center justify-center">
+                                            ➕ Create New Item
+                                        </button>
+                                    </div>
+                                    
+                                    <!-- API Limitations Notice -->
+                                    <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3 text-xs">
+                                        <div class="flex items-center mb-1">
+                                            <span class="text-yellow-600 dark:text-yellow-400 mr-2">ℹ️</span>
+                                            <strong class="text-yellow-800 dark:text-yellow-200">Toast API Note:</strong>
+                                        </div>
+                                        <p class="text-yellow-700 dark:text-yellow-300">
+                                            Menu item operations may be restricted by Toast API permissions. If you encounter errors, 
+                                            check the browser console (F12) for detailed API response information.
+                                        </p>
+                                    </div>
+                                    
+                                    <!-- Search & Filters -->
+                                    <div class="bg-white dark:bg-gray-600 rounded-lg p-3 border border-gray-200 dark:border-gray-500">
+                                        <div class="space-y-2">
+                                            <input type="text" id="itemSearchInput" placeholder="🔍 Search by name, description, or PLU..." class="w-full bg-gray-50 dark:bg-gray-700 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                            
+                                            <!-- Filter Row -->
+                                            <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                                                <select id="categoryFilterSelect" class="bg-gray-50 dark:bg-gray-700 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                                    <option value="">All Categories</option>
+                                                </select>
+                                                <select id="availabilityFilterSelect" class="bg-gray-50 dark:bg-gray-700 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                                    <option value="">All Items</option>
+                                                    <option value="available">Available Only</option>
+                                                    <option value="unavailable">Unavailable Only</option>
+                                                </select>
+                                                <select id="priceRangeSelect" class="bg-gray-50 dark:bg-gray-700 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                                    <option value="">All Prices</option>
+                                                    <option value="0-500">Under $5</option>
+                                                    <option value="500-1000">$5 - $10</option>
+                                                    <option value="1000-2000">$10 - $20</option>
+                                                    <option value="2000-5000">$20 - $50</option>
+                                                    <option value="5000+">Over $50</option>
+                                                </select>
+                                            </div>
+                                            
+                                            <!-- Action Buttons -->
+                                            <div class="flex gap-2">
+                                                <button id="searchMenuItemsBtn" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-md transition text-sm flex items-center justify-center">
+                                                    <span id="searchMenuItemsBtnText">🔍 Search & Filter</span>
+                                                    <div id="searchMenuItemsSpinner" class="spinner ml-2 hidden"></div>
+                                                </button>
+                                                <button id="clearFiltersBtn" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md transition text-sm">
+                                                    Clear
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Quick Select -->
                                     <div class="flex gap-2">
                                         <select id="menuItemDropdown" class="flex-1 bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
-                                            <option value="">Select an item...</option>
+                                            <option value="">Quick select an item...</option>
                                         </select>
-                                        <button id="viewSelectedItemBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md transition text-sm" disabled>View Details</button>
+                                        <button id="viewSelectedItemBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md transition text-sm whitespace-nowrap" disabled>View Details</button>
                                     </div>
-                                    <input type="text" id="itemSearchInput" placeholder="Search items by name..." class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
-                                    <div class="flex gap-2">
-                                        <button id="searchMenuItemsBtn" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-md transition text-sm flex items-center justify-center">
-                                            <span id="searchMenuItemsBtnText">Search Items</span>
-                                            <div id="searchMenuItemsSpinner" class="spinner ml-2 hidden"></div>
-                                        </button>
-                                        <button id="createMenuItemBtn" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-md transition text-sm">Create New</button>
-                                    </div>
+                                    
                                     <div id="searchMenuItemsStatus" class="text-xs text-center"></div>
                                 </div>
                             </div>
@@ -1231,6 +1286,11 @@
             const AUTH_PATH = 'authentication/v1/authentication/login';
             const RESTAURANTS_PATH = 'restaurants/v1/restaurants';
             const MENUS_PATH = 'menus/v2/menus';
+            const MENUS_PATH_BASE = 'menus/v2/menus';
+            const MENU_ITEMS_PATH = 'menus/v2/menuItems';
+            const MENU_GROUPS_PATH = 'menus/v2/menuGroups';
+            const MODIFIER_GROUPS_PATH = 'menus/v2/modifierGroups';
+            const MODIFIER_OPTIONS_PATH = 'menus/v2/modifierOptions';
             const DINING_OPTIONS_PATH = 'config/v2/diningOptions';
             const EMPLOYEES_PATH = '/labor/v1/employees';
             const DISCOUNTS_PATH = 'config/v2/discounts';
@@ -1536,6 +1596,13 @@
             const searchMenuItemsSpinner = document.getElementById('searchMenuItemsSpinner');
             const createMenuItemBtn = document.getElementById('createMenuItemBtn');
             const searchMenuItemsStatus = document.getElementById('searchMenuItemsStatus');
+            const fetchAllItemsBtn = document.getElementById('fetchAllItemsBtn');
+            const fetchAllItemsBtnText = document.getElementById('fetchAllItemsBtnText');
+            const fetchAllItemsSpinner = document.getElementById('fetchAllItemsSpinner');
+            const categoryFilterSelect = document.getElementById('categoryFilterSelect');
+            const availabilityFilterSelect = document.getElementById('availabilityFilterSelect');
+            const priceRangeSelect = document.getElementById('priceRangeSelect');
+            const clearFiltersBtn = document.getElementById('clearFiltersBtn');
             
             // Item Operations
             const itemOperationDropdown = document.getElementById('itemOperationDropdown');
@@ -4889,15 +4956,103 @@
                 }
             }
             
-            // Search Menu Items
+            // Fetch All Menu Items via Menus Structure
+            async function fetchAllItems() {
+                fetchAllItemsBtnText.textContent = '⏳ Fetching...';
+                fetchAllItemsSpinner.classList.remove('hidden');
+                fetchAllItemsBtn.disabled = true;
+                searchMenuItemsStatus.innerHTML = '';
+                
+                try {
+                    // Use the same approach as fetchAllMenus() since menu items are nested
+                    const url = CORS_PROXY + environmentSelect.value + MENUS_PATH_BASE;
+                    const result = await makeApiCall(url, 'GET', null, null, 'Menu data fetched successfully');
+                    
+                    if (result.error) {
+                        const errorMessage = typeof result.error === 'object' ? 
+                            result.error.message || JSON.stringify(result.error) : 
+                            result.error;
+                        searchMenuItemsStatus.innerHTML = `<span class="text-red-600">✗ Failed: ${errorMessage}</span>`;
+                    } else {
+                        console.log('Raw menu API response:', result.data);
+                        
+                        // Handle different possible response structures
+                        let menus = [];
+                        if (Array.isArray(result.data)) {
+                            menus = result.data;
+                        } else if (result.data && typeof result.data === 'object') {
+                            // Check if it's a wrapper object
+                            if (result.data.menus && Array.isArray(result.data.menus)) {
+                                menus = result.data.menus;
+                            } else if (result.data.data && Array.isArray(result.data.data)) {
+                                menus = result.data.data;
+                            } else {
+                                // Single menu object
+                                menus = [result.data];
+                            }
+                        }
+                        
+                        console.log('Processed menus array:', menus);
+                        allMenus = menus;
+                        
+                        // Extract all menu items from the menu structure
+                        const extractedItems = [];
+                        
+                        if (menus.length === 0) {
+                            searchMenuItemsStatus.innerHTML = `<span class="text-yellow-600">⚠️ No menus found or menu data unavailable</span>`;
+                            return;
+                        }
+                        
+                        menus.forEach(menu => {
+                            if (menu && menu.menuGroups && Array.isArray(menu.menuGroups)) {
+                                menu.menuGroups.forEach(group => {
+                                    if (group && group.menuItems && Array.isArray(group.menuItems)) {
+                                        group.menuItems.forEach(item => {
+                                            extractedItems.push({
+                                                ...item,
+                                                menuName: menu.name || 'Unknown Menu',
+                                                menuGuid: menu.guid || '',
+                                                groupName: group.name || 'Unknown Category',
+                                                groupGuid: group.guid || ''
+                                            });
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                        
+                        allMenuItems = extractedItems;
+                        
+                        // Update dropdowns with new data
+                        populateMenuItemDropdowns();
+                        populateMenuDropdowns();
+                        populateCategoryFilter();
+                        
+                        if (extractedItems.length === 0) {
+                            searchMenuItemsStatus.innerHTML = `<span class="text-yellow-600">⚠️ Found ${menus.length} menus but no menu items. Check console for API response details.</span>`;
+                        } else {
+                            searchMenuItemsStatus.innerHTML = `<span class="text-green-600">✓ Loaded ${extractedItems.length} menu items from ${menus.length} menus</span>`;
+                        }
+                        displayMenuItemResults(extractedItems, `All Menu Items (${extractedItems.length})`);
+                    }
+                } catch (error) {
+                    console.error('Error in fetchAllItems:', error);
+                    searchMenuItemsStatus.innerHTML = `<span class="text-red-600">✗ Error: ${error.message}. Check browser console for details.</span>`;
+                } finally {
+                    fetchAllItemsBtnText.textContent = '📋 Fetch All Items';
+                    fetchAllItemsSpinner.classList.add('hidden');
+                    fetchAllItemsBtn.disabled = false;
+                }
+            }
+            
+            // Enhanced Search and Filter Menu Items
             async function searchMenuItems() {
                 const searchTerm = itemSearchInput.value.trim();
-                if (!searchTerm) {
-                    searchMenuItemsStatus.innerHTML = `<span class="text-yellow-600">Please enter a search term</span>`;
-                    return;
-                }
+                const categoryFilter = categoryFilterSelect.value;
+                const availabilityFilter = availabilityFilterSelect.value;
+                const priceRangeFilter = priceRangeSelect.value;
                 
-                searchMenuItemsBtnText.textContent = 'Searching...';
+                searchMenuItemsBtnText.textContent = '⏳ Filtering...';
                 searchMenuItemsSpinner.classList.remove('hidden');
                 searchMenuItemsBtn.disabled = true;
                 searchMenuItemsStatus.innerHTML = '';
@@ -4905,30 +5060,124 @@
                 try {
                     // If menus aren't loaded yet, load them first
                     if (allMenuItems.length === 0) {
-                        await fetchAllMenus();
+                        searchMenuItemsStatus.innerHTML = '<span class="text-blue-600">⏳ Loading menu data first...</span>';
+                        await fetchAllItems();
+                        return; // fetchAllItems will handle display
                     }
                     
-                    // Filter items by search term (name, description, or price)
-                    const filteredItems = allMenuItems.filter(item => {
+                    let filteredItems = [...allMenuItems];
+                    
+                    // Apply search term filter
+                    if (searchTerm) {
                         const searchLower = searchTerm.toLowerCase();
-                        return (
-                            (item.name && item.name.toLowerCase().includes(searchLower)) ||
-                            (item.description && item.description.toLowerCase().includes(searchLower)) ||
-                            (item.basePrice && item.basePrice.toString().includes(searchTerm)) ||
-                            (item.plu && item.plu.toLowerCase().includes(searchLower))
+                        filteredItems = filteredItems.filter(item => {
+                            return (
+                                (item.name && item.name.toLowerCase().includes(searchLower)) ||
+                                (item.description && item.description.toLowerCase().includes(searchLower)) ||
+                                (item.basePrice && item.basePrice.toString().includes(searchTerm)) ||
+                                (item.plu && item.plu.toLowerCase().includes(searchLower))
+                            );
+                        });
+                    }
+                    
+                    // Apply category filter
+                    if (categoryFilter) {
+                        filteredItems = filteredItems.filter(item => 
+                            item.groupName === categoryFilter || 
+                            (item.menuGroups && item.menuGroups.some(group => group.name === categoryFilter))
                         );
-                    });
+                    }
+                    
+                    // Apply availability filter
+                    if (availabilityFilter === 'available') {
+                        filteredItems = filteredItems.filter(item => item.active !== false);
+                    } else if (availabilityFilter === 'unavailable') {
+                        filteredItems = filteredItems.filter(item => item.active === false);
+                    }
+                    
+                    // Apply price range filter
+                    if (priceRangeFilter) {
+                        if (priceRangeFilter === '5000+') {
+                            filteredItems = filteredItems.filter(item => 
+                                item.basePrice && item.basePrice >= 5000
+                            );
+                        } else {
+                            const [min, max] = priceRangeFilter.split('-').map(Number);
+                            filteredItems = filteredItems.filter(item => {
+                                if (!item.basePrice) return false;
+                                return item.basePrice >= min && item.basePrice < max;
+                            });
+                        }
+                    }
+                    
+                    // Build result title
+                    const filters = [];
+                    if (searchTerm) filters.push(`"${searchTerm}"`);
+                    if (categoryFilter) filters.push(`category: ${categoryFilter}`);
+                    if (availabilityFilter) filters.push(`${availabilityFilter} only`);
+                    if (priceRangeFilter) filters.push(`price: ${formatPriceRange(priceRangeFilter)}`);
+                    
+                    const title = filters.length > 0 
+                        ? `Filtered Items (${filters.join(', ')})`
+                        : `All Menu Items`;
                     
                     searchMenuItemsStatus.innerHTML = `<span class="text-green-600">✓ Found ${filteredItems.length} matching items</span>`;
-                    displayMenuItemResults(filteredItems, `Search Results for "${searchTerm}"`);
+                    displayMenuItemResults(filteredItems, title);
                     
                 } catch (error) {
                     searchMenuItemsStatus.innerHTML = `<span class="text-red-600">✗ Search failed: ${error.message}</span>`;
                 } finally {
-                    searchMenuItemsBtnText.textContent = 'Search Items';
+                    searchMenuItemsBtnText.textContent = '🔍 Search & Filter';
                     searchMenuItemsSpinner.classList.add('hidden');
                     searchMenuItemsBtn.disabled = false;
                 }
+            }
+            
+            // Clear all filters
+            function clearFilters() {
+                itemSearchInput.value = '';
+                categoryFilterSelect.value = '';
+                availabilityFilterSelect.value = '';
+                priceRangeSelect.value = '';
+                searchMenuItemsStatus.innerHTML = '<span class="text-gray-500">Filters cleared</span>';
+            }
+            
+            // Helper function to format price range for display
+            function formatPriceRange(range) {
+                const ranges = {
+                    '0-500': 'Under $5',
+                    '500-1000': '$5-$10',
+                    '1000-2000': '$10-$20',
+                    '2000-5000': '$20-$50',
+                    '5000+': 'Over $50'
+                };
+                return ranges[range] || range;
+            }
+            
+            // Populate category filter dropdown
+            function populateCategoryFilter() {
+                categoryFilterSelect.innerHTML = '<option value="">All Categories</option>';
+                
+                if (allMenuItems.length === 0) return;
+                
+                // Get unique categories
+                const categories = new Set();
+                allMenuItems.forEach(item => {
+                    if (item.groupName) categories.add(item.groupName);
+                    if (item.menuGroups) {
+                        item.menuGroups.forEach(group => {
+                            if (group.name) categories.add(group.name);
+                        });
+                    }
+                });
+                
+                // Sort and add to dropdown
+                [...categories].sort().forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category;
+                    option.textContent = category;
+                    categoryFilterSelect.appendChild(option);
+                });
             }
             
             // Update Item Price
@@ -4952,21 +5201,51 @@
                 }
                 
                 updateItemPriceBtn.disabled = true;
-                itemOperationsStatus.innerHTML = '<span class="text-blue-600">⏳ Updating price...</span>';
+                itemOperationsStatus.innerHTML = '<span class="text-blue-600">⏳ Trying multiple API endpoints for price update...</span>';
                 
                 try {
-                    const url = CORS_PROXY + environmentSelect.value + MENU_ITEMS_PATH + '/' + selectedGuid;
-                    const updateData = {
-                        basePrice: parseInt(newPrice)
-                    };
+                    // Find the item's group information for proper API path
+                    const selectedItem = allMenuItems.find(item => item.guid === selectedGuid);
+                    if (!selectedItem || !selectedItem.groupGuid) {
+                        itemOperationsStatus.innerHTML = `<span class="text-red-600">✗ Item group information not available. Try refreshing item data.</span>`;
+                        return;
+                    }
                     
-                    const result = await makeApiCall(url, 'PATCH', updateData, null, 'Price updated successfully');
+                    const updateData = { basePrice: parseInt(newPrice) };
+                    let result = null;
+                    let successfulUrl = '';
                     
-                    if (result.error) {
-                        const errorMessage = typeof result.error === 'object' ? 
-                            result.error.message || JSON.stringify(result.error) : 
-                            result.error;
-                        itemOperationsStatus.innerHTML = `<span class="text-red-600">✗ Failed: ${errorMessage}</span>`;
+                    // Try multiple possible endpoint structures for Toast API
+                    const possibleUrls = [
+                        // Try menu items endpoint directly  
+                        `menus/v2/menuItems/${selectedGuid}`,
+                        // Try through menu structure
+                        `menus/v2/menus/${selectedItem.menuGuid}/menuItems/${selectedGuid}`,
+                        // Try through menu groups
+                        `${MENU_GROUPS_PATH}/${selectedItem.groupGuid}/menuItems/${selectedGuid}`,
+                        // Alternative group structure
+                        `menus/v2/menus/${selectedItem.menuGuid}/groups/${selectedItem.groupGuid}/menuItems/${selectedGuid}`
+                    ];
+                    
+                    for (const urlPath of possibleUrls) {
+                        const fullUrl = CORS_PROXY + environmentSelect.value + urlPath;
+                        console.log(`Trying menu item update URL: ${urlPath}`);
+                        
+                        result = await makeApiCall(fullUrl, 'PATCH', updateData, null, 'Price updated successfully');
+                        
+                        if (!result.error) {
+                            successfulUrl = urlPath;
+                            break;
+                        }
+                    }
+                    
+                    // If all attempts failed, provide detailed error info
+                    if (!successfulUrl) {
+                        console.log('All menu item update endpoints failed. Attempted URLs:', possibleUrls);
+                    }
+                    
+                    if (!successfulUrl) {
+                        itemOperationsStatus.innerHTML = `<span class="text-red-600">✗ All update endpoints failed. Toast API may not support menu item price updates via API. Check console for attempted URLs.</span>`;
                     } else {
                         // Update the cached item
                         const itemIndex = allMenuItems.findIndex(item => item.guid === selectedGuid);
@@ -4974,6 +5253,7 @@
                             allMenuItems[itemIndex].basePrice = parseInt(newPrice);
                         }
                         
+                        console.log(`Price update successful using endpoint: ${successfulUrl}`);
                         itemOperationsStatus.innerHTML = `<span class="text-green-600">✓ Price updated to $${(newPrice / 100).toFixed(2)}</span>`;
                         displayMenuItemResults([result.data || selectedItem], 'Updated Item');
                     }
@@ -5002,21 +5282,51 @@
                 const newStatus = !currentlyActive;
                 
                 toggleItemAvailabilityBtn.disabled = true;
-                itemOperationsStatus.innerHTML = `<span class="text-blue-600">⏳ ${newStatus ? 'Enabling' : 'Disabling'} item...</span>`;
+                itemOperationsStatus.innerHTML = `<span class="text-blue-600">⏳ Trying multiple API endpoints to ${newStatus ? 'enable' : 'disable'} item...</span>`;
                 
                 try {
-                    const url = CORS_PROXY + environmentSelect.value + MENU_ITEMS_PATH + '/' + selectedGuid;
-                    const updateData = {
-                        active: newStatus
-                    };
+                    // Find the item's group information for proper API path
+                    const selectedItem = allMenuItems.find(item => item.guid === selectedGuid);
+                    if (!selectedItem || !selectedItem.groupGuid) {
+                        itemOperationsStatus.innerHTML = `<span class="text-red-600">✗ Item group information not available. Try refreshing item data.</span>`;
+                        return;
+                    }
                     
-                    const result = await makeApiCall(url, 'PATCH', updateData, null, 'Availability updated successfully');
+                    const updateData = { active: newStatus };
+                    let result = null;
+                    let successfulUrl = '';
                     
-                    if (result.error) {
-                        const errorMessage = typeof result.error === 'object' ? 
-                            result.error.message || JSON.stringify(result.error) : 
-                            result.error;
-                        itemOperationsStatus.innerHTML = `<span class="text-red-600">✗ Failed: ${errorMessage}</span>`;
+                    // Try multiple possible endpoint structures for Toast API
+                    const possibleUrls = [
+                        // Try menu items endpoint directly  
+                        `menus/v2/menuItems/${selectedGuid}`,
+                        // Try through menu structure
+                        `menus/v2/menus/${selectedItem.menuGuid}/menuItems/${selectedGuid}`,
+                        // Try through menu groups
+                        `${MENU_GROUPS_PATH}/${selectedItem.groupGuid}/menuItems/${selectedGuid}`,
+                        // Alternative group structure
+                        `menus/v2/menus/${selectedItem.menuGuid}/groups/${selectedItem.groupGuid}/menuItems/${selectedGuid}`
+                    ];
+                    
+                    for (const urlPath of possibleUrls) {
+                        const fullUrl = CORS_PROXY + environmentSelect.value + urlPath;
+                        console.log(`Trying menu item availability update URL: ${urlPath}`);
+                        
+                        result = await makeApiCall(fullUrl, 'PATCH', updateData, null, 'Availability updated successfully');
+                        
+                        if (!result.error) {
+                            successfulUrl = urlPath;
+                            break;
+                        }
+                    }
+                    
+                    // If all attempts failed, provide detailed error info
+                    if (!successfulUrl) {
+                        console.log('All menu item availability update endpoints failed. Attempted URLs:', possibleUrls);
+                    }
+                    
+                    if (!successfulUrl) {
+                        itemOperationsStatus.innerHTML = `<span class="text-red-600">✗ All availability update endpoints failed. Toast API may not support menu item availability updates via API. Check console for attempted URLs.</span>`;
                     } else {
                         // Update the cached item
                         const itemIndex = allMenuItems.findIndex(item => item.guid === selectedGuid);
@@ -5024,6 +5334,7 @@
                             allMenuItems[itemIndex].active = newStatus;
                         }
                         
+                        console.log(`Availability update successful using endpoint: ${successfulUrl}`);
                         itemOperationsStatus.innerHTML = `<span class="text-green-600">✓ Item ${newStatus ? 'enabled' : 'disabled'}</span>`;
                         displayMenuItemResults([result.data || selectedItem], 'Updated Item Availability');
                     }
@@ -5032,6 +5343,156 @@
                 } finally {
                     toggleItemAvailabilityBtn.disabled = false;
                 }
+            }
+            
+            // Create New Menu Item
+            async function createMenuItem() {
+                // First make sure we have menu data loaded
+                if (allMenus.length === 0) {
+                    await fetchAllItems(); // This will load menus and items
+                }
+                
+                if (allMenus.length === 0) {
+                    searchMenuItemsStatus.innerHTML = `<span class="text-red-600">✗ No menus available. Please check your API access.</span>`;
+                    return;
+                }
+                
+                // Prompt for menu item details
+                const itemName = prompt('Enter item name:');
+                if (!itemName || !itemName.trim()) {
+                    searchMenuItemsStatus.innerHTML = `<span class="text-red-600">✗ Item name is required</span>`;
+                    return;
+                }
+                
+                const itemDescription = prompt('Enter item description (optional):') || '';
+                const itemPriceStr = prompt('Enter item price in cents (e.g., 1250 for $12.50):');
+                const itemPrice = itemPriceStr ? parseInt(itemPriceStr) : 0;
+                
+                if (itemPriceStr && (isNaN(itemPrice) || itemPrice < 0)) {
+                    searchMenuItemsStatus.innerHTML = `<span class="text-red-600">✗ Invalid price format</span>`;
+                    return;
+                }
+                
+                // Get available menu groups for the item
+                const menuGroups = [];
+                allMenus.forEach(menu => {
+                    if (menu.menuGroups) {
+                        menu.menuGroups.forEach(group => {
+                            menuGroups.push({
+                                menuName: menu.name,
+                                menuGuid: menu.guid,
+                                groupName: group.name,
+                                groupGuid: group.guid,
+                                displayName: `${menu.name} → ${group.name}`
+                            });
+                        });
+                    }
+                });
+                
+                if (menuGroups.length === 0) {
+                    searchMenuItemsStatus.innerHTML = `<span class="text-red-600">✗ No menu groups available for item creation</span>`;
+                    return;
+                }
+                
+                const groupChoice = prompt(`Select menu group (enter number):\n${menuGroups.map((group, index) => `${index + 1}. ${group.displayName}`).join('\n')}`);
+                const groupIndex = parseInt(groupChoice) - 1;
+                
+                if (groupIndex < 0 || groupIndex >= menuGroups.length) {
+                    searchMenuItemsStatus.innerHTML = `<span class="text-red-600">✗ Valid menu group selection required</span>`;
+                    return;
+                }
+                
+                const selectedGroup = menuGroups[groupIndex];
+                
+                searchMenuItemsBtnText.textContent = 'Creating...';
+                searchMenuItemsSpinner.classList.remove('hidden');
+                createMenuItemBtn.disabled = true;
+                searchMenuItemsStatus.innerHTML = '<span class="text-blue-600">⏳ Trying multiple API endpoints for item creation...</span>';
+                
+                try {
+                    const menuItemData = {
+                        name: itemName.trim(),
+                        description: itemDescription.trim(),
+                        basePrice: itemPrice,
+                        active: true
+                    };
+                    
+                    let result = null;
+                    let successfulUrl = '';
+                    
+                    // Try multiple possible endpoint structures for Toast API menu item creation
+                    const possibleUrls = [
+                        // Try menu items endpoint directly  
+                        `menus/v2/menuItems`,
+                        // Try through menu groups
+                        `${MENU_GROUPS_PATH}/${selectedGroup.groupGuid}/menuItems`,
+                        // Try through menu structure
+                        `menus/v2/menus/${selectedGroup.menuGuid}/menuItems`,
+                        // Alternative group structure
+                        `menus/v2/menus/${selectedGroup.menuGuid}/groups/${selectedGroup.groupGuid}/menuItems`,
+                        // Alternative items path
+                        `menus/v2/menus/${selectedGroup.menuGuid}/groups/${selectedGroup.groupGuid}/items`
+                    ];
+                    
+                    for (const urlPath of possibleUrls) {
+                        const fullUrl = CORS_PROXY + environmentSelect.value + urlPath;
+                        console.log(`Trying menu item creation URL: ${urlPath}`);
+                        
+                        // Add group reference if not using direct menuItems endpoint
+                        let payloadData = { ...menuItemData };
+                        if (!urlPath.startsWith('menus/v2/menuItems')) {
+                            payloadData.menuGroupReference = { guid: selectedGroup.groupGuid };
+                        }
+                        
+                        result = await makeApiCall(fullUrl, 'POST', payloadData, null, 'Menu item created successfully');
+                        
+                        if (!result.error) {
+                            successfulUrl = urlPath;
+                            break;
+                        }
+                    }
+                    
+                    if (!successfulUrl) {
+                        console.log('All menu item creation endpoints failed. Attempted URLs:', possibleUrls);
+                        searchMenuItemsStatus.innerHTML = `<span class="text-red-600">✗ All creation endpoints failed. Toast API may not support menu item creation via API, or requires different permissions. Check console for details.</span>`;
+                        return;
+                    } else {
+                        console.log(`Menu item creation successful using endpoint: ${successfulUrl}`);
+                        const newItem = result.data;
+                        handleItemCreationSuccess(newItem, itemName, selectedGroup);
+                    }
+                    
+                } catch (error) {
+                    searchMenuItemsStatus.innerHTML = `<span class="text-red-600">✗ Error: ${error.message}. Note: Toast API may restrict menu item creation.</span>`;
+                } finally {
+                    searchMenuItemsBtnText.textContent = 'Search Items';
+                    searchMenuItemsSpinner.classList.add('hidden');
+                    createMenuItemBtn.disabled = false;
+                }
+            }
+            
+            // Helper function to handle successful item creation
+            function handleItemCreationSuccess(newItem, itemName, selectedGroup) {
+                // Add context to the new item
+                const itemWithContext = {
+                    ...newItem,
+                    menuName: selectedGroup.menuName,
+                    menuGuid: selectedGroup.menuGuid,
+                    groupName: selectedGroup.groupName,
+                    groupGuid: selectedGroup.groupGuid
+                };
+                
+                // Add to our cached items
+                if (!allMenuItems.find(item => item.guid === newItem.guid)) {
+                    allMenuItems.push(itemWithContext);
+                }
+                
+                // Update dropdowns
+                populateMenuItemDropdowns();
+                populateCategoryFilter();
+                
+                searchMenuItemsStatus.innerHTML = `<span class="text-green-600">✓ Menu item "${itemName}" created successfully in ${selectedGroup.displayName}</span>`;
+                displayMenuItemResults([itemWithContext], 'Newly Created Item');
             }
             
             // Display Menu Item Results
@@ -5207,9 +5668,9 @@
             navMenuItemsBtn.addEventListener('click', () => { 
                 currentWorkflow = 'menu-items'; 
                 updateUIState();
-                // Auto-fetch menu data for item management
+                // Auto-fetch menu items for item management
                 if (isAuthenticated) {
-                    fetchAllMenus();
+                    fetchAllItems();
                 }
                 toggleNavPanel(); // Close nav panel
             });
@@ -5417,6 +5878,9 @@
             // Menu Items
             viewSelectedItemBtn.addEventListener('click', viewSelectedItem);
             searchMenuItemsBtn.addEventListener('click', searchMenuItems);
+            createMenuItemBtn.addEventListener('click', createMenuItem);
+            fetchAllItemsBtn.addEventListener('click', fetchAllItems);
+            clearFiltersBtn.addEventListener('click', clearFilters);
             updateItemPriceBtn.addEventListener('click', updateItemPrice);
             toggleItemAvailabilityBtn.addEventListener('click', toggleItemAvailability);
             
