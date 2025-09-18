@@ -27,7 +27,7 @@
             to { transform: rotate(360deg); }
         }
         /* Hide sections by default, except proxy */
-        #workflowSelectionSection, #orderBuilderSection, #fetchOrderSection, #updateOrderSection, #stockManagementSection, #laborManagementSection, #resultsSection {
+        #workflowSelectionSection, #orderBuilderSection, #fetchOrderSection, #updateOrderSection, #stockManagementSection, #laborManagementSection, #menuManagementSection, #resultsSection {
             display: none;
         }
         details > summary {
@@ -436,13 +436,14 @@
                     </div>
                 </section>
 
-                <section id="laborManagementSection" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                <!-- Employee Management Section -->
+                <section id="employeeManagementSection" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
                     <div class="flex justify-between items-center mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">
-                        <h2 class="text-xl font-semibold">Labor Management</h2>
+                        <h2 class="text-xl font-semibold">👥 Employee Management</h2>
                         <button class="resetWorkflowBtn text-sm text-blue-500 hover:underline">Change Workflow</button>
                     </div>
                     
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="max-w-4xl mx-auto">
                         <!-- Employee Management -->
                         <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
                             <h3 class="text-lg font-semibold mb-3 text-indigo-600 dark:text-indigo-400">👥 Employee Management</h3>
@@ -515,7 +516,17 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </section>
 
+                <!-- Job Management Section -->
+                <section id="jobManagementSection" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                    <div class="flex justify-between items-center mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">
+                        <h2 class="text-xl font-semibold">💼 Job Management</h2>
+                        <button class="resetWorkflowBtn text-sm text-blue-500 hover:underline">Change Workflow</button>
+                    </div>
+                    
+                    <div class="max-w-4xl mx-auto">
                         <!-- Job Management -->
                         <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
                             <h3 class="text-lg font-semibold mb-3 text-purple-600 dark:text-purple-400">💼 Job Management</h3>
@@ -569,7 +580,17 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </section>
 
+                <!-- Shift Management Section -->
+                <section id="shiftManagementSection" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                    <div class="flex justify-between items-center mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">
+                        <h2 class="text-xl font-semibold">📅 Shift Management</h2>
+                        <button class="resetWorkflowBtn text-sm text-blue-500 hover:underline">Change Workflow</button>
+                    </div>
+                    
+                    <div class="max-w-4xl mx-auto">
                         <!-- Shift Management -->
                         <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
                             <h3 class="text-lg font-semibold mb-3 text-green-600 dark:text-green-400">📅 Shift Management</h3>
@@ -637,7 +658,17 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </section>
 
+                <!-- Time Entry Management Section -->
+                <section id="timeEntryManagementSection" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                    <div class="flex justify-between items-center mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">
+                        <h2 class="text-xl font-semibold">⏰ Time Entry Management</h2>
+                        <button class="resetWorkflowBtn text-sm text-blue-500 hover:underline">Change Workflow</button>
+                    </div>
+                    
+                    <div class="max-w-4xl mx-auto">
                         <!-- Time Entry Management -->
                         <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
                             <h3 class="text-lg font-semibold mb-3 text-orange-600 dark:text-orange-400">⏰ Time Entry Management</h3>
@@ -750,6 +781,261 @@
                     </div>
                 </section>
 
+                <!-- Menu Structure Management Section -->
+                <section id="menuStructureSection" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                    <div class="flex justify-between items-center mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">
+                        <h2 class="text-xl font-semibold">📋 Menu Structure</h2>
+                        <button class="resetWorkflowBtn text-sm text-blue-500 hover:underline">Change Workflow</button>
+                    </div>
+                    
+                    <div class="max-w-4xl mx-auto">
+                        <!-- Menu Structure Management -->
+                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                            <h3 class="text-lg font-semibold mb-3 text-amber-600 dark:text-amber-400">📋 Menu Structure</h3>
+                            
+                            <!-- View All Menus -->
+                            <div class="mb-4">
+                                <h4 class="font-medium mb-2">Menus & Categories</h4>
+                                <div class="space-y-2">
+                                    <button id="fetchAllMenusBtn" class="w-full bg-amber-600 hover:bg-amber-700 text-white py-2 rounded-md transition text-sm flex items-center justify-center">
+                                        <span id="fetchAllMenusBtnText">Fetch All Menus</span>
+                                        <div id="fetchAllMenusSpinner" class="spinner ml-2 hidden"></div>
+                                    </button>
+                                    <div class="flex gap-2">
+                                        <select id="menuDropdown" class="flex-1 bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                            <option value="">Select a menu...</option>
+                                        </select>
+                                        <button id="viewSelectedMenuBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md transition text-sm" disabled>View Details</button>
+                                    </div>
+                                    <div id="viewMenusStatus" class="text-xs text-center mt-2"></div>
+                                </div>
+                            </div>
+
+                            <!-- Menu Groups Management -->
+                            <div class="border-t pt-3">
+                                <h4 class="font-medium mb-2">Menu Categories/Groups</h4>
+                                <div class="space-y-2">
+                                    <select id="menuGroupDropdown" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                        <option value="">Select a category...</option>
+                                    </select>
+                                    <div class="flex gap-2">
+                                        <button id="viewMenuGroupBtn" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-md transition text-sm flex items-center justify-center" disabled>
+                                            <span id="viewMenuGroupBtnText">View Category</span>
+                                            <div id="viewMenuGroupSpinner" class="spinner ml-2 hidden"></div>
+                                        </button>
+                                        <button id="createMenuGroupBtn" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-md transition text-sm">Create New</button>
+                                    </div>
+                                    <div id="viewMenuGroupStatus" class="text-xs text-center"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Menu Items Management Section -->
+                <section id="menuItemsSection" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                    <div class="flex justify-between items-center mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">
+                        <h2 class="text-xl font-semibold">🍽️ Menu Items</h2>
+                        <button class="resetWorkflowBtn text-sm text-blue-500 hover:underline">Change Workflow</button>
+                    </div>
+                    
+                    <div class="max-w-4xl mx-auto">
+                        <!-- Menu Items Management -->
+                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                            <h3 class="text-lg font-semibold mb-3 text-emerald-600 dark:text-emerald-400">🍽️ Menu Items</h3>
+                            
+                            <!-- View & Search Items -->
+                            <div class="mb-4">
+                                <h4 class="font-medium mb-2">Items Management</h4>
+                                <div class="space-y-3">
+                                    <!-- Quick Actions -->
+                                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-2">
+                                        <button id="fetchAllItemsBtn" class="bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-md transition text-sm flex items-center justify-center">
+                                            <span id="fetchAllItemsBtnText">📋 Fetch All Items</span>
+                                            <div id="fetchAllItemsSpinner" class="spinner ml-2 hidden"></div>
+                                        </button>
+                                        <button id="createMenuItemBtn" class="bg-green-600 hover:bg-green-700 text-white py-2 rounded-md transition text-sm flex items-center justify-center">
+                                            ➕ Create New Item
+                                        </button>
+                                    </div>
+                                    
+                                    <!-- API Limitations Notice -->
+                                    <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3 text-xs">
+                                        <div class="flex items-center mb-1">
+                                            <span class="text-yellow-600 dark:text-yellow-400 mr-2">ℹ️</span>
+                                            <strong class="text-yellow-800 dark:text-yellow-200">Toast API Note:</strong>
+                                        </div>
+                                        <p class="text-yellow-700 dark:text-yellow-300">
+                                            Menu item operations may be restricted by Toast API permissions. If you encounter errors, 
+                                            check the browser console (F12) for detailed API response information.
+                                        </p>
+                                    </div>
+                                    
+                                    <!-- Search & Filters -->
+                                    <div class="bg-white dark:bg-gray-600 rounded-lg p-3 border border-gray-200 dark:border-gray-500">
+                                        <div class="space-y-2">
+                                            <input type="text" id="itemSearchInput" placeholder="🔍 Search by name, description, or PLU..." class="w-full bg-gray-50 dark:bg-gray-700 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                            
+                                            <!-- Filter Row -->
+                                            <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                                                <select id="categoryFilterSelect" class="bg-gray-50 dark:bg-gray-700 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                                    <option value="">All Categories</option>
+                                                </select>
+                                                <select id="availabilityFilterSelect" class="bg-gray-50 dark:bg-gray-700 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                                    <option value="">All Items</option>
+                                                    <option value="available">Available Only</option>
+                                                    <option value="unavailable">Unavailable Only</option>
+                                                </select>
+                                                <select id="priceRangeSelect" class="bg-gray-50 dark:bg-gray-700 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                                    <option value="">All Prices</option>
+                                                    <option value="0-500">Under $5</option>
+                                                    <option value="500-1000">$5 - $10</option>
+                                                    <option value="1000-2000">$10 - $20</option>
+                                                    <option value="2000-5000">$20 - $50</option>
+                                                    <option value="5000+">Over $50</option>
+                                                </select>
+                                            </div>
+                                            
+                                            <!-- Action Buttons -->
+                                            <div class="flex gap-2">
+                                                <button id="searchMenuItemsBtn" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-md transition text-sm flex items-center justify-center">
+                                                    <span id="searchMenuItemsBtnText">🔍 Search & Filter</span>
+                                                    <div id="searchMenuItemsSpinner" class="spinner ml-2 hidden"></div>
+                                                </button>
+                                                <button id="clearFiltersBtn" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md transition text-sm">
+                                                    Clear
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Quick Select -->
+                                    <div class="flex gap-2">
+                                        <select id="menuItemDropdown" class="flex-1 bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                            <option value="">Quick select an item...</option>
+                                        </select>
+                                        <button id="viewSelectedItemBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md transition text-sm whitespace-nowrap" disabled>View Details</button>
+                                    </div>
+                                    
+                                    <div id="searchMenuItemsStatus" class="text-xs text-center"></div>
+                                </div>
+                            </div>
+
+                            <!-- Item Operations -->
+                            <div class="border-t pt-3">
+                                <h4 class="font-medium mb-2">Item Operations</h4>
+                                <div class="space-y-2">
+                                    <select id="itemOperationDropdown" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                        <option value="">Select item for operations...</option>
+                                    </select>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <button id="updateItemPriceBtn" class="bg-yellow-600 hover:bg-yellow-700 text-white py-2 rounded-md transition text-sm" disabled>Update Price</button>
+                                        <button id="toggleItemAvailabilityBtn" class="bg-orange-600 hover:bg-orange-700 text-white py-2 rounded-md transition text-sm" disabled>Toggle Available</button>
+                                    </div>
+                                    <div id="itemOperationsStatus" class="text-xs text-center"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Modifier Management Section -->
+                <section id="modifiersSection" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                    <div class="flex justify-between items-center mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">
+                        <h2 class="text-xl font-semibold">🔧 Modifiers</h2>
+                        <button class="resetWorkflowBtn text-sm text-blue-500 hover:underline">Change Workflow</button>
+                    </div>
+                    
+                    <div class="max-w-4xl mx-auto">
+                        <!-- Modifier Management -->
+                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                            <h3 class="text-lg font-semibold mb-3 text-teal-600 dark:text-teal-400">🔧 Modifiers</h3>
+                            
+                            <!-- Modifier Groups -->
+                            <div class="mb-4">
+                                <h4 class="font-medium mb-2">Modifier Groups</h4>
+                                <div class="space-y-2">
+                                    <button id="fetchModifierGroupsBtn" class="w-full bg-teal-600 hover:bg-teal-700 text-white py-2 rounded-md transition text-sm flex items-center justify-center">
+                                        <span id="fetchModifierGroupsBtnText">Fetch Modifier Groups</span>
+                                        <div id="fetchModifierGroupsSpinner" class="spinner ml-2 hidden"></div>
+                                    </button>
+                                    <div class="flex gap-2">
+                                        <select id="modifierGroupDropdown" class="flex-1 bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                            <option value="">Select modifier group...</option>
+                                        </select>
+                                        <button id="viewModifierGroupBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md transition text-sm" disabled>View</button>
+                                    </div>
+                                    <div id="fetchModifierGroupsStatus" class="text-xs text-center"></div>
+                                </div>
+                            </div>
+
+                            <!-- Modifier Options -->
+                            <div class="border-t pt-3">
+                                <h4 class="font-medium mb-2">Modifier Options</h4>
+                                <div class="space-y-2">
+                                    <select id="modifierOptionDropdown" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                        <option value="">Select modifier option...</option>
+                                    </select>
+                                    <div class="flex gap-2">
+                                        <button id="viewModifierOptionsBtn" class="flex-1 bg-cyan-600 hover:bg-cyan-700 text-white py-2 rounded-md transition text-sm flex items-center justify-center">
+                                            <span id="viewModifierOptionsBtnText">View Options</span>
+                                            <div id="viewModifierOptionsSpinner" class="spinner ml-2 hidden"></div>
+                                        </button>
+                                        <button id="createModifierOptionBtn" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-md transition text-sm">Create</button>
+                                    </div>
+                                    <div id="viewModifierOptionsStatus" class="text-xs text-center"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Bulk Operations Section -->
+                <section id="bulkOperationsSection" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                    <div class="flex justify-between items-center mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">
+                        <h2 class="text-xl font-semibold">⚡ Bulk Operations</h2>
+                        <button class="resetWorkflowBtn text-sm text-blue-500 hover:underline">Change Workflow</button>
+                    </div>
+                    
+                    <div class="max-w-4xl mx-auto">
+                        <!-- Bulk Operations -->
+                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                            <h3 class="text-lg font-semibold mb-3 text-rose-600 dark:text-rose-400">⚡ Bulk Operations</h3>
+                            
+                            <!-- Batch Updates -->
+                            <div class="mb-4">
+                                <h4 class="font-medium mb-2">Batch Operations</h4>
+                                <div class="space-y-2">
+                                    <select id="bulkOperationTypeSelect" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                        <option value="">Select operation type...</option>
+                                        <option value="price-update">Bulk Price Update</option>
+                                        <option value="availability-toggle">Bulk Availability Toggle</option>
+                                        <option value="category-move">Move Items to Category</option>
+                                    </select>
+                                    <textarea id="bulkItemsList" rows="3" placeholder="Enter item GUIDs or names (one per line)" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm"></textarea>
+                                    <button id="executeBulkOperationBtn" class="w-full bg-rose-600 hover:bg-rose-700 text-white py-2 rounded-md transition text-sm flex items-center justify-center" disabled>
+                                        <span id="executeBulkOperationBtnText">Execute Bulk Operation</span>
+                                        <div id="executeBulkOperationSpinner" class="spinner ml-2 hidden"></div>
+                                    </button>
+                                    <div id="bulkOperationStatus" class="text-xs text-center"></div>
+                                </div>
+                            </div>
+
+                            <!-- Menu Publishing -->
+                            <div class="border-t pt-3">
+                                <h4 class="font-medium mb-2">Menu Publishing</h4>
+                                <div class="space-y-2">
+                                    <div class="flex gap-2">
+                                        <button id="validateMenuBtn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md transition text-sm">Validate Menu</button>
+                                        <button id="publishMenuBtn" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-md transition text-sm">Publish Menu</button>
+                                    </div>
+                                    <div id="menuPublishingStatus" class="text-xs text-center"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
                 <section id="resultsSection" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
                      <h2 class="text-xl font-semibold mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">Results</h2>
                      <div id="resultsContainer" class="space-y-4 max-h-[32rem] overflow-y-auto">
@@ -809,22 +1095,30 @@
         <div class="flex-1 overflow-y-auto p-6">
             <!-- Orders API Section -->
             <div class="mb-6">
-                <div class="flex items-center mb-3">
-                    <div class="w-8 h-8 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center mr-3">
-                        <svg class="w-4 h-4 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                        </svg>
+                <button class="w-full flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg transition" onclick="toggleApiSection('orders')">
+                    <div class="flex items-center">
+                        <div class="w-8 h-8 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center mr-3">
+                            <svg class="w-4 h-4 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-green-700 dark:text-green-300">Orders API</h3>
                     </div>
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Orders API</h3>
-                </div>
-                <div class="space-y-2 ml-11">
-                    <button id="navCreateOrderBtn" class="w-full text-left px-4 py-2 rounded-lg bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30 text-green-700 dark:text-green-300 transition">
+                    <svg id="ordersChevron" class="w-5 h-5 text-green-600 dark:text-green-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+                <div id="ordersSubMenu" class="ml-4 mt-2 space-y-1 hidden">
+                    <button id="navCreateOrderBtn" class="w-full text-left px-4 py-2 rounded-lg bg-green-50 dark:bg-green-900/10 hover:bg-green-100 dark:hover:bg-green-900/30 text-green-700 dark:text-green-300 transition text-sm flex items-center">
+                        <span class="w-2 h-2 bg-green-400 rounded-full mr-3"></span>
                         Create New Order
                     </button>
-                    <button id="navFetchOrderBtn" class="w-full text-left px-4 py-2 rounded-lg bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 text-blue-700 dark:text-blue-300 transition">
+                    <button id="navFetchOrderBtn" class="w-full text-left px-4 py-2 rounded-lg bg-green-50 dark:bg-green-900/10 hover:bg-green-100 dark:hover:bg-green-900/30 text-green-700 dark:text-green-300 transition text-sm flex items-center">
+                        <span class="w-2 h-2 bg-green-400 rounded-full mr-3"></span>
                         Fetch/Review Order
                     </button>
-                    <button id="navUpdateOrderBtn" class="w-full text-left px-4 py-2 rounded-lg bg-purple-50 dark:bg-purple-900/20 hover:bg-purple-100 dark:hover:bg-purple-900/30 text-purple-700 dark:text-purple-300 transition">
+                    <button id="navUpdateOrderBtn" class="w-full text-left px-4 py-2 rounded-lg bg-green-50 dark:bg-green-900/10 hover:bg-green-100 dark:hover:bg-green-900/30 text-green-700 dark:text-green-300 transition text-sm flex items-center">
+                        <span class="w-2 h-2 bg-green-400 rounded-full mr-3"></span>
                         Update Existing Order
                     </button>
                 </div>
@@ -832,34 +1126,93 @@
             
             <!-- Stock API Section -->
             <div class="mb-6">
-                <div class="flex items-center mb-3">
-                    <div class="w-8 h-8 bg-orange-100 dark:bg-orange-900 rounded-lg flex items-center justify-center mr-3">
-                        <svg class="w-4 h-4 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                        </svg>
+                <button class="w-full flex items-center justify-between p-3 bg-orange-50 dark:bg-orange-900/20 hover:bg-orange-100 dark:hover:bg-orange-900/30 rounded-lg transition" onclick="toggleApiSection('stock')">
+                    <div class="flex items-center">
+                        <div class="w-8 h-8 bg-orange-100 dark:bg-orange-900 rounded-lg flex items-center justify-center mr-3">
+                            <svg class="w-4 h-4 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-orange-700 dark:text-orange-300">Stock API</h3>
                     </div>
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Stock API</h3>
-                </div>
-                <div class="space-y-2 ml-11">
-                    <button id="navStockBtn" class="w-full text-left px-4 py-2 rounded-lg bg-orange-50 dark:bg-orange-900/20 hover:bg-orange-100 dark:hover:bg-orange-900/30 text-orange-700 dark:text-orange-300 transition">
-                        Manage Inventory
+                    <svg id="stockChevron" class="w-5 h-5 text-orange-600 dark:text-orange-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+                <div id="stockSubMenu" class="ml-4 mt-2 space-y-1 hidden">
+                    <button id="navStockBtn" class="w-full text-left px-4 py-2 rounded-lg bg-orange-50 dark:bg-orange-900/10 hover:bg-orange-100 dark:hover:bg-orange-900/30 text-orange-700 dark:text-orange-300 transition text-sm flex items-center">
+                        <span class="w-2 h-2 bg-orange-400 rounded-full mr-3"></span>
+                        Inventory Management
                     </button>
                 </div>
             </div>
             
             <!-- Labor API Section -->
             <div class="mb-6">
-                <div class="flex items-center mb-3">
-                    <div class="w-8 h-8 bg-indigo-100 dark:bg-indigo-900 rounded-lg flex items-center justify-center mr-3">
-                        <svg class="w-4 h-4 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                        </svg>
+                <button class="w-full flex items-center justify-between p-3 bg-indigo-50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 rounded-lg transition" onclick="toggleApiSection('labor')">
+                    <div class="flex items-center">
+                        <div class="w-8 h-8 bg-indigo-100 dark:bg-indigo-900 rounded-lg flex items-center justify-center mr-3">
+                            <svg class="w-4 h-4 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-indigo-700 dark:text-indigo-300">Labor API</h3>
                     </div>
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Labor API</h3>
+                    <svg id="laborChevron" class="w-5 h-5 text-indigo-600 dark:text-indigo-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+                <div id="laborSubMenu" class="ml-4 mt-2 space-y-1 hidden">
+                    <button id="navEmployeeManagementBtn" class="w-full text-left px-4 py-2 rounded-lg bg-indigo-50 dark:bg-indigo-900/10 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 transition text-sm flex items-center">
+                        <span class="w-2 h-2 bg-indigo-400 rounded-full mr-3"></span>
+                        Employee Management
+                    </button>
+                    <button id="navShiftManagementBtn" class="w-full text-left px-4 py-2 rounded-lg bg-indigo-50 dark:bg-indigo-900/10 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 transition text-sm flex items-center">
+                        <span class="w-2 h-2 bg-indigo-400 rounded-full mr-3"></span>
+                        Shift Management
+                    </button>
+                    <button id="navJobManagementBtn" class="w-full text-left px-4 py-2 rounded-lg bg-indigo-50 dark:bg-indigo-900/10 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 transition text-sm flex items-center">
+                        <span class="w-2 h-2 bg-indigo-400 rounded-full mr-3"></span>
+                        Job Management
+                    </button>
+                    <button id="navTimeEntryManagementBtn" class="w-full text-left px-4 py-2 rounded-lg bg-indigo-50 dark:bg-indigo-900/10 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 transition text-sm flex items-center">
+                        <span class="w-2 h-2 bg-indigo-400 rounded-full mr-3"></span>
+                        Time Entry Management
+                    </button>
                 </div>
-                <div class="space-y-2 ml-11">
-                    <button id="navLaborBtn" class="w-full text-left px-4 py-2 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 transition">
-                        Manage Labor
+            </div>
+            
+            <!-- Menus API Section -->
+            <div class="mb-6">
+                <button class="w-full flex items-center justify-between p-3 bg-amber-50 dark:bg-amber-900/20 hover:bg-amber-100 dark:hover:bg-amber-900/30 rounded-lg transition" onclick="toggleApiSection('menus')">
+                    <div class="flex items-center">
+                        <div class="w-8 h-8 bg-amber-100 dark:bg-amber-900 rounded-lg flex items-center justify-center mr-3">
+                            <svg class="w-4 h-4 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-amber-700 dark:text-amber-300">Menus API</h3>
+                    </div>
+                    <svg id="menusChevron" class="w-5 h-5 text-amber-600 dark:text-amber-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+                <div id="menusSubMenu" class="ml-4 mt-2 space-y-1 hidden">
+                    <button id="navMenuStructureBtn" class="w-full text-left px-4 py-2 rounded-lg bg-amber-50 dark:bg-amber-900/10 hover:bg-amber-100 dark:hover:bg-amber-900/30 text-amber-700 dark:text-amber-300 transition text-sm flex items-center">
+                        <span class="w-2 h-2 bg-amber-400 rounded-full mr-3"></span>
+                        Menu Structure
+                    </button>
+                    <button id="navMenuItemsBtn" class="w-full text-left px-4 py-2 rounded-lg bg-amber-50 dark:bg-amber-900/10 hover:bg-amber-100 dark:hover:bg-amber-900/30 text-amber-700 dark:text-amber-300 transition text-sm flex items-center">
+                        <span class="w-2 h-2 bg-amber-400 rounded-full mr-3"></span>
+                        Menu Items
+                    </button>
+                    <button id="navModifiersBtn" class="w-full text-left px-4 py-2 rounded-lg bg-amber-50 dark:bg-amber-900/10 hover:bg-amber-100 dark:hover:bg-amber-900/30 text-amber-700 dark:text-amber-300 transition text-sm flex items-center">
+                        <span class="w-2 h-2 bg-amber-400 rounded-full mr-3"></span>
+                        Modifiers
+                    </button>
+                    <button id="navBulkOperationsBtn" class="w-full text-left px-4 py-2 rounded-lg bg-amber-50 dark:bg-amber-900/10 hover:bg-amber-100 dark:hover:bg-amber-900/30 text-amber-700 dark:text-amber-300 transition text-sm flex items-center">
+                        <span class="w-2 h-2 bg-amber-400 rounded-full mr-3"></span>
+                        Bulk Operations
                     </button>
                 </div>
             </div>
@@ -933,6 +1286,11 @@
             const AUTH_PATH = 'authentication/v1/authentication/login';
             const RESTAURANTS_PATH = 'restaurants/v1/restaurants';
             const MENUS_PATH = 'menus/v2/menus';
+            const MENUS_PATH_BASE = 'menus/v2/menus';
+            const MENU_ITEMS_PATH = 'menus/v2/menuItems';
+            const MENU_GROUPS_PATH = 'menus/v2/menuGroups';
+            const MODIFIER_GROUPS_PATH = 'menus/v2/modifierGroups';
+            const MODIFIER_OPTIONS_PATH = 'menus/v2/modifierOptions';
             const DINING_OPTIONS_PATH = 'config/v2/diningOptions';
             const EMPLOYEES_PATH = '/labor/v1/employees';
             const DISCOUNTS_PATH = 'config/v2/discounts';
@@ -1035,7 +1393,18 @@
             const navFetchOrderBtn = document.getElementById('navFetchOrderBtn');
             const navUpdateOrderBtn = document.getElementById('navUpdateOrderBtn');
             const navStockBtn = document.getElementById('navStockBtn');
-            const navLaborBtn = document.getElementById('navLaborBtn');
+            
+            // Labor Management Sub-navigation
+            const navEmployeeManagementBtn = document.getElementById('navEmployeeManagementBtn');
+            const navShiftManagementBtn = document.getElementById('navShiftManagementBtn');
+            const navJobManagementBtn = document.getElementById('navJobManagementBtn');
+            const navTimeEntryManagementBtn = document.getElementById('navTimeEntryManagementBtn');
+            
+            // Menu Management Sub-navigation
+            const navMenuStructureBtn = document.getElementById('navMenuStructureBtn');
+            const navMenuItemsBtn = document.getElementById('navMenuItemsBtn');
+            const navModifiersBtn = document.getElementById('navModifiersBtn');
+            const navBulkOperationsBtn = document.getElementById('navBulkOperationsBtn');
             
             // Config Panel Elements
             const configPanel = document.getElementById('configPanel');
@@ -1096,8 +1465,10 @@
             const bulkUpdateInventoryStatus = document.getElementById('bulkUpdateInventoryStatus');
 
             // Labor Management Elements
-            const laborManagementSection = document.getElementById('laborManagementSection');
-            const laborWorkflowBtn = document.getElementById('laborWorkflowBtn');
+            const employeeManagementSection = document.getElementById('employeeManagementSection');
+            const jobManagementSection = document.getElementById('jobManagementSection');
+            const shiftManagementSection = document.getElementById('shiftManagementSection');
+            const timeEntryManagementSection = document.getElementById('timeEntryManagementSection');
             
             // Employee Management
             const fetchAllEmployeesBtn = document.getElementById('fetchAllEmployeesBtn');
@@ -1194,6 +1565,79 @@
             const customFieldValueInput = document.getElementById('customFieldValue');
             const customFieldsList = document.getElementById('customFieldsList');
 
+            // Menu Management Elements
+            const menuStructureSection = document.getElementById('menuStructureSection');
+            const menuItemsSection = document.getElementById('menuItemsSection');
+            const modifiersSection = document.getElementById('modifiersSection');
+            const bulkOperationsSection = document.getElementById('bulkOperationsSection');
+            
+            // Menu Structure
+            const fetchAllMenusBtn = document.getElementById('fetchAllMenusBtn');
+            const fetchAllMenusBtnText = document.getElementById('fetchAllMenusBtnText');
+            const fetchAllMenusSpinner = document.getElementById('fetchAllMenusSpinner');
+            const menuDropdown = document.getElementById('menuDropdown');
+            const viewSelectedMenuBtn = document.getElementById('viewSelectedMenuBtn');
+            const viewMenusStatus = document.getElementById('viewMenusStatus');
+            
+            // Menu Groups
+            const menuGroupDropdown = document.getElementById('menuGroupDropdown');
+            const viewMenuGroupBtn = document.getElementById('viewMenuGroupBtn');
+            const viewMenuGroupBtnText = document.getElementById('viewMenuGroupBtnText');
+            const viewMenuGroupSpinner = document.getElementById('viewMenuGroupSpinner');
+            const createMenuGroupBtn = document.getElementById('createMenuGroupBtn');
+            const viewMenuGroupStatus = document.getElementById('viewMenuGroupStatus');
+            
+            // Menu Items
+            const menuItemDropdown = document.getElementById('menuItemDropdown');
+            const viewSelectedItemBtn = document.getElementById('viewSelectedItemBtn');
+            const itemSearchInput = document.getElementById('itemSearchInput');
+            const searchMenuItemsBtn = document.getElementById('searchMenuItemsBtn');
+            const searchMenuItemsBtnText = document.getElementById('searchMenuItemsBtnText');
+            const searchMenuItemsSpinner = document.getElementById('searchMenuItemsSpinner');
+            const createMenuItemBtn = document.getElementById('createMenuItemBtn');
+            const searchMenuItemsStatus = document.getElementById('searchMenuItemsStatus');
+            const fetchAllItemsBtn = document.getElementById('fetchAllItemsBtn');
+            const fetchAllItemsBtnText = document.getElementById('fetchAllItemsBtnText');
+            const fetchAllItemsSpinner = document.getElementById('fetchAllItemsSpinner');
+            const categoryFilterSelect = document.getElementById('categoryFilterSelect');
+            const availabilityFilterSelect = document.getElementById('availabilityFilterSelect');
+            const priceRangeSelect = document.getElementById('priceRangeSelect');
+            const clearFiltersBtn = document.getElementById('clearFiltersBtn');
+            
+            // Item Operations
+            const itemOperationDropdown = document.getElementById('itemOperationDropdown');
+            const updateItemPriceBtn = document.getElementById('updateItemPriceBtn');
+            const toggleItemAvailabilityBtn = document.getElementById('toggleItemAvailabilityBtn');
+            const itemOperationsStatus = document.getElementById('itemOperationsStatus');
+            
+            // Modifier Management
+            const fetchModifierGroupsBtn = document.getElementById('fetchModifierGroupsBtn');
+            const fetchModifierGroupsBtnText = document.getElementById('fetchModifierGroupsBtnText');
+            const fetchModifierGroupsSpinner = document.getElementById('fetchModifierGroupsSpinner');
+            const modifierGroupDropdown = document.getElementById('modifierGroupDropdown');
+            const viewModifierGroupBtn = document.getElementById('viewModifierGroupBtn');
+            const fetchModifierGroupsStatus = document.getElementById('fetchModifierGroupsStatus');
+            
+            const modifierOptionDropdown = document.getElementById('modifierOptionDropdown');
+            const viewModifierOptionsBtn = document.getElementById('viewModifierOptionsBtn');
+            const viewModifierOptionsBtnText = document.getElementById('viewModifierOptionsBtnText');
+            const viewModifierOptionsSpinner = document.getElementById('viewModifierOptionsSpinner');
+            const createModifierOptionBtn = document.getElementById('createModifierOptionBtn');
+            const viewModifierOptionsStatus = document.getElementById('viewModifierOptionsStatus');
+            
+            // Bulk Operations
+            const bulkOperationTypeSelect = document.getElementById('bulkOperationTypeSelect');
+            const bulkItemsList = document.getElementById('bulkItemsList');
+            const executeBulkOperationBtn = document.getElementById('executeBulkOperationBtn');
+            const executeBulkOperationBtnText = document.getElementById('executeBulkOperationBtnText');
+            const executeBulkOperationSpinner = document.getElementById('executeBulkOperationSpinner');
+            const bulkOperationStatus = document.getElementById('bulkOperationStatus');
+            
+            // Menu Publishing
+            const validateMenuBtn = document.getElementById('validateMenuBtn');
+            const publishMenuBtn = document.getElementById('publishMenuBtn');
+            const menuPublishingStatus = document.getElementById('menuPublishingStatus');
+
             const resultsSection = document.getElementById('resultsSection');
             const resultsContainer = document.getElementById('resultsContainer');
 
@@ -1285,7 +1729,14 @@
                 fetchOrderSection.style.display = 'none';
                 updateOrderSection.style.display = 'none';
                 stockManagementSection.style.display = 'none';
-                laborManagementSection.style.display = 'none';
+                employeeManagementSection.style.display = 'none';
+                jobManagementSection.style.display = 'none';
+                shiftManagementSection.style.display = 'none';
+                timeEntryManagementSection.style.display = 'none';
+                menuStructureSection.style.display = 'none';
+                menuItemsSection.style.display = 'none';
+                modifiersSection.style.display = 'none';
+                bulkOperationsSection.style.display = 'none';
                 resultsSection.style.display = 'none';
 
                 if (token) {
@@ -1346,8 +1797,29 @@
                             case 'stock':
                                 stockManagementSection.style.display = 'block';
                                 break;
-                            case 'labor':
-                                laborManagementSection.style.display = 'block';
+                            case 'employee-management':
+                                employeeManagementSection.style.display = 'block';
+                                break;
+                            case 'shift-management':
+                                shiftManagementSection.style.display = 'block';
+                                break;
+                            case 'job-management':
+                                jobManagementSection.style.display = 'block';
+                                break;
+                            case 'time-entry-management':
+                                timeEntryManagementSection.style.display = 'block';
+                                break;
+                            case 'menu-structure':
+                                menuStructureSection.style.display = 'block';
+                                break;
+                            case 'menu-items':
+                                menuItemsSection.style.display = 'block';
+                                break;
+                            case 'modifiers':
+                                modifiersSection.style.display = 'block';
+                                break;
+                            case 'bulk-operations':
+                                bulkOperationsSection.style.display = 'block';
                                 break;
                             default:
                                 break;
@@ -2782,6 +3254,13 @@
             // Store fetched employees and jobs for dropdowns
             let allEmployees = [];
             let allJobs = [];
+            
+            // Store fetched menu data for dropdowns
+            let allMenus = [];
+            let allMenuGroups = [];
+            let allMenuItems = [];
+            let allModifierGroups = [];
+            let allModifierOptions = [];
             
             // Employee Management Functions
             async function fetchAllEmployees() {
@@ -4258,6 +4737,839 @@
                 resultsContainer.innerHTML = html;
             }
 
+            // --- Menu Management Functions ---
+            
+            // Fetch All Menus
+            async function fetchAllMenus() {
+                fetchAllMenusBtnText.textContent = 'Fetching...';
+                fetchAllMenusSpinner.classList.remove('hidden');
+                fetchAllMenusBtn.disabled = true;
+                viewMenusStatus.innerHTML = '';
+                
+                try {
+                    const url = CORS_PROXY + environmentSelect.value + MENUS_PATH_BASE;
+                    const result = await makeApiCall(url, 'GET', null, viewMenusStatus, 'Menus fetched successfully');
+                    
+                    if (result.error) {
+                        const errorMessage = typeof result.error === 'object' ? 
+                            result.error.message || JSON.stringify(result.error) : 
+                            result.error;
+                        viewMenusStatus.innerHTML = `<span class="text-red-600">✗ Failed: ${errorMessage}</span>`;
+                    } else {
+                        allMenus = result.data || [];
+                        viewMenusStatus.innerHTML = `<span class="text-green-600">✓ Found ${allMenus.length} menus</span>`;
+                        populateMenuDropdowns();
+                        displayMenuResults(allMenus, 'All Restaurant Menus');
+                        
+                        // Extract menu groups and items for other dropdowns
+                        extractMenuGroupsAndItems();
+                    }
+                } catch (error) {
+                    viewMenusStatus.innerHTML = `<span class="text-red-600">✗ Error: ${error.message}</span>`;
+                } finally {
+                    fetchAllMenusBtnText.textContent = 'Fetch All Menus';
+                    fetchAllMenusSpinner.classList.add('hidden');
+                    fetchAllMenusBtn.disabled = false;
+                }
+            }
+            
+            // View Selected Menu
+            function viewSelectedMenu() {
+                const selectedGuid = menuDropdown.value;
+                if (!selectedGuid) {
+                    viewMenusStatus.innerHTML = `<span class="text-yellow-600">Please select a menu first</span>`;
+                    return;
+                }
+                
+                const selectedMenu = allMenus.find(menu => menu.guid === selectedGuid);
+                if (selectedMenu) {
+                    displayMenuResults([selectedMenu], 'Selected Menu Details');
+                    viewMenusStatus.innerHTML = `<span class="text-green-600">✓ Menu details displayed</span>`;
+                } else {
+                    viewMenusStatus.innerHTML = `<span class="text-red-600">✗ Menu not found in cache</span>`;
+                }
+            }
+            
+            // Extract Menu Groups and Items from fetched menus
+            function extractMenuGroupsAndItems() {
+                allMenuGroups = [];
+                allMenuItems = [];
+                
+                allMenus.forEach(menu => {
+                    if (menu.menuGroups) {
+                        menu.menuGroups.forEach(group => {
+                            allMenuGroups.push({
+                                ...group,
+                                menuName: menu.name,
+                                menuGuid: menu.guid
+                            });
+                            
+                            if (group.menuItems) {
+                                group.menuItems.forEach(item => {
+                                    allMenuItems.push({
+                                        ...item,
+                                        groupName: group.name,
+                                        groupGuid: group.guid,
+                                        menuName: menu.name,
+                                        menuGuid: menu.guid
+                                    });
+                                });
+                            }
+                        });
+                    }
+                });
+                
+                populateMenuGroupDropdowns();
+                populateMenuItemDropdowns();
+                
+                console.log(`Extracted ${allMenuGroups.length} menu groups and ${allMenuItems.length} menu items`);
+            }
+            
+            // Populate Menu Dropdowns
+            function populateMenuDropdowns() {
+                if (menuDropdown) {
+                    menuDropdown.innerHTML = '<option value="">Select a menu...</option>';
+                    allMenus.forEach(menu => {
+                        const displayName = menu.name || menu.guid.slice(-8);
+                        menuDropdown.innerHTML += `<option value="${menu.guid}">${displayName}</option>`;
+                    });
+                    
+                    // Enable buttons that depend on menu data
+                    viewSelectedMenuBtn.disabled = false;
+                }
+            }
+            
+            // Populate Menu Group Dropdowns
+            function populateMenuGroupDropdowns() {
+                if (menuGroupDropdown) {
+                    menuGroupDropdown.innerHTML = '<option value="">Select a category...</option>';
+                    allMenuGroups.forEach(group => {
+                        const displayName = `${group.name} (${group.menuName})`;
+                        menuGroupDropdown.innerHTML += `<option value="${group.guid}">${displayName}</option>`;
+                    });
+                    
+                    // Enable buttons
+                    viewMenuGroupBtn.disabled = false;
+                }
+            }
+            
+            // Populate Menu Item Dropdowns
+            function populateMenuItemDropdowns() {
+                const dropdowns = [menuItemDropdown, itemOperationDropdown];
+                
+                dropdowns.forEach(dropdown => {
+                    if (dropdown) {
+                        const placeholder = dropdown === menuItemDropdown ? 'Select an item...' : 'Select item for operations...';
+                        dropdown.innerHTML = `<option value="">${placeholder}</option>`;
+                        
+                        allMenuItems.forEach(item => {
+                            const displayName = `${item.name} (${item.groupName})`;
+                            dropdown.innerHTML += `<option value="${item.guid}">${displayName}</option>`;
+                        });
+                    }
+                });
+                
+                // Enable buttons
+                if (viewSelectedItemBtn) viewSelectedItemBtn.disabled = false;
+            }
+            
+            // Display Menu Results
+            function displayMenuResults(menus, title) {
+                let html = `<div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+                    <h3 class="font-semibold text-lg mb-3">${title}</h3>`;
+                
+                if (menus.length === 0) {
+                    html += '<p class="text-gray-500">No menus found</p>';
+                } else {
+                    html += '<div class="space-y-4">';
+                    
+                    menus.forEach(menu => {
+                        html += `
+                        <div class="border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+                            <div class="flex justify-between items-start mb-3">
+                                <h4 class="font-semibold text-amber-600 dark:text-amber-400">${menu.name || 'Unnamed Menu'}</h4>
+                                <span class="text-xs text-gray-500 font-mono">${menu.guid.slice(-8)}</span>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                <div>
+                                    <span class="font-medium">Menu Groups:</span> ${menu.menuGroups ? menu.menuGroups.length : 0}
+                                </div>
+                                <div>
+                                    <span class="font-medium">Total Items:</span> ${menu.menuGroups ? 
+                                        menu.menuGroups.reduce((total, group) => total + (group.menuItems ? group.menuItems.length : 0), 0) : 0}
+                                </div>
+                                <div>
+                                    <span class="font-medium">Master:</span> ${menu.master ? 'Yes' : 'No'}
+                                </div>
+                                <div>
+                                    <span class="font-medium">Status:</span> <span class="px-2 py-1 rounded text-xs ${menu.published ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'}">${menu.published ? 'Published' : 'Draft'}</span>
+                                </div>
+                            </div>`;
+                        
+                        // Show menu groups if available
+                        if (menu.menuGroups && menu.menuGroups.length > 0) {
+                            html += `
+                            <div class="mt-4 pt-3 border-t border-gray-200 dark:border-gray-600">
+                                <h5 class="font-medium mb-2">Menu Categories (${menu.menuGroups.length}):</h5>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">`;
+                            
+                            menu.menuGroups.forEach(group => {
+                                const itemCount = group.menuItems ? group.menuItems.length : 0;
+                                html += `
+                                <div class="bg-gray-50 dark:bg-gray-700 p-2 rounded text-sm">
+                                    <div class="font-medium">${group.name}</div>
+                                    <div class="text-gray-600 dark:text-gray-400">${itemCount} items</div>
+                                </div>`;
+                            });
+                            
+                            html += `
+                                </div>
+                            </div>`;
+                        }
+                        
+                        html += '</div>';
+                    });
+                    
+                    html += '</div>';
+                }
+                
+                html += '</div>';
+                resultsContainer.innerHTML = html;
+            }
+
+            // --- Menu Items Management Functions ---
+            
+            // View Selected Menu Item
+            function viewSelectedItem() {
+                const selectedGuid = menuItemDropdown.value;
+                if (!selectedGuid) {
+                    searchMenuItemsStatus.innerHTML = `<span class="text-yellow-600">Please select an item first</span>`;
+                    return;
+                }
+                
+                const selectedItem = allMenuItems.find(item => item.guid === selectedGuid);
+                if (selectedItem) {
+                    displayMenuItemResults([selectedItem], 'Selected Item Details');
+                    searchMenuItemsStatus.innerHTML = `<span class="text-green-600">✓ Item details displayed</span>`;
+                } else {
+                    searchMenuItemsStatus.innerHTML = `<span class="text-red-600">✗ Item not found in cache</span>`;
+                }
+            }
+            
+            // Fetch All Menu Items via Menus Structure
+            async function fetchAllItems() {
+                fetchAllItemsBtnText.textContent = '⏳ Fetching...';
+                fetchAllItemsSpinner.classList.remove('hidden');
+                fetchAllItemsBtn.disabled = true;
+                searchMenuItemsStatus.innerHTML = '';
+                
+                try {
+                    // Use the same approach as fetchAllMenus() since menu items are nested
+                    const url = CORS_PROXY + environmentSelect.value + MENUS_PATH_BASE;
+                    const result = await makeApiCall(url, 'GET', null, null, 'Menu data fetched successfully');
+                    
+                    if (result.error) {
+                        const errorMessage = typeof result.error === 'object' ? 
+                            result.error.message || JSON.stringify(result.error) : 
+                            result.error;
+                        searchMenuItemsStatus.innerHTML = `<span class="text-red-600">✗ Failed: ${errorMessage}</span>`;
+                    } else {
+                        console.log('Raw menu API response:', result.data);
+                        
+                        // Handle different possible response structures
+                        let menus = [];
+                        if (Array.isArray(result.data)) {
+                            menus = result.data;
+                        } else if (result.data && typeof result.data === 'object') {
+                            // Check if it's a wrapper object
+                            if (result.data.menus && Array.isArray(result.data.menus)) {
+                                menus = result.data.menus;
+                            } else if (result.data.data && Array.isArray(result.data.data)) {
+                                menus = result.data.data;
+                            } else {
+                                // Single menu object
+                                menus = [result.data];
+                            }
+                        }
+                        
+                        console.log('Processed menus array:', menus);
+                        allMenus = menus;
+                        
+                        // Extract all menu items from the menu structure
+                        const extractedItems = [];
+                        
+                        if (menus.length === 0) {
+                            searchMenuItemsStatus.innerHTML = `<span class="text-yellow-600">⚠️ No menus found or menu data unavailable</span>`;
+                            return;
+                        }
+                        
+                        menus.forEach(menu => {
+                            if (menu && menu.menuGroups && Array.isArray(menu.menuGroups)) {
+                                menu.menuGroups.forEach(group => {
+                                    if (group && group.menuItems && Array.isArray(group.menuItems)) {
+                                        group.menuItems.forEach(item => {
+                                            extractedItems.push({
+                                                ...item,
+                                                menuName: menu.name || 'Unknown Menu',
+                                                menuGuid: menu.guid || '',
+                                                groupName: group.name || 'Unknown Category',
+                                                groupGuid: group.guid || ''
+                                            });
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                        
+                        allMenuItems = extractedItems;
+                        
+                        // Update dropdowns with new data
+                        populateMenuItemDropdowns();
+                        populateMenuDropdowns();
+                        populateCategoryFilter();
+                        
+                        if (extractedItems.length === 0) {
+                            searchMenuItemsStatus.innerHTML = `<span class="text-yellow-600">⚠️ Found ${menus.length} menus but no menu items. Check console for API response details.</span>`;
+                        } else {
+                            searchMenuItemsStatus.innerHTML = `<span class="text-green-600">✓ Loaded ${extractedItems.length} menu items from ${menus.length} menus</span>`;
+                        }
+                        displayMenuItemResults(extractedItems, `All Menu Items (${extractedItems.length})`);
+                    }
+                } catch (error) {
+                    console.error('Error in fetchAllItems:', error);
+                    searchMenuItemsStatus.innerHTML = `<span class="text-red-600">✗ Error: ${error.message}. Check browser console for details.</span>`;
+                } finally {
+                    fetchAllItemsBtnText.textContent = '📋 Fetch All Items';
+                    fetchAllItemsSpinner.classList.add('hidden');
+                    fetchAllItemsBtn.disabled = false;
+                }
+            }
+            
+            // Enhanced Search and Filter Menu Items
+            async function searchMenuItems() {
+                const searchTerm = itemSearchInput.value.trim();
+                const categoryFilter = categoryFilterSelect.value;
+                const availabilityFilter = availabilityFilterSelect.value;
+                const priceRangeFilter = priceRangeSelect.value;
+                
+                searchMenuItemsBtnText.textContent = '⏳ Filtering...';
+                searchMenuItemsSpinner.classList.remove('hidden');
+                searchMenuItemsBtn.disabled = true;
+                searchMenuItemsStatus.innerHTML = '';
+                
+                try {
+                    // If menus aren't loaded yet, load them first
+                    if (allMenuItems.length === 0) {
+                        searchMenuItemsStatus.innerHTML = '<span class="text-blue-600">⏳ Loading menu data first...</span>';
+                        await fetchAllItems();
+                        return; // fetchAllItems will handle display
+                    }
+                    
+                    let filteredItems = [...allMenuItems];
+                    
+                    // Apply search term filter
+                    if (searchTerm) {
+                        const searchLower = searchTerm.toLowerCase();
+                        filteredItems = filteredItems.filter(item => {
+                            return (
+                                (item.name && item.name.toLowerCase().includes(searchLower)) ||
+                                (item.description && item.description.toLowerCase().includes(searchLower)) ||
+                                (item.basePrice && item.basePrice.toString().includes(searchTerm)) ||
+                                (item.plu && item.plu.toLowerCase().includes(searchLower))
+                            );
+                        });
+                    }
+                    
+                    // Apply category filter
+                    if (categoryFilter) {
+                        filteredItems = filteredItems.filter(item => 
+                            item.groupName === categoryFilter || 
+                            (item.menuGroups && item.menuGroups.some(group => group.name === categoryFilter))
+                        );
+                    }
+                    
+                    // Apply availability filter
+                    if (availabilityFilter === 'available') {
+                        filteredItems = filteredItems.filter(item => item.active !== false);
+                    } else if (availabilityFilter === 'unavailable') {
+                        filteredItems = filteredItems.filter(item => item.active === false);
+                    }
+                    
+                    // Apply price range filter
+                    if (priceRangeFilter) {
+                        if (priceRangeFilter === '5000+') {
+                            filteredItems = filteredItems.filter(item => 
+                                item.basePrice && item.basePrice >= 5000
+                            );
+                        } else {
+                            const [min, max] = priceRangeFilter.split('-').map(Number);
+                            filteredItems = filteredItems.filter(item => {
+                                if (!item.basePrice) return false;
+                                return item.basePrice >= min && item.basePrice < max;
+                            });
+                        }
+                    }
+                    
+                    // Build result title
+                    const filters = [];
+                    if (searchTerm) filters.push(`"${searchTerm}"`);
+                    if (categoryFilter) filters.push(`category: ${categoryFilter}`);
+                    if (availabilityFilter) filters.push(`${availabilityFilter} only`);
+                    if (priceRangeFilter) filters.push(`price: ${formatPriceRange(priceRangeFilter)}`);
+                    
+                    const title = filters.length > 0 
+                        ? `Filtered Items (${filters.join(', ')})`
+                        : `All Menu Items`;
+                    
+                    searchMenuItemsStatus.innerHTML = `<span class="text-green-600">✓ Found ${filteredItems.length} matching items</span>`;
+                    displayMenuItemResults(filteredItems, title);
+                    
+                } catch (error) {
+                    searchMenuItemsStatus.innerHTML = `<span class="text-red-600">✗ Search failed: ${error.message}</span>`;
+                } finally {
+                    searchMenuItemsBtnText.textContent = '🔍 Search & Filter';
+                    searchMenuItemsSpinner.classList.add('hidden');
+                    searchMenuItemsBtn.disabled = false;
+                }
+            }
+            
+            // Clear all filters
+            function clearFilters() {
+                itemSearchInput.value = '';
+                categoryFilterSelect.value = '';
+                availabilityFilterSelect.value = '';
+                priceRangeSelect.value = '';
+                searchMenuItemsStatus.innerHTML = '<span class="text-gray-500">Filters cleared</span>';
+            }
+            
+            // Helper function to format price range for display
+            function formatPriceRange(range) {
+                const ranges = {
+                    '0-500': 'Under $5',
+                    '500-1000': '$5-$10',
+                    '1000-2000': '$10-$20',
+                    '2000-5000': '$20-$50',
+                    '5000+': 'Over $50'
+                };
+                return ranges[range] || range;
+            }
+            
+            // Populate category filter dropdown
+            function populateCategoryFilter() {
+                categoryFilterSelect.innerHTML = '<option value="">All Categories</option>';
+                
+                if (allMenuItems.length === 0) return;
+                
+                // Get unique categories
+                const categories = new Set();
+                allMenuItems.forEach(item => {
+                    if (item.groupName) categories.add(item.groupName);
+                    if (item.menuGroups) {
+                        item.menuGroups.forEach(group => {
+                            if (group.name) categories.add(group.name);
+                        });
+                    }
+                });
+                
+                // Sort and add to dropdown
+                [...categories].sort().forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category;
+                    option.textContent = category;
+                    categoryFilterSelect.appendChild(option);
+                });
+            }
+            
+            // Update Item Price
+            async function updateItemPrice() {
+                const selectedGuid = itemOperationDropdown.value;
+                if (!selectedGuid) {
+                    itemOperationsStatus.innerHTML = `<span class="text-yellow-600">Please select an item first</span>`;
+                    return;
+                }
+                
+                const newPrice = prompt('Enter new price (in cents, e.g., 1250 for $12.50):');
+                if (!newPrice || isNaN(newPrice) || newPrice <= 0) {
+                    itemOperationsStatus.innerHTML = `<span class="text-red-600">✗ Invalid price entered</span>`;
+                    return;
+                }
+                
+                const selectedItem = allMenuItems.find(item => item.guid === selectedGuid);
+                if (!selectedItem) {
+                    itemOperationsStatus.innerHTML = `<span class="text-red-600">✗ Item not found</span>`;
+                    return;
+                }
+                
+                updateItemPriceBtn.disabled = true;
+                itemOperationsStatus.innerHTML = '<span class="text-blue-600">⏳ Trying multiple API endpoints for price update...</span>';
+                
+                try {
+                    // Find the item's group information for proper API path
+                    const selectedItem = allMenuItems.find(item => item.guid === selectedGuid);
+                    if (!selectedItem || !selectedItem.groupGuid) {
+                        itemOperationsStatus.innerHTML = `<span class="text-red-600">✗ Item group information not available. Try refreshing item data.</span>`;
+                        return;
+                    }
+                    
+                    const updateData = { basePrice: parseInt(newPrice) };
+                    let result = null;
+                    let successfulUrl = '';
+                    
+                    // Try multiple possible endpoint structures for Toast API
+                    const possibleUrls = [
+                        // Try menu items endpoint directly  
+                        `menus/v2/menuItems/${selectedGuid}`,
+                        // Try through menu structure
+                        `menus/v2/menus/${selectedItem.menuGuid}/menuItems/${selectedGuid}`,
+                        // Try through menu groups
+                        `${MENU_GROUPS_PATH}/${selectedItem.groupGuid}/menuItems/${selectedGuid}`,
+                        // Alternative group structure
+                        `menus/v2/menus/${selectedItem.menuGuid}/groups/${selectedItem.groupGuid}/menuItems/${selectedGuid}`
+                    ];
+                    
+                    for (const urlPath of possibleUrls) {
+                        const fullUrl = CORS_PROXY + environmentSelect.value + urlPath;
+                        console.log(`Trying menu item update URL: ${urlPath}`);
+                        
+                        result = await makeApiCall(fullUrl, 'PATCH', updateData, null, 'Price updated successfully');
+                        
+                        if (!result.error) {
+                            successfulUrl = urlPath;
+                            break;
+                        }
+                    }
+                    
+                    // If all attempts failed, provide detailed error info
+                    if (!successfulUrl) {
+                        console.log('All menu item update endpoints failed. Attempted URLs:', possibleUrls);
+                    }
+                    
+                    if (!successfulUrl) {
+                        itemOperationsStatus.innerHTML = `<span class="text-red-600">✗ All update endpoints failed. Toast API may not support menu item price updates via API. Check console for attempted URLs.</span>`;
+                    } else {
+                        // Update the cached item
+                        const itemIndex = allMenuItems.findIndex(item => item.guid === selectedGuid);
+                        if (itemIndex !== -1) {
+                            allMenuItems[itemIndex].basePrice = parseInt(newPrice);
+                        }
+                        
+                        console.log(`Price update successful using endpoint: ${successfulUrl}`);
+                        itemOperationsStatus.innerHTML = `<span class="text-green-600">✓ Price updated to $${(newPrice / 100).toFixed(2)}</span>`;
+                        displayMenuItemResults([result.data || selectedItem], 'Updated Item');
+                    }
+                } catch (error) {
+                    itemOperationsStatus.innerHTML = `<span class="text-red-600">✗ Error: ${error.message}</span>`;
+                } finally {
+                    updateItemPriceBtn.disabled = false;
+                }
+            }
+            
+            // Toggle Item Availability
+            async function toggleItemAvailability() {
+                const selectedGuid = itemOperationDropdown.value;
+                if (!selectedGuid) {
+                    itemOperationsStatus.innerHTML = `<span class="text-yellow-600">Please select an item first</span>`;
+                    return;
+                }
+                
+                const selectedItem = allMenuItems.find(item => item.guid === selectedGuid);
+                if (!selectedItem) {
+                    itemOperationsStatus.innerHTML = `<span class="text-red-600">✗ Item not found</span>`;
+                    return;
+                }
+                
+                const currentlyActive = selectedItem.active !== false; // Default to true if undefined
+                const newStatus = !currentlyActive;
+                
+                toggleItemAvailabilityBtn.disabled = true;
+                itemOperationsStatus.innerHTML = `<span class="text-blue-600">⏳ Trying multiple API endpoints to ${newStatus ? 'enable' : 'disable'} item...</span>`;
+                
+                try {
+                    // Find the item's group information for proper API path
+                    const selectedItem = allMenuItems.find(item => item.guid === selectedGuid);
+                    if (!selectedItem || !selectedItem.groupGuid) {
+                        itemOperationsStatus.innerHTML = `<span class="text-red-600">✗ Item group information not available. Try refreshing item data.</span>`;
+                        return;
+                    }
+                    
+                    const updateData = { active: newStatus };
+                    let result = null;
+                    let successfulUrl = '';
+                    
+                    // Try multiple possible endpoint structures for Toast API
+                    const possibleUrls = [
+                        // Try menu items endpoint directly  
+                        `menus/v2/menuItems/${selectedGuid}`,
+                        // Try through menu structure
+                        `menus/v2/menus/${selectedItem.menuGuid}/menuItems/${selectedGuid}`,
+                        // Try through menu groups
+                        `${MENU_GROUPS_PATH}/${selectedItem.groupGuid}/menuItems/${selectedGuid}`,
+                        // Alternative group structure
+                        `menus/v2/menus/${selectedItem.menuGuid}/groups/${selectedItem.groupGuid}/menuItems/${selectedGuid}`
+                    ];
+                    
+                    for (const urlPath of possibleUrls) {
+                        const fullUrl = CORS_PROXY + environmentSelect.value + urlPath;
+                        console.log(`Trying menu item availability update URL: ${urlPath}`);
+                        
+                        result = await makeApiCall(fullUrl, 'PATCH', updateData, null, 'Availability updated successfully');
+                        
+                        if (!result.error) {
+                            successfulUrl = urlPath;
+                            break;
+                        }
+                    }
+                    
+                    // If all attempts failed, provide detailed error info
+                    if (!successfulUrl) {
+                        console.log('All menu item availability update endpoints failed. Attempted URLs:', possibleUrls);
+                    }
+                    
+                    if (!successfulUrl) {
+                        itemOperationsStatus.innerHTML = `<span class="text-red-600">✗ All availability update endpoints failed. Toast API may not support menu item availability updates via API. Check console for attempted URLs.</span>`;
+                    } else {
+                        // Update the cached item
+                        const itemIndex = allMenuItems.findIndex(item => item.guid === selectedGuid);
+                        if (itemIndex !== -1) {
+                            allMenuItems[itemIndex].active = newStatus;
+                        }
+                        
+                        console.log(`Availability update successful using endpoint: ${successfulUrl}`);
+                        itemOperationsStatus.innerHTML = `<span class="text-green-600">✓ Item ${newStatus ? 'enabled' : 'disabled'}</span>`;
+                        displayMenuItemResults([result.data || selectedItem], 'Updated Item Availability');
+                    }
+                } catch (error) {
+                    itemOperationsStatus.innerHTML = `<span class="text-red-600">✗ Error: ${error.message}</span>`;
+                } finally {
+                    toggleItemAvailabilityBtn.disabled = false;
+                }
+            }
+            
+            // Create New Menu Item
+            async function createMenuItem() {
+                // First make sure we have menu data loaded
+                if (allMenus.length === 0) {
+                    await fetchAllItems(); // This will load menus and items
+                }
+                
+                if (allMenus.length === 0) {
+                    searchMenuItemsStatus.innerHTML = `<span class="text-red-600">✗ No menus available. Please check your API access.</span>`;
+                    return;
+                }
+                
+                // Prompt for menu item details
+                const itemName = prompt('Enter item name:');
+                if (!itemName || !itemName.trim()) {
+                    searchMenuItemsStatus.innerHTML = `<span class="text-red-600">✗ Item name is required</span>`;
+                    return;
+                }
+                
+                const itemDescription = prompt('Enter item description (optional):') || '';
+                const itemPriceStr = prompt('Enter item price in cents (e.g., 1250 for $12.50):');
+                const itemPrice = itemPriceStr ? parseInt(itemPriceStr) : 0;
+                
+                if (itemPriceStr && (isNaN(itemPrice) || itemPrice < 0)) {
+                    searchMenuItemsStatus.innerHTML = `<span class="text-red-600">✗ Invalid price format</span>`;
+                    return;
+                }
+                
+                // Get available menu groups for the item
+                const menuGroups = [];
+                allMenus.forEach(menu => {
+                    if (menu.menuGroups) {
+                        menu.menuGroups.forEach(group => {
+                            menuGroups.push({
+                                menuName: menu.name,
+                                menuGuid: menu.guid,
+                                groupName: group.name,
+                                groupGuid: group.guid,
+                                displayName: `${menu.name} → ${group.name}`
+                            });
+                        });
+                    }
+                });
+                
+                if (menuGroups.length === 0) {
+                    searchMenuItemsStatus.innerHTML = `<span class="text-red-600">✗ No menu groups available for item creation</span>`;
+                    return;
+                }
+                
+                const groupChoice = prompt(`Select menu group (enter number):\n${menuGroups.map((group, index) => `${index + 1}. ${group.displayName}`).join('\n')}`);
+                const groupIndex = parseInt(groupChoice) - 1;
+                
+                if (groupIndex < 0 || groupIndex >= menuGroups.length) {
+                    searchMenuItemsStatus.innerHTML = `<span class="text-red-600">✗ Valid menu group selection required</span>`;
+                    return;
+                }
+                
+                const selectedGroup = menuGroups[groupIndex];
+                
+                searchMenuItemsBtnText.textContent = 'Creating...';
+                searchMenuItemsSpinner.classList.remove('hidden');
+                createMenuItemBtn.disabled = true;
+                searchMenuItemsStatus.innerHTML = '<span class="text-blue-600">⏳ Trying multiple API endpoints for item creation...</span>';
+                
+                try {
+                    const menuItemData = {
+                        name: itemName.trim(),
+                        description: itemDescription.trim(),
+                        basePrice: itemPrice,
+                        active: true
+                    };
+                    
+                    let result = null;
+                    let successfulUrl = '';
+                    
+                    // Try multiple possible endpoint structures for Toast API menu item creation
+                    const possibleUrls = [
+                        // Try menu items endpoint directly  
+                        `menus/v2/menuItems`,
+                        // Try through menu groups
+                        `${MENU_GROUPS_PATH}/${selectedGroup.groupGuid}/menuItems`,
+                        // Try through menu structure
+                        `menus/v2/menus/${selectedGroup.menuGuid}/menuItems`,
+                        // Alternative group structure
+                        `menus/v2/menus/${selectedGroup.menuGuid}/groups/${selectedGroup.groupGuid}/menuItems`,
+                        // Alternative items path
+                        `menus/v2/menus/${selectedGroup.menuGuid}/groups/${selectedGroup.groupGuid}/items`
+                    ];
+                    
+                    for (const urlPath of possibleUrls) {
+                        const fullUrl = CORS_PROXY + environmentSelect.value + urlPath;
+                        console.log(`Trying menu item creation URL: ${urlPath}`);
+                        
+                        // Add group reference if not using direct menuItems endpoint
+                        let payloadData = { ...menuItemData };
+                        if (!urlPath.startsWith('menus/v2/menuItems')) {
+                            payloadData.menuGroupReference = { guid: selectedGroup.groupGuid };
+                        }
+                        
+                        result = await makeApiCall(fullUrl, 'POST', payloadData, null, 'Menu item created successfully');
+                        
+                        if (!result.error) {
+                            successfulUrl = urlPath;
+                            break;
+                        }
+                    }
+                    
+                    if (!successfulUrl) {
+                        console.log('All menu item creation endpoints failed. Attempted URLs:', possibleUrls);
+                        searchMenuItemsStatus.innerHTML = `<span class="text-red-600">✗ All creation endpoints failed. Toast API may not support menu item creation via API, or requires different permissions. Check console for details.</span>`;
+                        return;
+                    } else {
+                        console.log(`Menu item creation successful using endpoint: ${successfulUrl}`);
+                        const newItem = result.data;
+                        handleItemCreationSuccess(newItem, itemName, selectedGroup);
+                    }
+                    
+                } catch (error) {
+                    searchMenuItemsStatus.innerHTML = `<span class="text-red-600">✗ Error: ${error.message}. Note: Toast API may restrict menu item creation.</span>`;
+                } finally {
+                    searchMenuItemsBtnText.textContent = 'Search Items';
+                    searchMenuItemsSpinner.classList.add('hidden');
+                    createMenuItemBtn.disabled = false;
+                }
+            }
+            
+            // Helper function to handle successful item creation
+            function handleItemCreationSuccess(newItem, itemName, selectedGroup) {
+                // Add context to the new item
+                const itemWithContext = {
+                    ...newItem,
+                    menuName: selectedGroup.menuName,
+                    menuGuid: selectedGroup.menuGuid,
+                    groupName: selectedGroup.groupName,
+                    groupGuid: selectedGroup.groupGuid
+                };
+                
+                // Add to our cached items
+                if (!allMenuItems.find(item => item.guid === newItem.guid)) {
+                    allMenuItems.push(itemWithContext);
+                }
+                
+                // Update dropdowns
+                populateMenuItemDropdowns();
+                populateCategoryFilter();
+                
+                searchMenuItemsStatus.innerHTML = `<span class="text-green-600">✓ Menu item "${itemName}" created successfully in ${selectedGroup.displayName}</span>`;
+                displayMenuItemResults([itemWithContext], 'Newly Created Item');
+            }
+            
+            // Display Menu Item Results
+            function displayMenuItemResults(items, title) {
+                let html = `<div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+                    <h3 class="font-semibold text-lg mb-3">${title}</h3>`;
+                
+                if (items.length === 0) {
+                    html += '<p class="text-gray-500">No menu items found</p>';
+                } else {
+                    html += '<div class="space-y-4">';
+                    
+                    items.forEach(item => {
+                        const price = item.basePrice ? `$${(item.basePrice / 100).toFixed(2)}` : 'No price set';
+                        const isActive = item.active !== false; // Default to true if undefined
+                        const statusClass = isActive ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
+                        const statusText = isActive ? 'Available' : 'Unavailable';
+                        
+                        html += `
+                        <div class="border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+                            <div class="flex justify-between items-start mb-3">
+                                <h4 class="font-semibold text-emerald-600 dark:text-emerald-400">${item.name || 'Unnamed Item'}</h4>
+                                <div class="flex items-center space-x-2">
+                                    <span class="px-2 py-1 rounded text-xs ${statusClass}">${statusText}</span>
+                                    <span class="text-xs text-gray-500 font-mono">${item.guid.slice(-8)}</span>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                <div>
+                                    <span class="font-medium">Price:</span> <span class="text-green-600 dark:text-green-400 font-semibold">${price}</span>
+                                </div>
+                                <div>
+                                    <span class="font-medium">Category:</span> ${item.groupName || 'Unknown'}
+                                </div>
+                                <div>
+                                    <span class="font-medium">Menu:</span> ${item.menuName || 'Unknown'}
+                                </div>
+                                <div>
+                                    <span class="font-medium">PLU:</span> ${item.plu || 'Not set'}
+                                </div>
+                            </div>`;
+                        
+                        // Show description if available
+                        if (item.description) {
+                            html += `
+                            <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
+                                <span class="font-medium text-sm">Description:</span>
+                                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">${item.description}</p>
+                            </div>`;
+                        }
+                        
+                        // Show modifiers if available
+                        if (item.modifierGroups && item.modifierGroups.length > 0) {
+                            html += `
+                            <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
+                                <span class="font-medium text-sm">Modifiers (${item.modifierGroups.length}):</span>
+                                <div class="flex flex-wrap gap-1 mt-2">`;
+                            
+                            item.modifierGroups.forEach(modGroup => {
+                                html += `<span class="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs rounded">${modGroup.name || 'Modifier Group'}</span>`;
+                            });
+                            
+                            html += `
+                                </div>
+                            </div>`;
+                        }
+                        
+                        html += '</div>';
+                    });
+                    
+                    html += '</div>';
+                }
+                
+                html += '</div>';
+                resultsContainer.innerHTML = html;
+            }
+
             // --- Event Listeners ---
             testProxyBtn.addEventListener('click', testProxyConnection);
             authBtn.addEventListener('click', handleAuthentication);
@@ -4306,12 +5618,100 @@
                 toggleNavPanel(); // Close nav panel
                 resultsContainer.innerHTML='<p class="text-gray-500 dark:text-gray-400">Inventory results will be displayed here.</p>' 
             });
-            navLaborBtn.addEventListener('click', () => { 
-                currentWorkflow = 'labor'; 
-                updateUIState(); 
+
+            // Labor Management Navigation
+            navEmployeeManagementBtn.addEventListener('click', () => { 
+                currentWorkflow = 'employee-management'; 
+                updateUIState();
+                // Auto-fetch employee data
+                if (isAuthenticated) {
+                    fetchAllEmployees();
+                }
                 toggleNavPanel(); // Close nav panel
-                resultsContainer.innerHTML='<p class="text-gray-500 dark:text-gray-400 text-sm">Labor management results will appear here...</p>' 
             });
+
+            navShiftManagementBtn.addEventListener('click', () => { 
+                currentWorkflow = 'shift-management'; 
+                updateUIState();
+                // Auto-fetch employee data for shift creation
+                if (isAuthenticated) {
+                    fetchAllEmployees();
+                }
+                toggleNavPanel(); // Close nav panel
+            });
+
+            navJobManagementBtn.addEventListener('click', () => { 
+                currentWorkflow = 'job-management'; 
+                updateUIState();
+                // Auto-fetch job data
+                if (isAuthenticated) {
+                    fetchAllJobs();
+                }
+                toggleNavPanel(); // Close nav panel
+            });
+
+            navTimeEntryManagementBtn.addEventListener('click', () => { 
+                currentWorkflow = 'time-entry-management'; 
+                updateUIState();
+                toggleNavPanel(); // Close nav panel
+            });
+            // Menu Management Sub-navigation
+            navMenuStructureBtn.addEventListener('click', () => { 
+                currentWorkflow = 'menu-structure'; 
+                updateUIState();
+                // Auto-fetch menu data for structure management
+                if (isAuthenticated) {
+                    fetchAllMenus();
+                }
+                toggleNavPanel(); // Close nav panel
+            });
+            navMenuItemsBtn.addEventListener('click', () => { 
+                currentWorkflow = 'menu-items'; 
+                updateUIState();
+                // Auto-fetch menu items for item management
+                if (isAuthenticated) {
+                    fetchAllItems();
+                }
+                toggleNavPanel(); // Close nav panel
+            });
+            navModifiersBtn.addEventListener('click', () => { 
+                currentWorkflow = 'modifiers'; 
+                updateUIState();
+                // Auto-fetch modifier groups
+                if (isAuthenticated && typeof fetchModifierGroups === 'function') {
+                    fetchModifierGroups();
+                }
+                toggleNavPanel(); // Close nav panel
+            });
+            navBulkOperationsBtn.addEventListener('click', () => { 
+                currentWorkflow = 'bulk-operations'; 
+                updateUIState();
+                // Auto-fetch menu data for bulk operations
+                if (isAuthenticated) {
+                    fetchAllMenus();
+                }
+                toggleNavPanel(); // Close nav panel
+            });
+
+            // API Section toggles for collapsible navigation
+            const toggleApiSection = (apiName) => {
+                const subMenu = document.getElementById(`${apiName}SubMenu`);
+                const chevron = document.getElementById(`${apiName}Chevron`);
+                
+                if (subMenu && chevron) {
+                    if (subMenu.classList.contains('hidden')) {
+                        subMenu.classList.remove('hidden');
+                        chevron.style.transform = 'rotate(90deg)';
+                    } else {
+                        subMenu.classList.add('hidden');
+                        chevron.style.transform = 'rotate(0deg)';
+                    }
+                }
+            };
+            
+            // Make toggleApiSection globally available for onclick handlers
+            window.toggleApiSection = toggleApiSection;
+
 
             // Config panel toggles
             const toggleConfigPanel = () => {
@@ -4339,16 +5739,23 @@
                 renderCustomFields();
                  resultsContainer.innerHTML='<p class="text-gray-500 dark:text-gray-400">Order results will appear here after sending.</p>';
             });
+            // Legacy workflow buttons (now handled by navigation panel)
             fetchWorkflowBtn.addEventListener('click', () => { currentWorkflow = 'fetch'; updateUIState(); resultsContainer.innerHTML='<p class="text-gray-500 dark:text-gray-400">Results will be displayed here.</p>' });
             updateWorkflowBtn.addEventListener('click', () => { currentWorkflow = 'update'; updateUIState(); resultsContainer.innerHTML='<p class="text-gray-500 dark:text-gray-400">Load an order to begin editing.</p>' });
             stockWorkflowBtn.addEventListener('click', () => { currentWorkflow = 'stock'; updateUIState(); resultsContainer.innerHTML='<p class="text-gray-500 dark:text-gray-400">Inventory results will be displayed here.</p>' });
-            laborWorkflowBtn.addEventListener('click', () => { currentWorkflow = 'labor'; updateUIState(); resultsContainer.innerHTML='<p class="text-gray-500 dark:text-gray-400 text-sm">Labor management results will appear here...</p>' });
+            laborWorkflowBtn.addEventListener('click', () => { currentWorkflow = 'employee-management'; updateUIState(); resultsContainer.innerHTML='<p class="text-gray-500 dark:text-gray-400 text-sm">Select an employee management operation from the navigation panel...</p>' });
             resetWorkflowBtns.forEach(btn => btn.addEventListener('click', () => { 
                 currentWorkflow = null; 
                 activeUpdateOrder = null; 
                 cartItems = [];
                 customFields = [];
                 stagedItemsForUpdate = [];
+                // Clear any menu section highlights
+                const allSections = document.querySelectorAll('#menuManagementSection .bg-amber-50, #menuManagementSection .dark\\:bg-amber-900\\/10');
+                allSections.forEach(section => {
+                    section.classList.remove('ring-2', 'ring-amber-400', 'ring-opacity-50', 'bg-amber-50', 'dark:bg-amber-900/10');
+                    section.classList.add('bg-gray-50', 'dark:bg-gray-700');
+                });
                 updateUIState(); 
             }));
 
@@ -4463,6 +5870,26 @@
             createShiftBtn.addEventListener('click', createShift);
             viewTimeEntriesBtn.addEventListener('click', viewTimeEntries);
             createTimeEntryBtn.addEventListener('click', createTimeEntry);
+            
+            // Menu Management
+            fetchAllMenusBtn.addEventListener('click', fetchAllMenus);
+            viewSelectedMenuBtn.addEventListener('click', viewSelectedMenu);
+            
+            // Menu Items
+            viewSelectedItemBtn.addEventListener('click', viewSelectedItem);
+            searchMenuItemsBtn.addEventListener('click', searchMenuItems);
+            createMenuItemBtn.addEventListener('click', createMenuItem);
+            fetchAllItemsBtn.addEventListener('click', fetchAllItems);
+            clearFiltersBtn.addEventListener('click', clearFilters);
+            updateItemPriceBtn.addEventListener('click', updateItemPrice);
+            toggleItemAvailabilityBtn.addEventListener('click', toggleItemAvailability);
+            
+            // Enable/disable item operation buttons based on selection
+            itemOperationDropdown.addEventListener('change', function() {
+                const hasSelection = itemOperationDropdown.value !== '';
+                updateItemPriceBtn.disabled = !hasSelection;
+                toggleItemAvailabilityBtn.disabled = !hasSelection;
+            });
             
             // Add event listeners for shift creation form
             shiftEmployeeDropdown.addEventListener('change', updateShiftJobDropdownForEmployee);
