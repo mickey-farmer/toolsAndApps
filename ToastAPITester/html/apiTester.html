@@ -296,6 +296,27 @@
                             </div>
                             <div id="customFieldsList" class="mt-4 space-y-2"></div>
                         </div>
+                        <div>
+                            <h3 class="text-md font-semibold mb-2">💰 Order Pricing Preview</h3>
+                            <div class="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 rounded-lg p-4 border border-green-200 dark:border-green-800">
+                                <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                                    Calculate exact pricing and validate your order before submission using Toast's pricing engine.
+                                </p>
+                                <button id="calculatePricingBtn" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-md transition flex items-center justify-center">
+                                    <span id="calculatePricingBtnText">📊 Calculate Pricing</span>
+                                    <div id="calculatePricingSpinner" class="spinner ml-2 hidden"></div>
+                                </button>
+                                <div id="calculatePricingStatus" class="mt-2 text-sm text-center"></div>
+                                
+                                <!-- Pricing Breakdown Panel -->
+                                <div id="pricingBreakdownPanel" class="hidden mt-4 bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
+                                    <h4 class="font-semibold mb-3 flex items-center">
+                                        <span class="mr-2">🧾</span>Pricing Breakdown
+                                    </h4>
+                                    <div id="pricingBreakdownContent"></div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="text-center mt-6">
                             <button id="sendOrderBtn" class="w-full md:w-1/2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition-transform transform hover:scale-105 shadow-lg flex items-center justify-center mx-auto disabled:bg-gray-400">
                                 <span id="sendOrderBtnText">Create & Send Order</span>
@@ -839,47 +860,47 @@
                         <button class="resetWorkflowBtn text-sm text-blue-500 hover:underline">Change Workflow</button>
                     </div>
                     
-                    <div class="max-w-4xl mx-auto">
-                        <!-- Menu Items Management -->
+                    <div class="max-w-6xl mx-auto">
+                        <!-- Menu Items Viewer -->
                         <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                            <h3 class="text-lg font-semibold mb-3 text-emerald-600 dark:text-emerald-400">🍽️ Menu Items</h3>
+                            <h3 class="text-lg font-semibold mb-3 text-emerald-600 dark:text-emerald-400">📖 Menu Items Viewer</h3>
                             
-                            <!-- View & Search Items -->
+                            <!-- API Notice -->
+                            <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 text-sm mb-4">
+                                <div class="flex items-center mb-1">
+                                    <span class="text-blue-600 dark:text-blue-400 mr-2">ℹ️</span>
+                                    <strong class="text-blue-800 dark:text-blue-200">Read-Only Mode:</strong>
+                                </div>
+                                <p class="text-blue-700 dark:text-blue-300">
+                                    This section displays comprehensive menu data in read-only format. Menu item creation and updates are not supported via the Toast API.
+                                </p>
+                            </div>
+                            
+                            <!-- Load Menu Data -->
                             <div class="mb-4">
-                                <h4 class="font-medium mb-2">Items Management</h4>
+                                <h4 class="font-medium mb-2">Menu Data Loader</h4>
                                 <div class="space-y-3">
-                                    <!-- Quick Actions -->
-                                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-2">
-                                        <button id="fetchAllItemsBtn" class="bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-md transition text-sm flex items-center justify-center">
-                                            <span id="fetchAllItemsBtnText">📋 Fetch All Items</span>
-                                            <div id="fetchAllItemsSpinner" class="spinner ml-2 hidden"></div>
-                                        </button>
-                                        <button id="createMenuItemBtn" class="bg-green-600 hover:bg-green-700 text-white py-2 rounded-md transition text-sm flex items-center justify-center">
-                                            ➕ Create New Item
-                                        </button>
-                                    </div>
+                                    <!-- Primary Action -->
+                                    <button id="fetchAllItemsBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-md transition text-sm flex items-center justify-center">
+                                        <span id="fetchAllItemsBtnText">📋 Load All Menu Items & Details</span>
+                                        <div id="fetchAllItemsSpinner" class="spinner ml-2 hidden"></div>
+                                    </button>
                                     
-                                    <!-- API Limitations Notice -->
-                                    <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3 text-xs">
-                                        <div class="flex items-center mb-1">
-                                            <span class="text-yellow-600 dark:text-yellow-400 mr-2">ℹ️</span>
-                                            <strong class="text-yellow-800 dark:text-yellow-200">Toast API Note:</strong>
-                                        </div>
-                                        <p class="text-yellow-700 dark:text-yellow-300">
-                                            Menu item operations may be restricted by Toast API permissions. If you encounter errors, 
-                                            check the browser console (F12) for detailed API response information.
-                                        </p>
-                                    </div>
-                                    
-                                    <!-- Search & Filters -->
+                                    <!-- Search & Filters Panel -->
                                     <div class="bg-white dark:bg-gray-600 rounded-lg p-3 border border-gray-200 dark:border-gray-500">
+                                        <div class="flex items-center mb-3">
+                                            <h5 class="font-medium text-gray-900 dark:text-gray-100">🔍 Search & Filter Menu Items</h5>
+                                        </div>
                                         <div class="space-y-2">
                                             <input type="text" id="itemSearchInput" placeholder="🔍 Search by name, description, or PLU..." class="w-full bg-gray-50 dark:bg-gray-700 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
                                             
                                             <!-- Filter Row -->
-                                            <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                                            <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
                                                 <select id="categoryFilterSelect" class="bg-gray-50 dark:bg-gray-700 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
                                                     <option value="">All Categories</option>
+                                                </select>
+                                                <select id="menuFilterSelect" class="bg-gray-50 dark:bg-gray-700 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                                    <option value="">All Menus</option>
                                                 </select>
                                                 <select id="availabilityFilterSelect" class="bg-gray-50 dark:bg-gray-700 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
                                                     <option value="">All Items</option>
@@ -909,30 +930,35 @@
                                         </div>
                                     </div>
                                     
-                                    <!-- Quick Select -->
-                                    <div class="flex gap-2">
-                                        <select id="menuItemDropdown" class="flex-1 bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
-                                            <option value="">Quick select an item...</option>
-                                        </select>
-                                        <button id="viewSelectedItemBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md transition text-sm whitespace-nowrap" disabled>View Details</button>
+                                    <!-- Data Summary & Quick Select -->
+                                    <div class="bg-white dark:bg-gray-600 rounded-lg p-3 border border-gray-200 dark:border-gray-500">
+                                        <div class="flex items-center mb-2">
+                                            <h5 class="font-medium text-gray-900 dark:text-gray-100">📊 Menu Summary</h5>
+                                        </div>
+                                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
+                                            <div class="text-center">
+                                                <div class="text-lg font-bold text-emerald-600 dark:text-emerald-400" id="totalItemsCount">-</div>
+                                                <div class="text-xs text-gray-500">Total Items</div>
+                                            </div>
+                                            <div class="text-center">
+                                                <div class="text-lg font-bold text-blue-600 dark:text-blue-400" id="totalMenusCount">-</div>
+                                                <div class="text-xs text-gray-500">Menus</div>
+                                            </div>
+                                            <div class="text-center">
+                                                <div class="text-lg font-bold text-purple-600 dark:text-purple-400" id="totalCategoriesCount">-</div>
+                                                <div class="text-xs text-gray-500">Categories</div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="flex gap-2">
+                                            <select id="menuItemDropdown" class="flex-1 bg-gray-50 dark:bg-gray-700 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                                <option value="">Quick select an item...</option>
+                                            </select>
+                                            <button id="viewSelectedItemBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md transition text-sm whitespace-nowrap" disabled>View Details</button>
+                                        </div>
                                     </div>
                                     
                                     <div id="searchMenuItemsStatus" class="text-xs text-center"></div>
-                                </div>
-                            </div>
-
-                            <!-- Item Operations -->
-                            <div class="border-t pt-3">
-                                <h4 class="font-medium mb-2">Item Operations</h4>
-                                <div class="space-y-2">
-                                    <select id="itemOperationDropdown" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
-                                        <option value="">Select item for operations...</option>
-                                    </select>
-                                    <div class="grid grid-cols-2 gap-2">
-                                        <button id="updateItemPriceBtn" class="bg-yellow-600 hover:bg-yellow-700 text-white py-2 rounded-md transition text-sm" disabled>Update Price</button>
-                                        <button id="toggleItemAvailabilityBtn" class="bg-orange-600 hover:bg-orange-700 text-white py-2 rounded-md transition text-sm" disabled>Toggle Available</button>
-                                    </div>
-                                    <div id="itemOperationsStatus" class="text-xs text-center"></div>
                                 </div>
                             </div>
                         </div>
@@ -1296,6 +1322,7 @@
             const DISCOUNTS_PATH = 'config/v2/discounts';
             const TAXES_PATH = 'config/v2/taxRates';
             const ORDERS_PATH = 'orders/v2/orders';
+            const PRICES_PATH = 'orders/v2/prices';
             const ALTERNATE_PAYMENT_TYPES_PATH = 'config/v2/alternatePaymentTypes';
             
             // --- Stock API Endpoints ---
@@ -1377,6 +1404,14 @@
             const sendOrderBtnText = document.getElementById('sendOrderBtnText');
             const sendOrderSpinner = document.getElementById('sendOrderSpinner');
             const sendOrderStatus = document.getElementById('sendOrderStatus');
+            
+            // Pricing Preview Elements
+            const calculatePricingBtn = document.getElementById('calculatePricingBtn');
+            const calculatePricingBtnText = document.getElementById('calculatePricingBtnText');
+            const calculatePricingSpinner = document.getElementById('calculatePricingSpinner');
+            const calculatePricingStatus = document.getElementById('calculatePricingStatus');
+            const pricingBreakdownPanel = document.getElementById('pricingBreakdownPanel');
+            const pricingBreakdownContent = document.getElementById('pricingBreakdownContent');
             
             const discountDetailsSection = document.getElementById('discountDetailsSection');
             const discountValueInput = document.getElementById('discountValueInput');
@@ -1594,7 +1629,7 @@
             const searchMenuItemsBtn = document.getElementById('searchMenuItemsBtn');
             const searchMenuItemsBtnText = document.getElementById('searchMenuItemsBtnText');
             const searchMenuItemsSpinner = document.getElementById('searchMenuItemsSpinner');
-            const createMenuItemBtn = document.getElementById('createMenuItemBtn');
+            // const createMenuItemBtn = document.getElementById('createMenuItemBtn'); // Removed for read-only mode
             const searchMenuItemsStatus = document.getElementById('searchMenuItemsStatus');
             const fetchAllItemsBtn = document.getElementById('fetchAllItemsBtn');
             const fetchAllItemsBtnText = document.getElementById('fetchAllItemsBtnText');
@@ -1605,9 +1640,10 @@
             const clearFiltersBtn = document.getElementById('clearFiltersBtn');
             
             // Item Operations
-            const itemOperationDropdown = document.getElementById('itemOperationDropdown');
-            const updateItemPriceBtn = document.getElementById('updateItemPriceBtn');
-            const toggleItemAvailabilityBtn = document.getElementById('toggleItemAvailabilityBtn');
+            // Item operation elements removed for read-only mode
+            // const itemOperationDropdown = document.getElementById('itemOperationDropdown');
+            // const updateItemPriceBtn = document.getElementById('updateItemPriceBtn');
+            // const toggleItemAvailabilityBtn = document.getElementById('toggleItemAvailabilityBtn');
             const itemOperationsStatus = document.getElementById('itemOperationsStatus');
             
             // Modifier Management
@@ -2398,6 +2434,263 @@
                 }
 
                 unhideButton();
+            }
+            
+            // --- Order Pricing Functions ---
+            async function calculateOrderPricing() {
+                calculatePricingBtn.disabled = true;
+                calculatePricingBtnText.textContent = '⏳ Calculating...';
+                calculatePricingSpinner.classList.remove('hidden');
+                calculatePricingStatus.innerHTML = '';
+                pricingBreakdownPanel.classList.add('hidden');
+
+                const unhideButton = () => {
+                    calculatePricingBtn.disabled = false;
+                    calculatePricingBtnText.textContent = '📊 Calculate Pricing';
+                    calculatePricingSpinner.classList.add('hidden');
+                };
+
+                try {
+                    // Validation - same as createAndSendOrder
+                    if (!diningOptionsSelect.value) {
+                        calculatePricingStatus.innerHTML = '<span class="text-red-600">⚠️ A Dining Option is required for pricing calculation.</span>';
+                        unhideButton();
+                        return;
+                    }
+
+                    if (cartItems.length === 0) {
+                        calculatePricingStatus.innerHTML = '<span class="text-red-600">⚠️ Add items to cart to calculate pricing.</span>';
+                        unhideButton();
+                        return;
+                    } 
+                    
+                    // Build the same order payload as createAndSendOrder
+                    const isDelivery = deliveryInfoSection.style.display === 'block';
+                    const apiBase = environmentSelect.value;
+                    const selections = cartItems.map(item => ({
+                        item: { guid: item.guid },
+                        itemGroup: { guid: item.itemGroupGuid },
+                        quantity: parseInt(item.quantity, 10),
+                        modifiers: []
+                    }));
+
+                    const orderPayload = {
+                        diningOption: { "guid": diningOptionsSelect.value },
+                        checks: [{
+                            selections: selections
+                        }]
+                    };
+
+                    // Add discount if selected
+                    const selectedDiscountOption = discountSelect.options[discountSelect.selectedIndex];
+                    if (selectedDiscountOption && selectedDiscountOption.value) {
+                        const discountGuid = selectedDiscountOption.value;
+                        const discountType = selectedDiscountOption.dataset.type;
+                        const selectionType = selectedDiscountOption.dataset.selectionType;
+
+                        const appliedDiscount = {
+                            discount: { guid: discountGuid }
+                        };
+
+                        const openTypes = ['OPEN_FIXED', 'OPEN_PERCENT'];
+                        if (openTypes.includes(discountType)) {
+                            const discountValue = parseFloat(discountValueInput.value);
+                            if (!isNaN(discountValue) && discountValue > 0) {
+                                if (discountType === 'OPEN_PERCENT') {
+                                    appliedDiscount.discountPercent = discountValue;
+                                } else {
+                                    appliedDiscount.discountAmount = discountValue;
+                                }
+                            }
+                        }
+
+                        if (selectionType === 'ITEM') {
+                            const itemSelectCreate = document.getElementById('discountItemSelectCreate');
+                            const selectedItemIndex = itemSelectCreate.value;
+                            if (selectedItemIndex !== "") {
+                                const selectionToDiscount = orderPayload.checks[0].selections[selectedItemIndex];
+                                if (selectionToDiscount) {
+                                    if (!selectionToDiscount.appliedDiscounts) {
+                                        selectionToDiscount.appliedDiscounts = [];
+                                    }
+                                    selectionToDiscount.appliedDiscounts.push(appliedDiscount);
+                                }
+                            }
+                        } else { 
+                            orderPayload.checks[0].appliedDiscounts = [appliedDiscount];
+                        }
+                    }
+
+                    // Add tax if selected
+                    const selectedTaxOption = taxSelect.options[taxSelect.selectedIndex];
+                    if (selectedTaxOption && selectedTaxOption.value) {
+                        orderPayload.checks[0].appliedTaxes = [{
+                            taxRate: { guid: selectedTaxOption.value }
+                        }];
+                    }
+                    
+                    // Add customer info
+                    const customerFirstName = guestFirstNameInput.value.trim();
+                    const customerLastName = guestLastNameInput.value.trim();
+                    const customerPhone = guestPhoneInput.value.trim();
+                    const customerEmail = guestEmailInput.value.trim();
+
+                    if (customerFirstName || customerLastName || customerPhone || customerEmail) {
+                        orderPayload.checks[0].customer = { 
+                            firstName: customerFirstName, 
+                            lastName: customerLastName, 
+                            phone: customerPhone, 
+                            email: customerEmail 
+                        };
+                    }
+
+                    // Add delivery info if applicable
+                    if(isDelivery) {
+                        orderPayload.deliveryInfo = { 
+                            address1: deliveryAddress1Input.value, 
+                            city: deliveryCityInput.value, 
+                            state: deliveryStateInput.value, 
+                            zipCode: deliveryZipInput.value, 
+                            notes: deliveryNotesInput.value 
+                        };
+                    }
+                    
+                    // Add custom fields
+                    customFields.forEach(field => setNestedValue(orderPayload, field.key, smartParse(field.value)));
+
+                    console.log('Pricing calculation request:', orderPayload);
+
+                    // Call the prices endpoint
+                    const fullUrl = CORS_PROXY + apiBase + PRICES_PATH;
+                    const { data } = await makeApiCall(fullUrl, 'POST', orderPayload, null, 'Pricing calculated successfully!');
+                    
+                    if (data) {
+                        calculatePricingStatus.innerHTML = '<span class="text-green-600">✅ Pricing calculated successfully!</span>';
+                        displayPricingBreakdown(data);
+                        pricingBreakdownPanel.classList.remove('hidden');
+                    }
+
+                } catch (error) {
+                    console.error('Pricing calculation error:', error);
+                    calculatePricingStatus.innerHTML = `<span class="text-red-600">❌ Pricing calculation failed: ${error.message}</span>`;
+                } finally {
+                    unhideButton();
+                }
+            }
+
+            function displayPricingBreakdown(pricingData) {
+                let html = '';
+                
+                if (pricingData && pricingData.checks && pricingData.checks.length > 0) {
+                    const check = pricingData.checks[0];
+                    
+                    // Calculate totals
+                    const subtotal = check.selections ? check.selections.reduce((acc, sel) => acc + (sel.price || 0), 0) : 0;
+                    const taxAmount = check.taxAmount || 0;
+                    const discountAmount = check.discountAmount || 0;
+                    const serviceChargeAmount = check.serviceChargeAmount || 0;
+                    const total = subtotal + taxAmount + serviceChargeAmount - discountAmount;
+
+                    html += `
+                    <div class="space-y-3">
+                        <div class="border-b border-gray-200 dark:border-gray-600 pb-3">
+                            <h5 class="font-medium mb-2">📋 Items</h5>
+                            <div class="space-y-1 text-sm">`;
+                    
+                    // Display items
+                    if (check.selections) {
+                        check.selections.forEach((selection, index) => {
+                            const itemPrice = selection.price || 0;
+                            const itemName = cartItems[index]?.name || 'Unknown Item';
+                            const itemQuantity = selection.quantity || 1;
+                            
+                            html += `
+                                <div class="flex justify-between items-center">
+                                    <span>${itemQuantity}x ${itemName}</span>
+                                    <span class="font-mono">$${(itemPrice / 100).toFixed(2)}</span>
+                                </div>`;
+                            
+                            // Show item-level discounts
+                            if (selection.appliedDiscounts && selection.appliedDiscounts.length > 0) {
+                                selection.appliedDiscounts.forEach(discount => {
+                                    html += `
+                                        <div class="flex justify-between items-center text-green-600 dark:text-green-400 ml-4">
+                                            <span class="text-xs">- ${discount.discount?.name || 'Discount'}</span>
+                                            <span class="font-mono text-xs">-$${((discount.discountAmount || 0) / 100).toFixed(2)}</span>
+                                        </div>`;
+                                });
+                            }
+                        });
+                    }
+
+                    html += `
+                            </div>
+                        </div>
+                        
+                        <div class="border-b border-gray-200 dark:border-gray-600 pb-3">
+                            <h5 class="font-medium mb-2">💰 Totals</h5>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between">
+                                    <span>Subtotal</span>
+                                    <span class="font-mono">$${(subtotal / 100).toFixed(2)}</span>
+                                </div>`;
+                    
+                    // Show check-level discounts
+                    if (check.appliedDiscounts && check.appliedDiscounts.length > 0) {
+                        check.appliedDiscounts.forEach(discount => {
+                            html += `
+                                <div class="flex justify-between text-green-600 dark:text-green-400">
+                                    <span>Discount (${discount.discount?.name || 'Unknown'})</span>
+                                    <span class="font-mono">-$${((discount.discountAmount || 0) / 100).toFixed(2)}</span>
+                                </div>`;
+                        });
+                    }
+                    
+                    if (serviceChargeAmount > 0) {
+                        html += `
+                                <div class="flex justify-between">
+                                    <span>Service Charge</span>
+                                    <span class="font-mono">$${(serviceChargeAmount / 100).toFixed(2)}</span>
+                                </div>`;
+                    }
+                    
+                    if (taxAmount > 0) {
+                        html += `
+                                <div class="flex justify-between">
+                                    <span>Tax</span>
+                                    <span class="font-mono">$${(taxAmount / 100).toFixed(2)}</span>
+                                </div>`;
+                    }
+
+                    html += `
+                                <div class="flex justify-between font-bold text-lg border-t border-gray-300 dark:border-gray-500 pt-2">
+                                    <span>Total</span>
+                                    <span class="font-mono text-green-600 dark:text-green-400">$${(total / 100).toFixed(2)}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-blue-50 dark:bg-blue-900/20 rounded p-3 text-xs">
+                            <div class="flex items-center mb-1">
+                                <span class="text-blue-600 dark:text-blue-400 mr-1">ℹ️</span>
+                                <strong>Toast Pricing Info</strong>
+                            </div>
+                            <p class="text-blue-700 dark:text-blue-300">
+                                Pricing calculated using Toast's real-time pricing engine. 
+                                ${check.selections?.length || 0} items validated and priced successfully.
+                            </p>
+                        </div>
+                    </div>`;
+                    
+                } else {
+                    html = `
+                    <div class="text-center py-4 text-gray-500">
+                        <p>❌ No pricing data received</p>
+                        <p class="text-xs mt-1">Check console for response details</p>
+                    </div>`;
+                }
+
+                pricingBreakdownContent.innerHTML = html;
             }
             
             // --- Fetch/Review Order Functions ---
@@ -4855,7 +5148,7 @@
             
             // Populate Menu Item Dropdowns
             function populateMenuItemDropdowns() {
-                const dropdowns = [menuItemDropdown, itemOperationDropdown];
+                const dropdowns = [menuItemDropdown]; // itemOperationDropdown removed for read-only mode
                 
                 dropdowns.forEach(dropdown => {
                     if (dropdown) {
@@ -5023,17 +5316,19 @@
                         
                         allMenuItems = extractedItems;
                         
-                        // Update dropdowns with new data
+                        // Update dropdowns and summary data
                         populateMenuItemDropdowns();
                         populateMenuDropdowns();
                         populateCategoryFilter();
+                        populateMenuFilter();
+                        updateMenuSummaryStats(extractedItems, menus);
                         
                         if (extractedItems.length === 0) {
                             searchMenuItemsStatus.innerHTML = `<span class="text-yellow-600">⚠️ Found ${menus.length} menus but no menu items. Check console for API response details.</span>`;
                         } else {
                             searchMenuItemsStatus.innerHTML = `<span class="text-green-600">✓ Loaded ${extractedItems.length} menu items from ${menus.length} menus</span>`;
                         }
-                        displayMenuItemResults(extractedItems, `All Menu Items (${extractedItems.length})`);
+                        displayMenuItemResults(extractedItems, `Complete Menu Catalog`);
                     }
                 } catch (error) {
                     console.error('Error in fetchAllItems:', error);
@@ -5078,6 +5373,12 @@
                                 (item.plu && item.plu.toLowerCase().includes(searchLower))
                             );
                         });
+                    }
+                    
+                    // Apply menu filter
+                    const menuFilter = document.getElementById('menuFilterSelect')?.value;
+                    if (menuFilter) {
+                        filteredItems = filteredItems.filter(item => item.menuName === menuFilter);
                     }
                     
                     // Apply category filter
@@ -5180,8 +5481,41 @@
                 });
             }
             
-            // Update Item Price
-            async function updateItemPrice() {
+            // Populate menu filter dropdown
+            function populateMenuFilter() {
+                const menuFilterSelect = document.getElementById('menuFilterSelect');
+                if (menuFilterSelect && allMenuItems.length > 0) {
+                    menuFilterSelect.innerHTML = '<option value="">All Menus</option>';
+                    
+                    const menus = [...new Set(allMenuItems.map(item => item.menuName).filter(name => name))];
+                    menus.sort();
+                    
+                    menus.forEach(menu => {
+                        const option = document.createElement('option');
+                        option.value = menu;
+                        option.textContent = menu;
+                        menuFilterSelect.appendChild(option);
+                    });
+                }
+            }
+            
+            // Update menu summary statistics
+            function updateMenuSummaryStats(items, menus) {
+                const totalItemsCount = document.getElementById('totalItemsCount');
+                const totalMenusCount = document.getElementById('totalMenusCount');
+                const totalCategoriesCount = document.getElementById('totalCategoriesCount');
+                
+                if (totalItemsCount) totalItemsCount.textContent = items.length.toLocaleString();
+                if (totalMenusCount) totalMenusCount.textContent = menus.length;
+                
+                if (totalCategoriesCount) {
+                    const uniqueCategories = [...new Set(items.map(item => item.groupName).filter(name => name))];
+                    totalCategoriesCount.textContent = uniqueCategories.length;
+                }
+            }
+            
+            // Update Item Price - DISABLED IN READ-ONLY MODE
+            /* async function updateItemPrice() {
                 const selectedGuid = itemOperationDropdown.value;
                 if (!selectedGuid) {
                     itemOperationsStatus.innerHTML = `<span class="text-yellow-600">Please select an item first</span>`;
@@ -5262,10 +5596,10 @@
                 } finally {
                     updateItemPriceBtn.disabled = false;
                 }
-            }
+            } */
             
-            // Toggle Item Availability
-            async function toggleItemAvailability() {
+            // Toggle Item Availability - DISABLED IN READ-ONLY MODE
+            /* async function toggleItemAvailability() {
                 const selectedGuid = itemOperationDropdown.value;
                 if (!selectedGuid) {
                     itemOperationsStatus.innerHTML = `<span class="text-yellow-600">Please select an item first</span>`;
@@ -5343,10 +5677,10 @@
                 } finally {
                     toggleItemAvailabilityBtn.disabled = false;
                 }
-            }
+            } */
             
-            // Create New Menu Item
-            async function createMenuItem() {
+            // Create New Menu Item - DISABLED IN READ-ONLY MODE
+            /* async function createMenuItem() {
                 // First make sure we have menu data loaded
                 if (allMenus.length === 0) {
                     await fetchAllItems(); // This will load menus and items
@@ -5469,10 +5803,10 @@
                     searchMenuItemsSpinner.classList.add('hidden');
                     createMenuItemBtn.disabled = false;
                 }
-            }
+            } */
             
-            // Helper function to handle successful item creation
-            function handleItemCreationSuccess(newItem, itemName, selectedGroup) {
+            // Helper function to handle successful item creation - DISABLED IN READ-ONLY MODE
+            /* function handleItemCreationSuccess(newItem, itemName, selectedGroup) {
                 // Add context to the new item
                 const itemWithContext = {
                     ...newItem,
@@ -5493,74 +5827,135 @@
                 
                 searchMenuItemsStatus.innerHTML = `<span class="text-green-600">✓ Menu item "${itemName}" created successfully in ${selectedGroup.displayName}</span>`;
                 displayMenuItemResults([itemWithContext], 'Newly Created Item');
-            }
+            } */
             
             // Display Menu Item Results
             function displayMenuItemResults(items, title) {
                 let html = `<div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
-                    <h3 class="font-semibold text-lg mb-3">${title}</h3>`;
+                    <h3 class="font-semibold text-lg mb-4 flex items-center">
+                        <span class="mr-2">🍽️</span>
+                        ${title}
+                        <span class="ml-2 text-sm font-normal text-gray-500">(${items.length} items)</span>
+                    </h3>`;
                 
                 if (items.length === 0) {
-                    html += '<p class="text-gray-500">No menu items found</p>';
+                    html += '<div class="text-center py-8 text-gray-500"><p class="text-lg">📋 No menu items found</p><p class="text-sm mt-2">Try adjusting your filters or loading menu data first.</p></div>';
                 } else {
-                    html += '<div class="space-y-4">';
-                    
+                    // Group items by menu and category for better organization
+                    const groupedItems = {};
                     items.forEach(item => {
-                        const price = item.basePrice ? `$${(item.basePrice / 100).toFixed(2)}` : 'No price set';
-                        const isActive = item.active !== false; // Default to true if undefined
-                        const statusClass = isActive ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
-                        const statusText = isActive ? 'Available' : 'Unavailable';
+                        const menuKey = item.menuName || 'Unknown Menu';
+                        const categoryKey = item.groupName || 'Unknown Category';
                         
-                        html += `
-                        <div class="border border-gray-200 dark:border-gray-600 rounded-lg p-4">
-                            <div class="flex justify-between items-start mb-3">
-                                <h4 class="font-semibold text-emerald-600 dark:text-emerald-400">${item.name || 'Unnamed Item'}</h4>
-                                <div class="flex items-center space-x-2">
-                                    <span class="px-2 py-1 rounded text-xs ${statusClass}">${statusText}</span>
-                                    <span class="text-xs text-gray-500 font-mono">${item.guid.slice(-8)}</span>
-                                </div>
-                            </div>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                                <div>
-                                    <span class="font-medium">Price:</span> <span class="text-green-600 dark:text-green-400 font-semibold">${price}</span>
-                                </div>
-                                <div>
-                                    <span class="font-medium">Category:</span> ${item.groupName || 'Unknown'}
-                                </div>
-                                <div>
-                                    <span class="font-medium">Menu:</span> ${item.menuName || 'Unknown'}
-                                </div>
-                                <div>
-                                    <span class="font-medium">PLU:</span> ${item.plu || 'Not set'}
-                                </div>
-                            </div>`;
-                        
-                        // Show description if available
-                        if (item.description) {
-                            html += `
-                            <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
-                                <span class="font-medium text-sm">Description:</span>
-                                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">${item.description}</p>
-                            </div>`;
+                        if (!groupedItems[menuKey]) {
+                            groupedItems[menuKey] = {};
                         }
+                        if (!groupedItems[menuKey][categoryKey]) {
+                            groupedItems[menuKey][categoryKey] = [];
+                        }
+                        groupedItems[menuKey][categoryKey].push(item);
+                    });
+                    
+                    html += '<div class="space-y-6">';
+                    
+                    Object.entries(groupedItems).forEach(([menuName, categories]) => {
+                        html += `
+                        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
+                            <h4 class="text-lg font-bold text-blue-900 dark:text-blue-100 mb-3 flex items-center">
+                                <span class="mr-2">📋</span>${menuName}
+                            </h4>
+                            <div class="space-y-4">`;
                         
-                        // Show modifiers if available
-                        if (item.modifierGroups && item.modifierGroups.length > 0) {
+                        Object.entries(categories).forEach(([categoryName, categoryItems]) => {
                             html += `
-                            <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
-                                <span class="font-medium text-sm">Modifiers (${item.modifierGroups.length}):</span>
-                                <div class="flex flex-wrap gap-1 mt-2">`;
+                            <div class="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-600">
+                                <h5 class="font-semibold text-purple-600 dark:text-purple-400 mb-3 flex items-center">
+                                    <span class="mr-2">🏷️</span>${categoryName}
+                                    <span class="ml-2 text-xs font-normal text-gray-500">(${categoryItems.length} items)</span>
+                                </h5>
+                                <div class="grid gap-3">`;
                             
-                            item.modifierGroups.forEach(modGroup => {
-                                html += `<span class="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs rounded">${modGroup.name || 'Modifier Group'}</span>`;
+                            categoryItems.forEach(item => {
+                                const price = item.basePrice ? `$${(item.basePrice / 100).toFixed(2)}` : 'No price set';
+                                const isActive = item.active !== false;
+                                const statusClass = isActive ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
+                                const statusText = isActive ? 'Available' : 'Unavailable';
+                                
+                                html += `
+                                <div class="border border-gray-200 dark:border-gray-600 rounded-lg p-3 hover:shadow-md transition-shadow">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <h6 class="font-semibold text-emerald-600 dark:text-emerald-400 text-lg">${item.name || 'Unnamed Item'}</h6>
+                                        <div class="flex items-center space-x-2">
+                                            <span class="px-2 py-1 rounded text-xs font-medium ${statusClass}">${statusText}</span>
+                                            <span class="text-xs text-gray-500 font-mono bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">${item.guid ? item.guid.slice(-8) : 'No ID'}</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 text-sm mb-3">
+                                        <div class="flex items-center">
+                                            <span class="font-medium text-gray-700 dark:text-gray-300 mr-2">💰 Price:</span> 
+                                            <span class="text-green-600 dark:text-green-400 font-bold">${price}</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <span class="font-medium text-gray-700 dark:text-gray-300 mr-2">🏷️ PLU:</span> 
+                                            <span class="font-mono text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">${item.plu || 'Not set'}</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <span class="font-medium text-gray-700 dark:text-gray-300 mr-2">🎆 Type:</span> 
+                                            <span class="text-xs">${item.type || 'Standard'}</span>
+                                        </div>
+                                    </div>`;
+                                
+                                // Show description if available
+                                if (item.description) {
+                                    html += `
+                                    <div class="mb-3 p-2 bg-gray-50 dark:bg-gray-700 rounded">
+                                        <span class="font-medium text-sm text-gray-700 dark:text-gray-300">📝 Description:</span>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">${item.description}</p>
+                                    </div>`;
+                                }
+                                
+                                // Show additional item details
+                                const additionalDetails = [];
+                                if (item.unitOfMeasure) additionalDetails.push(`Unit: ${item.unitOfMeasure}`);
+                                if (item.visibility !== undefined) additionalDetails.push(`Visibility: ${item.visibility}`);
+                                if (item.taxInfo) additionalDetails.push('Tax: Configured');
+                                if (item.nutritionalInfo) additionalDetails.push('Nutrition: Available');
+                                
+                                if (additionalDetails.length > 0) {
+                                    html += `
+                                    <div class="mb-3">
+                                        <span class="font-medium text-sm text-gray-700 dark:text-gray-300">📊 Details:</span>
+                                        <div class="flex flex-wrap gap-1 mt-1">`;
+                                    additionalDetails.forEach(detail => {
+                                        html += `<span class="px-2 py-1 bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 text-xs rounded">${detail}</span>`;
+                                    });
+                                    html += `</div></div>`;
+                                }
+                                
+                                // Show modifiers if available
+                                if (item.modifierGroups && item.modifierGroups.length > 0) {
+                                    html += `
+                                    <div class="border-t pt-2 mt-2">
+                                        <span class="font-medium text-sm text-gray-700 dark:text-gray-300">🔧 Modifiers (${item.modifierGroups.length}):</span>
+                                        <div class="flex flex-wrap gap-1 mt-2">`;
+                                    
+                                    item.modifierGroups.forEach(modGroup => {
+                                        const modName = modGroup.name || modGroup.guid || 'Modifier Group';
+                                        const isRequired = modGroup.minSelections > 0 ? ' (Required)' : '';
+                                        html += `<span class="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs rounded border border-blue-200 dark:border-blue-800">${modName}${isRequired}</span>`;
+                                    });
+                                    
+                                    html += `</div></div>`;
+                                }
+                                
+                                html += '</div>';
                             });
                             
-                            html += `
-                                </div>
-                            </div>`;
-                        }
+                            html += `</div></div>`;
+                        });
                         
-                        html += '</div>';
+                        html += `</div></div>`;
                     });
                     
                     html += '</div>';
@@ -5776,6 +6171,7 @@
                 }
             });
             sendOrderBtn.addEventListener('click', createAndSendOrder);
+            calculatePricingBtn.addEventListener('click', calculateOrderPricing);
 
             discountSelect.addEventListener('change', handleDiscountSelectChange);
             
@@ -5875,21 +6271,21 @@
             fetchAllMenusBtn.addEventListener('click', fetchAllMenus);
             viewSelectedMenuBtn.addEventListener('click', viewSelectedMenu);
             
-            // Menu Items
+            // Menu Items (read-only mode)
             viewSelectedItemBtn.addEventListener('click', viewSelectedItem);
             searchMenuItemsBtn.addEventListener('click', searchMenuItems);
-            createMenuItemBtn.addEventListener('click', createMenuItem);
+            // createMenuItemBtn.addEventListener('click', createMenuItem); // Removed for read-only mode
             fetchAllItemsBtn.addEventListener('click', fetchAllItems);
             clearFiltersBtn.addEventListener('click', clearFilters);
-            updateItemPriceBtn.addEventListener('click', updateItemPrice);
-            toggleItemAvailabilityBtn.addEventListener('click', toggleItemAvailability);
+            // updateItemPriceBtn.addEventListener('click', updateItemPrice); // Removed for read-only mode
+            // toggleItemAvailabilityBtn.addEventListener('click', toggleItemAvailability); // Removed for read-only mode
             
-            // Enable/disable item operation buttons based on selection
-            itemOperationDropdown.addEventListener('change', function() {
-                const hasSelection = itemOperationDropdown.value !== '';
-                updateItemPriceBtn.disabled = !hasSelection;
-                toggleItemAvailabilityBtn.disabled = !hasSelection;
-            });
+            // Item operation buttons removed for read-only mode
+            // itemOperationDropdown.addEventListener('change', function() {
+            //     const hasSelection = itemOperationDropdown.value !== '';
+            //     updateItemPriceBtn.disabled = !hasSelection;
+            //     toggleItemAvailabilityBtn.disabled = !hasSelection;
+            // });
             
             // Add event listeners for shift creation form
             shiftEmployeeDropdown.addEventListener('change', updateShiftJobDropdownForEmployee);
