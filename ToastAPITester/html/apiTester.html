@@ -336,7 +336,15 @@
                         <div>
                             <label class="font-semibold">Lookup by GUID:</label>
                             <div class="flex items-center gap-2 mt-1">
-                                <input type="text" id="fetchOrderGuidInput" placeholder="Enter Order GUID" class="w-full bg-gray-50 dark:bg-gray-700 rounded-md p-2 border border-gray-300 dark:border-gray-600">
+                                <div class="relative flex-1">
+                                    <input type="text" id="fetchOrderGuidInput" placeholder="Enter Order GUID" class="w-full bg-gray-50 dark:bg-gray-700 rounded-md p-2 pr-8 border border-gray-300 dark:border-gray-600">
+                                    <button type="button" onclick="if(fetchOrderGuidInput.value) copyToClipboard(fetchOrderGuidInput.value, 'Order GUID copied!')" class="absolute top-1/2 transform -translate-y-1/2 right-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 transition-colors" title="Copy GUID to clipboard">
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z"></path>
+                                            <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z"></path>
+                                        </svg>
+                                    </button>
+                                </div>
                                 <button id="fetchOrderByGuidBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition">Fetch</button>
                             </div>
                              <div id="fetchOrderByGuidStatus" class="mt-2 text-sm text-center"></div>
@@ -368,7 +376,15 @@
                     <div class="space-y-4">
                         <label class="font-semibold">Load Order to Update:</label>
                         <div class="flex items-center gap-2 mt-1">
-                            <input type="text" id="updateOrderGuidInput" placeholder="Enter Order GUID" class="w-full bg-gray-50 dark:bg-gray-700 rounded-md p-2 border border-gray-300 dark:border-gray-600">
+                            <div class="relative flex-1">
+                                <input type="text" id="updateOrderGuidInput" placeholder="Enter Order GUID" class="w-full bg-gray-50 dark:bg-gray-700 rounded-md p-2 pr-8 border border-gray-300 dark:border-gray-600">
+                                <button type="button" onclick="if(updateOrderGuidInput.value) copyToClipboard(updateOrderGuidInput.value, 'Order GUID copied!')" class="absolute top-1/2 transform -translate-y-1/2 right-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 transition-colors" title="Copy GUID to clipboard">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z"></path>
+                                        <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z"></path>
+                                    </svg>
+                                </button>
+                            </div>
                             <button id="loadOrderForUpdateBtn" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-md transition">Load</button>
                         </div>
                         <div id="loadOrderForUpdateStatus" class="mt-2 text-sm text-center"></div>
@@ -382,9 +398,22 @@
                     </div>
                     
                     <div class="space-y-6">
-                        <!-- View All Inventory -->
+                        <!-- Fetch Menu Items for Stock Management -->
                         <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                            <h3 class="text-md font-semibold mb-3">View Current Inventory</h3>
+                            <h3 class="text-md font-semibold mb-3">📋 Available Menu Items</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                                Load menu items to see what's available for stock management. Copy GUIDs to use in other operations.
+                            </p>
+                            <button id="fetchMenuItemsForStockBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-4 rounded-md transition flex items-center justify-center mb-3">
+                                <span id="fetchMenuItemsForStockBtnText">🍽️ Fetch Menu Items</span>
+                                <div id="fetchMenuItemsForStockSpinner" class="spinner ml-2 hidden"></div>
+                            </button>
+                            <div id="fetchMenuItemsForStockStatus" class="text-sm text-center"></div>
+                        </div>
+
+                        <!-- View Current Stock Levels -->
+                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                            <h3 class="text-md font-semibold mb-3">📦 View Current Stock Levels</h3>
                             <div class="flex items-center gap-4 mb-3">
                                 <select id="inventoryStatusFilter" class="bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500">
                                     <option value="">All Items</option>
@@ -392,7 +421,7 @@
                                     <option value="QUANTITY">Limited Quantity</option>
                                 </select>
                                 <button id="viewInventoryBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition flex items-center">
-                                    <span id="viewInventoryBtnText">View Inventory</span>
+                                    <span id="viewInventoryBtnText">View Stock Levels</span>
                                     <div id="viewInventorySpinner" class="spinner ml-2 hidden"></div>
                                 </button>
                             </div>
@@ -403,16 +432,54 @@
                         <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
                             <h3 class="text-md font-semibold mb-3">Search Specific Items</h3>
                             <div class="space-y-3">
+                                <!-- Quick Item Selection -->
                                 <div>
-                                    <label class="block text-sm font-medium mb-1">Menu Item GUIDs (comma-separated)</label>
-                                    <textarea id="searchItemGuids" rows="2" placeholder="Enter menu item GUIDs separated by commas" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500"></textarea>
+                                    <label class="block text-sm font-medium mb-1">🍽️ Select Item by Name</label>
+                                    <select id="inventoryItemDropdown" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500">
+                                        <option value="">Select an item...</option>
+                                        <option value="" disabled>Load menu data and inventory first</option>
+                                    </select>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                        Choose an item to auto-fill GUIDs and see current stock status
+                                    </p>
+                                </div>
+
+                                <!-- Current Stock Info Display -->
+                                <div id="selectedItemStockInfo"></div>
+
+                                <!-- Manual GUID Entry -->
+                                <div>
+                                    <label class="flex items-center text-sm font-medium mb-1">
+                                        Menu Item GUIDs (comma-separated)
+                                        <span class="ml-2 text-xs text-gray-500">Auto-filled from selection above</span>
+                                    </label>
+                                    <div class="relative">
+                                        <textarea id="searchItemGuids" rows="2" placeholder="Enter menu item GUIDs separated by commas (or select from dropdown above)" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 pr-8"></textarea>
+                                        <button type="button" onclick="if(searchItemGuids.value) copyToClipboard(searchItemGuids.value, 'GUIDs copied!')" class="absolute top-2 right-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 transition-colors" title="Copy GUIDs to clipboard">
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z"></path>
+                                                <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z"></path>
+                                            </svg>
+                                        </button>
+                                </div>
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium mb-1">Multi-Location IDs (comma-separated)</label>
-                                    <textarea id="searchItemMLIds" rows="2" placeholder="Enter multi-location IDs separated by commas" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500"></textarea>
+                                    <label class="flex items-center text-sm font-medium mb-1">
+                                        Multi-Location IDs (comma-separated)
+                                        <span class="ml-2 text-xs text-gray-500">Auto-filled from selection above</span>
+                                    </label>
+                                    <div class="relative">
+                                        <textarea id="searchItemMLIds" rows="2" placeholder="Enter multi-location IDs separated by commas (or select from dropdown above)" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 pr-8"></textarea>
+                                        <button type="button" onclick="if(searchItemMLIds.value) copyToClipboard(searchItemMLIds.value, 'Multi-Location IDs copied!')" class="absolute top-2 right-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 transition-colors" title="Copy Multi-Location IDs to clipboard">
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z"></path>
+                                                <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
                                 </div>
-                                <button id="searchInventoryBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-md transition flex items-center">
-                                    <span id="searchInventoryBtnText">Search Items</span>
+                                <button id="searchInventoryBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-md transition flex items-center justify-center">
+                                    <span id="searchInventoryBtnText">🔍 Search Items</span>
                                     <div id="searchInventorySpinner" class="spinner ml-2 hidden"></div>
                                 </button>
                                 <div id="searchInventoryStatus" class="text-sm text-center"></div>
@@ -421,13 +488,21 @@
 
                         <!-- Update Inventory -->
                         <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                            <h3 class="text-md font-semibold mb-3">Update Inventory</h3>
+                            <h3 class="text-md font-semibold mb-3">🔄 Update Inventory</h3>
+                            <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-3 mb-4">
+                                <p class="text-sm text-blue-700 dark:text-blue-300">
+                                    <strong>💡 How it works:</strong> Select items from the dropdown (populated after fetching menu items above), set their status. The quantity field only becomes editable when you select "Limited Quantity" status.
+                                </p>
+                            </div>
                             <div id="inventoryUpdateList" class="space-y-3 mb-4">
                                 <div class="inventory-update-item bg-white dark:bg-gray-800 p-3 rounded border" id="updateTemplate" style="display: none;">
                                     <div class="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
                                         <div>
-                                            <label class="block text-sm font-medium mb-1">Item GUID/Multi-Location ID</label>
-                                            <input type="text" class="item-identifier w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500" placeholder="Item identifier">
+                                            <label class="block text-sm font-medium mb-1">🍽️ Select Item</label>
+                                            <select class="item-identifier w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500">
+                                                <option value="">Choose an item...</option>
+                                                <option value="" disabled>Click "Fetch Menu Items" above to populate this list</option>
+                                            </select>
                                         </div>
                                         <div>
                                             <label class="block text-sm font-medium mb-1">Status</label>
@@ -438,8 +513,11 @@
                                             </select>
                                         </div>
                                         <div class="quantity-container">
-                                            <label class="block text-sm font-medium mb-1">Quantity</label>
-                                            <input type="number" class="item-quantity w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500" placeholder="0.0" step="0.1" min="0" disabled>
+                                            <label class="block text-sm font-medium mb-1">
+                                                Quantity 
+                                                <span class="text-xs text-gray-500 font-normal">(for "Limited Quantity" only)</span>
+                                            </label>
+                                            <input type="number" class="item-quantity w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 opacity-50" placeholder="Select 'Limited Quantity' first" step="0.1" min="0" disabled>
                                         </div>
                                         <button type="button" class="remove-item-btn bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-md transition">Remove</button>
                                     </div>
@@ -872,7 +950,7 @@
                                     <strong class="text-blue-800 dark:text-blue-200">Read-Only Mode:</strong>
                                 </div>
                                 <p class="text-blue-700 dark:text-blue-300">
-                                    This section displays comprehensive menu data in read-only format. Menu item creation and updates are not supported via the Toast API.
+                                    This section displays comprehensive menu data in read-only format. Menu item creation and updates are not supported via the Toast API. Results are displayed in the Results section below. 
                                 </p>
                             </div>
                             
@@ -1024,28 +1102,61 @@
                     </div>
                     
                     <div class="max-w-4xl mx-auto">
-                        <!-- Bulk Operations -->
-                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                            <h3 class="text-lg font-semibold mb-3 text-rose-600 dark:text-rose-400">⚡ Bulk Operations</h3>
-                            
-                            <!-- Batch Updates -->
-                            <div class="mb-4">
-                                <h4 class="font-medium mb-2">Batch Operations</h4>
-                                <div class="space-y-2">
-                                    <select id="bulkOperationTypeSelect" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
-                                        <option value="">Select operation type...</option>
-                                        <option value="price-update">Bulk Price Update</option>
-                                        <option value="availability-toggle">Bulk Availability Toggle</option>
-                                        <option value="category-move">Move Items to Category</option>
-                                    </select>
-                                    <textarea id="bulkItemsList" rows="3" placeholder="Enter item GUIDs or names (one per line)" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm"></textarea>
-                                    <button id="executeBulkOperationBtn" class="w-full bg-rose-600 hover:bg-rose-700 text-white py-2 rounded-md transition text-sm flex items-center justify-center" disabled>
-                                        <span id="executeBulkOperationBtnText">Execute Bulk Operation</span>
-                                        <div id="executeBulkOperationSpinner" class="spinner ml-2 hidden"></div>
+                        <!-- Operation Type Selection -->
+                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg mb-6">
+                            <h3 class="text-lg font-semibold mb-3 text-rose-600 dark:text-rose-400">⚡ Choose Bulk Operation</h3>
+                            <select id="bulkOperationTypeSelect" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                <option value="">Select operation type...</option>
+                                <option value="price-update">💰 Bulk Price Update</option>
+                                <option value="availability-toggle">🔄 Bulk Availability Toggle</option>
+                                <option value="category-move">📁 Move Items to Category</option>
+                            </select>
+                        </div>
+
+                        <!-- Item Staging Area -->
+                        <div id="bulkOperationContainer" class="space-y-6 hidden">
+                            <!-- Add Items Section -->
+                            <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 p-4 rounded-lg">
+                                <h4 class="font-semibold text-blue-800 dark:text-blue-200 mb-3">📋 Add Items to Staging</h4>
+                                <div class="flex gap-3 items-end">
+                                    <div class="flex-grow">
+                                        <label class="block text-sm font-medium mb-1">Select Menu Item</label>
+                                        <select id="bulkItemSelect" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500">
+                                            <option value="">Choose an item...</option>
+                                            <option value="" disabled>Fetch menu data first to populate this list</option>
+                                        </select>
+                                    </div>
+                                    <button id="addToBulkStagingBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition">
+                                        Add to Staging
                                     </button>
-                                    <div id="bulkOperationStatus" class="text-xs text-center"></div>
+                                </div>
+                                <div id="addToBulkStatus" class="text-xs text-center mt-2"></div>
+                            </div>
+
+                            <!-- Staged Items List -->
+                            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                                <h4 class="font-semibold text-gray-800 dark:text-gray-200 mb-3">📦 Staged Items (<span id="stagedItemsCount">0</span>)</h4>
+                                <div id="stagedItemsList" class="space-y-2 mb-4 min-h-[100px] max-h-[300px] overflow-y-auto border border-gray-200 dark:border-gray-600 rounded-lg p-3 bg-white dark:bg-gray-800">
+                                    <div class="text-gray-500 dark:text-gray-400 text-center py-8">
+                                        No items staged yet. Add items using the section above.
+                                    </div>
                                 </div>
                             </div>
+
+                            <!-- Operation-Specific Parameters -->
+                            <div id="operationParametersSection" class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 p-4 rounded-lg">
+                                <!-- Will be populated based on operation type -->
+                            </div>
+
+                            <!-- Execute Operation -->
+                            <div class="bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-700 p-4 rounded-lg">
+                                <button id="executeBulkOperationBtn" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-semibold py-3 px-4 rounded-md transition flex items-center justify-center" disabled>
+                                    <span id="executeBulkOperationBtnText">Execute Bulk Operation</span>
+                                    <div id="executeBulkOperationSpinner" class="spinner ml-2 hidden"></div>
+                                </button>
+                                <div id="bulkOperationStatus" class="text-sm text-center mt-3"></div>
+                            </div>
+                        </div>
 
                             <!-- Menu Publishing -->
                             <div class="border-t pt-3">
@@ -1481,6 +1592,10 @@
 
             // Stock Management Elements
             const stockManagementSection = document.getElementById('stockManagementSection');
+            const fetchMenuItemsForStockBtn = document.getElementById('fetchMenuItemsForStockBtn');
+            const fetchMenuItemsForStockBtnText = document.getElementById('fetchMenuItemsForStockBtnText');
+            const fetchMenuItemsForStockSpinner = document.getElementById('fetchMenuItemsForStockSpinner');
+            const fetchMenuItemsForStockStatus = document.getElementById('fetchMenuItemsForStockStatus');
             const inventoryStatusFilter = document.getElementById('inventoryStatusFilter');
             const viewInventoryBtn = document.getElementById('viewInventoryBtn');
             const viewInventoryBtnText = document.getElementById('viewInventoryBtnText');
@@ -1663,7 +1778,13 @@
             
             // Bulk Operations
             const bulkOperationTypeSelect = document.getElementById('bulkOperationTypeSelect');
-            const bulkItemsList = document.getElementById('bulkItemsList');
+            const bulkOperationContainer = document.getElementById('bulkOperationContainer');
+            const bulkItemSelect = document.getElementById('bulkItemSelect');
+            const addToBulkStagingBtn = document.getElementById('addToBulkStagingBtn');
+            const addToBulkStatus = document.getElementById('addToBulkStatus');
+            const stagedItemsList = document.getElementById('stagedItemsList');
+            const stagedItemsCount = document.getElementById('stagedItemsCount');
+            const operationParametersSection = document.getElementById('operationParametersSection');
             const executeBulkOperationBtn = document.getElementById('executeBulkOperationBtn');
             const executeBulkOperationBtnText = document.getElementById('executeBulkOperationBtnText');
             const executeBulkOperationSpinner = document.getElementById('executeBulkOperationSpinner');
@@ -1684,6 +1805,8 @@
             let apiLogHistory = [];
             let isProxyActive = false;
             let currentCredentials = { id: '', secret: '' };
+            let bulkStagedItems = []; // Items staged for bulk operations
+            let currentBulkOperation = null;
             let currentWorkflow = null; // null, 'create', 'fetch', 'update', 'stock', 'labor'
             let activeUpdateOrder = null; // Store the order being updated
 
@@ -1888,8 +2011,8 @@
                     setTimeout(() => { element.innerHTML = ''; }, 15000); // Longer timeout for detailed messages
                 } else {
                     // For simple text messages, use the original format
-                    element.innerHTML = `<p class="${colorClass} font-medium">[${status}] ${message}</p>`;
-                    setTimeout(() => { element.innerHTML = ''; }, 5000);
+                element.innerHTML = `<p class="${colorClass} font-medium">[${status}] ${message}</p>`;
+                setTimeout(() => { element.innerHTML = ''; }, 5000);
                 }
             }
             
@@ -2307,6 +2430,66 @@
                     } catch (e) { /* Fallback to string */ }
                 }
                 return value; // Return original string if no other type matches
+            }
+
+            // Copy to clipboard utility function
+            async function copyToClipboard(text, successMessage = 'Copied to clipboard!') {
+                try {
+                    await navigator.clipboard.writeText(text);
+                    // Create a temporary success indicator
+                    const notification = document.createElement('div');
+                    notification.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-pulse';
+                    notification.textContent = successMessage;
+                    document.body.appendChild(notification);
+                    
+                    // Remove notification after 2 seconds
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.parentNode.removeChild(notification);
+                        }
+                    }, 2000);
+                    
+                    return true;
+                } catch (err) {
+                    console.error('Failed to copy to clipboard:', err);
+                    // Fallback for older browsers
+                    try {
+                        const textArea = document.createElement('textarea');
+                        textArea.value = text;
+                        document.body.appendChild(textArea);
+                        textArea.focus();
+                        textArea.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(textArea);
+                        
+                        // Show success message
+                        const notification = document.createElement('div');
+                        notification.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-pulse';
+                        notification.textContent = successMessage;
+                        document.body.appendChild(notification);
+                        
+                        setTimeout(() => {
+                            if (notification.parentNode) {
+                                notification.parentNode.removeChild(notification);
+                            }
+                        }, 2000);
+                        
+                        return true;
+                    } catch (fallbackErr) {
+                        console.error('Fallback copy failed:', fallbackErr);
+                        return false;
+                    }
+                }
+            }
+
+            // Create copy icon HTML
+            function createCopyIcon(text, label = 'GUID') {
+                return `<button onclick="copyToClipboard('${text}', '${label} copied!')" class="ml-1 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 transition-colors" title="Copy ${label} to clipboard">
+                    <svg class="w-3 h-3 inline" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z"></path>
+                        <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z"></path>
+                    </svg>
+                </button>`;
             }
 
 
@@ -2741,7 +2924,7 @@
                             <details class="bg-gray-100 dark:bg-gray-700 rounded-md" data-guid="${order.guid}">
                                 <summary class="p-3 cursor-pointer font-semibold flex justify-between items-center list-none">
                                     <div class="flex items-center">
-                                      <span>Order GUID: <span class="font-mono">${order.guid}</span></span>
+                                      <span>Order GUID: <span class="font-mono">${order.guid}</span>${createCopyIcon(order.guid, 'Order GUID')}</span>
                                       ${statusFlag}
                                     </div>
                                     <div class="text-right">
@@ -2882,7 +3065,7 @@
                 }
 
                  resultsContainer.innerHTML = `
-                    <h3 class="text-lg font-bold">Editing Order: ${order.guid}</h3>
+                    <h3 class="text-lg font-bold flex items-center">Editing Order: <span class="font-mono ml-2">${order.guid}</span>${createCopyIcon(order.guid, 'Order GUID')}</h3>
                     <div class="my-4">${receiptHtml}</div>
                     <div id="updateActionStatus" class="mt-2 text-sm text-center"></div>
                     <div class="space-y-4 mt-4">
@@ -3179,7 +3362,7 @@
                             <p>${order.diningOption?.name || 'Dine-In'}</p>
                         </div>
                         <div class="mb-2">
-                            <p><strong>Order:</strong> ${order.guid}</p>
+                            <p><strong>Order:</strong> <span class="font-mono">${order.guid}</span>${createCopyIcon(order.guid, 'Order GUID')}</p>
                             <p><strong>Opened:</strong> ${new Date(order.openedDate).toLocaleString()}</p>
                             <p><strong>Customer:</strong> ${check.customer?.firstName || ''} ${check.customer?.lastName || 'Guest'}</p>
                         </div>
@@ -3333,7 +3516,830 @@
                 }
             }
 
+            // --- Bulk Operations Functions ---
+            
+            // Handle operation type change - show/hide staging area and set parameters
+            function handleBulkOperationTypeChange() {
+                const selectedOperation = bulkOperationTypeSelect.value;
+                
+                if (selectedOperation) {
+                    bulkOperationContainer.classList.remove('hidden');
+                    currentBulkOperation = selectedOperation;
+                    
+                    // Populate item dropdown if we have menu data
+                    if (allMenuItems.length > 0) {
+                        populateBulkItemDropdown();
+                    }
+                    
+                    // Show operation-specific parameters
+                    updateOperationParametersSection();
+                    
+                    // Reset staged items
+                    bulkStagedItems = [];
+                    updateStagedItemsDisplay();
+                    updateExecuteButtonState();
+                } else {
+                    bulkOperationContainer.classList.add('hidden');
+                    currentBulkOperation = null;
+                }
+            }
+            
+            // Populate the bulk item selection dropdown
+            function populateBulkItemDropdown() {
+                bulkItemSelect.innerHTML = '<option value="">Choose an item...</option>';
+                
+                if (allMenuItems.length === 0) {
+                    bulkItemSelect.innerHTML += '<option value="" disabled>Fetch menu data first to populate this list</option>';
+                    return;
+                }
+                
+                // Sort items by menu and group for better organization
+                const sortedItems = [...allMenuItems].sort((a, b) => {
+                    if (a.menuName !== b.menuName) return a.menuName.localeCompare(b.menuName);
+                    if (a.groupName !== b.groupName) return a.groupName.localeCompare(b.groupName);
+                    return a.name.localeCompare(b.name);
+                });
+                
+                let currentMenu = '';
+                let currentGroup = '';
+                
+                sortedItems.forEach(item => {
+                    // Add menu header
+                    if (item.menuName !== currentMenu) {
+                        currentMenu = item.menuName;
+                        const menuHeader = document.createElement('optgroup');
+                        menuHeader.label = `📋 ${item.menuName || 'Unknown Menu'}`;
+                        bulkItemSelect.appendChild(menuHeader);
+                    }
+                    
+                    const option = document.createElement('option');
+                    option.value = item.guid;
+                    option.textContent = `${item.name} (${item.groupName || 'Unknown Category'})`;
+                    option.setAttribute('data-name', item.name);
+                    option.setAttribute('data-menu', item.menuName || 'Unknown Menu');
+                    option.setAttribute('data-group', item.groupName || 'Unknown Category');
+                    option.setAttribute('data-price', item.price || item.basePrice || 0);
+                    bulkItemSelect.lastElementChild.appendChild(option);
+                });
+            }
+            
+            // Add item to bulk staging area
+            function addToBulkStaging() {
+                const selectedGuid = bulkItemSelect.value;
+                
+                if (!selectedGuid) {
+                    addToBulkStatus.innerHTML = '<span class="text-yellow-600">Please select an item first</span>';
+                    return;
+                }
+                
+                // Check if item is already staged
+                if (bulkStagedItems.find(item => item.guid === selectedGuid)) {
+                    addToBulkStatus.innerHTML = '<span class="text-yellow-600">Item is already staged</span>';
+                    return;
+                }
+                
+                // Find item details
+                const selectedItem = allMenuItems.find(item => item.guid === selectedGuid);
+                if (!selectedItem) {
+                    addToBulkStatus.innerHTML = '<span class="text-red-600">Item not found</span>';
+                    return;
+                }
+                
+                // Add to staged items
+                bulkStagedItems.push({
+                    ...selectedItem,
+                    // Add any operation-specific default values
+                    bulkParams: getBulkOperationDefaults()
+                });
+                
+                // Update UI
+                updateStagedItemsDisplay();
+                updateExecuteButtonState();
+                
+                // Reset dropdown and show success
+                bulkItemSelect.value = '';
+                addToBulkStatus.innerHTML = '<span class="text-green-600">✓ Item added to staging</span>';
+                
+                setTimeout(() => {
+                    addToBulkStatus.innerHTML = '';
+                }, 2000);
+            }
+            
+            // Remove item from bulk staging
+            function removeFromBulkStaging(itemGuid) {
+                bulkStagedItems = bulkStagedItems.filter(item => item.guid !== itemGuid);
+                updateStagedItemsDisplay();
+                updateExecuteButtonState();
+            }
+            
+            // Update the staged items display
+            function updateStagedItemsDisplay() {
+                stagedItemsCount.textContent = bulkStagedItems.length;
+                
+                if (bulkStagedItems.length === 0) {
+                    stagedItemsList.innerHTML = `
+                        <div class="text-gray-500 dark:text-gray-400 text-center py-8">
+                            No items staged yet. Add items using the section above.
+                        </div>
+                    `;
+                    return;
+                }
+                
+                let html = '';
+                bulkStagedItems.forEach((item, index) => {
+                    const currentPrice = item.price ? `$${item.price.toFixed(2)}` : 
+                                       (item.basePrice ? `$${(item.basePrice / 100).toFixed(2)}` : 'No price');
+                    
+                    html += `
+                        <div class="flex items-center justify-between bg-gray-50 dark:bg-gray-600 p-3 rounded-lg">
+                            <div class="flex-grow">
+                                <div class="font-medium">${item.name}</div>
+                                <div class="text-sm text-gray-600 dark:text-gray-400">
+                                    ${item.menuName} → ${item.groupName} | ${currentPrice}
+                                </div>
+                                ${getOperationSpecificDisplay(item)}
+                            </div>
+                            <button onclick="removeFromBulkStaging('${item.guid}')" 
+                                    class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-xs transition">
+                                Remove
+                            </button>
+                        </div>
+                    `;
+                });
+                
+                stagedItemsList.innerHTML = html;
+            }
+            
+            // Update operation parameters section based on selected operation
+            function updateOperationParametersSection() {
+                if (!currentBulkOperation) {
+                    operationParametersSection.innerHTML = '';
+                    return;
+                }
+                
+                let html = '';
+                
+                switch (currentBulkOperation) {
+                    case 'price-update':
+                        html = `
+                            <h4 class="font-semibold text-amber-800 dark:text-amber-200 mb-3">💰 Price Update Parameters</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">New Price (per item)</label>
+                                    <div class="flex items-center">
+                                        <span class="text-gray-500 mr-2">$</span>
+                                        <input type="number" id="bulkNewPrice" step="0.01" min="0" 
+                                               class="flex-grow bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500" 
+                                               placeholder="0.00">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Price Update Method</label>
+                                    <select id="bulkPriceMethod" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500">
+                                        <option value="set">Set to exact price</option>
+                                        <option value="increase">Increase by amount</option>
+                                        <option value="decrease">Decrease by amount</option>
+                                        <option value="percent-increase">Increase by percentage</option>
+                                        <option value="percent-decrease">Decrease by percentage</option>
+                                    </select>
+                                </div>
+                            </div>
+                        `;
+                        break;
+                        
+                    case 'availability-toggle':
+                        html = `
+                            <h4 class="font-semibold text-amber-800 dark:text-amber-200 mb-3">🔄 Availability Toggle Parameters</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">New Availability Status</label>
+                                    <select id="bulkAvailabilityStatus" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500">
+                                        <option value="available">✅ Make Available</option>
+                                        <option value="unavailable">❌ Make Unavailable</option>
+                                        <option value="toggle">🔄 Toggle Status</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Reason (Optional)</label>
+                                    <input type="text" id="bulkAvailabilityReason" 
+                                           class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500" 
+                                           placeholder="e.g. Seasonal item, Out of stock">
+                                </div>
+                            </div>
+                        `;
+                        break;
+                        
+                    case 'category-move':
+                        html = `
+                            <h4 class="font-semibold text-amber-800 dark:text-amber-200 mb-3">📁 Move to Category Parameters</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Target Menu</label>
+                                    <select id="bulkTargetMenu" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500">
+                                        <option value="">Select target menu...</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Target Category</label>
+                                    <select id="bulkTargetCategory" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500">
+                                        <option value="">Select target category...</option>
+                                    </select>
+                                </div>
+                            </div>
+                        `;
+                        
+                        // Populate menu dropdown for category move
+                        setTimeout(() => {
+                            const targetMenuSelect = document.getElementById('bulkTargetMenu');
+                            const targetCategorySelect = document.getElementById('bulkTargetCategory');
+                            
+                            if (targetMenuSelect && allMenus.length > 0) {
+                                allMenus.forEach(menu => {
+                                    const option = document.createElement('option');
+                                    option.value = menu.guid;
+                                    option.textContent = menu.name;
+                                    targetMenuSelect.appendChild(option);
+                                });
+                                
+                                // Add event listener for menu change
+                                targetMenuSelect.addEventListener('change', () => {
+                                    const selectedMenuGuid = targetMenuSelect.value;
+                                    targetCategorySelect.innerHTML = '<option value="">Select target category...</option>';
+                                    
+                                    if (selectedMenuGuid) {
+                                        const selectedMenu = allMenus.find(menu => menu.guid === selectedMenuGuid);
+                                        if (selectedMenu && selectedMenu.menuGroups) {
+                                            selectedMenu.menuGroups.forEach(group => {
+                                                const option = document.createElement('option');
+                                                option.value = group.guid;
+                                                option.textContent = group.name;
+                                                targetCategorySelect.appendChild(option);
+                                            });
+                                        }
+                                    }
+                                });
+                            }
+                        }, 100);
+                        break;
+                }
+                
+                operationParametersSection.innerHTML = html;
+            }
+            
+            // Get default values for bulk operation parameters
+            function getBulkOperationDefaults() {
+                switch (currentBulkOperation) {
+                    case 'price-update':
+                        return { newPrice: null };
+                    case 'availability-toggle':
+                        return { newStatus: null };
+                    case 'category-move':
+                        return { targetMenuGuid: null, targetCategoryGuid: null };
+                    default:
+                        return {};
+                }
+            }
+            
+            // Get operation-specific display for staged items
+            function getOperationSpecificDisplay(item) {
+                switch (currentBulkOperation) {
+                    case 'price-update':
+                        return `<div class="text-xs text-blue-600 dark:text-blue-400 mt-1">Ready for price update</div>`;
+                    case 'availability-toggle':
+                        return `<div class="text-xs text-green-600 dark:text-green-400 mt-1">Ready for availability toggle</div>`;
+                    case 'category-move':
+                        return `<div class="text-xs text-purple-600 dark:text-purple-400 mt-1">Ready to move categories</div>`;
+                    default:
+                        return '';
+                }
+            }
+            
+            // Update execute button state
+            function updateExecuteButtonState() {
+                const hasItems = bulkStagedItems.length > 0;
+                const hasOperation = currentBulkOperation !== null;
+                
+                executeBulkOperationBtn.disabled = !hasItems || !hasOperation;
+                
+                if (hasItems && hasOperation) {
+                    executeBulkOperationBtn.classList.remove('opacity-50');
+                    executeBulkOperationBtnText.textContent = `Execute ${getBulkOperationDisplayName()} (${bulkStagedItems.length} items)`;
+                } else {
+                    executeBulkOperationBtn.classList.add('opacity-50');
+                    executeBulkOperationBtnText.textContent = 'Execute Bulk Operation';
+                }
+            }
+            
+            // Get display name for bulk operation
+            function getBulkOperationDisplayName() {
+                switch (currentBulkOperation) {
+                    case 'price-update': return 'Price Update';
+                    case 'availability-toggle': return 'Availability Toggle';
+                    case 'category-move': return 'Category Move';
+                    default: return 'Bulk Operation';
+                }
+            }
+            
+            // Execute the bulk operation
+            async function executeBulkOperation() {
+                if (bulkStagedItems.length === 0 || !currentBulkOperation) {
+                    bulkOperationStatus.innerHTML = '<span class="text-red-600">⚠️ No items staged or operation selected</span>';
+                    return;
+                }
+                
+                // Show loading state
+                executeBulkOperationBtnText.textContent = 'Processing...';
+                executeBulkOperationSpinner.classList.remove('hidden');
+                executeBulkOperationBtn.disabled = true;
+                bulkOperationStatus.innerHTML = '<span class="text-blue-600">⏳ Executing bulk operation...</span>';
+                
+                try {
+                    let results = [];
+                    
+                    switch (currentBulkOperation) {
+                        case 'price-update':
+                            results = await executeBulkPriceUpdate();
+                            break;
+                        case 'availability-toggle':
+                            results = await executeBulkAvailabilityToggle();
+                            break;
+                        case 'category-move':
+                            results = await executeBulkCategoryMove();
+                            break;
+                    }
+                    
+                    // Display results
+                    displayBulkOperationResults(results);
+                    
+                    // Reset staging area
+                    bulkStagedItems = [];
+                    updateStagedItemsDisplay();
+                    
+                } catch (error) {
+                    console.error('Bulk operation error:', error);
+                    bulkOperationStatus.innerHTML = `<span class="text-red-600">✗ Error: ${error.message}</span>`;
+                } finally {
+                    // Reset button state
+                    executeBulkOperationBtnText.textContent = 'Execute Bulk Operation';
+                    executeBulkOperationSpinner.classList.add('hidden');
+                    updateExecuteButtonState();
+                }
+            }
+            
+            // Execute bulk price update
+            async function executeBulkPriceUpdate() {
+                const newPriceInput = document.getElementById('bulkNewPrice');
+                const priceMethodSelect = document.getElementById('bulkPriceMethod');
+                
+                if (!newPriceInput || !newPriceInput.value) {
+                    throw new Error('Please enter a price value');
+                }
+                
+                const inputPrice = parseFloat(newPriceInput.value);
+                const method = priceMethodSelect ? priceMethodSelect.value : 'set';
+                const results = [];
+                
+                for (const item of bulkStagedItems) {
+                    try {
+                        let finalPrice = inputPrice;
+                        
+                        // Calculate final price based on method
+                        if (method !== 'set') {
+                            const currentPrice = item.price || (item.basePrice / 100) || 0;
+                            
+                            switch (method) {
+                                case 'increase':
+                                    finalPrice = currentPrice + inputPrice;
+                                    break;
+                                case 'decrease':
+                                    finalPrice = Math.max(0, currentPrice - inputPrice);
+                                    break;
+                                case 'percent-increase':
+                                    finalPrice = currentPrice * (1 + inputPrice / 100);
+                                    break;
+                                case 'percent-decrease':
+                                    finalPrice = currentPrice * (1 - inputPrice / 100);
+                                    break;
+                            }
+                        }
+                        
+                        // Convert to cents for API
+                        const priceInCents = Math.round(finalPrice * 100);
+                        
+                        // Try multiple API endpoints for updating price
+                        const possibleUrls = [
+                            `menuGroups/${item.groupGuid}/menuItems/${item.guid}`,
+                            `menus/${item.menuGuid}/menuItems/${item.guid}`,
+                            `menuItems/${item.guid}`
+                        ];
+                        
+                        let success = false;
+                        let lastError = null;
+                        
+                        for (const urlPath of possibleUrls) {
+                            try {
+                                const fullUrl = CORS_PROXY + environmentSelect.value + urlPath;
+                                const result = await makeApiCall(fullUrl, 'PATCH', { basePrice: priceInCents }, null, null);
+                                
+                                if (!result.error) {
+                                    results.push({
+                                        item: item,
+                                        success: true,
+                                        oldPrice: item.price || (item.basePrice / 100) || 0,
+                                        newPrice: finalPrice,
+                                        method: method
+                                    });
+                                    success = true;
+                                    break;
+                                }
+                            } catch (err) {
+                                lastError = err;
+                                continue;
+                            }
+                        }
+                        
+                        if (!success) {
+                            results.push({
+                                item: item,
+                                success: false,
+                                error: lastError?.message || 'All API endpoints failed'
+                            });
+                        }
+                        
+                    } catch (error) {
+                        results.push({
+                            item: item,
+                            success: false,
+                            error: error.message
+                        });
+                    }
+                }
+                
+                return results;
+            }
+            
+            // Execute bulk availability toggle
+            async function executeBulkAvailabilityToggle() {
+                const availabilitySelect = document.getElementById('bulkAvailabilityStatus');
+                const reasonInput = document.getElementById('bulkAvailabilityReason');
+                
+                if (!availabilitySelect || !availabilitySelect.value) {
+                    throw new Error('Please select availability status');
+                }
+                
+                const method = availabilitySelect.value;
+                const reason = reasonInput ? reasonInput.value : '';
+                const results = [];
+                
+                for (const item of bulkStagedItems) {
+                    try {
+                        let newAvailability;
+                        
+                        switch (method) {
+                            case 'available':
+                                newAvailability = true;
+                                break;
+                            case 'unavailable':
+                                newAvailability = false;
+                                break;
+                            case 'toggle':
+                                newAvailability = !item.available;
+                                break;
+                        }
+                        
+                        const payload = { available: newAvailability };
+                        if (reason) payload.unavailableReason = reason;
+                        
+                        // Try multiple API endpoints for updating availability
+                        const possibleUrls = [
+                            `menuGroups/${item.groupGuid}/menuItems/${item.guid}`,
+                            `menus/${item.menuGuid}/menuItems/${item.guid}`,
+                            `menuItems/${item.guid}`
+                        ];
+                        
+                        let success = false;
+                        let lastError = null;
+                        
+                        for (const urlPath of possibleUrls) {
+                            try {
+                                const fullUrl = CORS_PROXY + environmentSelect.value + urlPath;
+                                const result = await makeApiCall(fullUrl, 'PATCH', payload, null, null);
+                                
+                                if (!result.error) {
+                                    results.push({
+                                        item: item,
+                                        success: true,
+                                        oldStatus: item.available,
+                                        newStatus: newAvailability,
+                                        reason: reason
+                                    });
+                                    success = true;
+                                    break;
+                                }
+                            } catch (err) {
+                                lastError = err;
+                                continue;
+                            }
+                        }
+                        
+                        if (!success) {
+                            results.push({
+                                item: item,
+                                success: false,
+                                error: lastError?.message || 'All API endpoints failed'
+                            });
+                        }
+                        
+                    } catch (error) {
+                        results.push({
+                            item: item,
+                            success: false,
+                            error: error.message
+                        });
+                    }
+                }
+                
+                return results;
+            }
+            
+            // Execute bulk category move
+            async function executeBulkCategoryMove() {
+                const targetMenuSelect = document.getElementById('bulkTargetMenu');
+                const targetCategorySelect = document.getElementById('bulkTargetCategory');
+                
+                if (!targetMenuSelect || !targetMenuSelect.value) {
+                    throw new Error('Please select target menu');
+                }
+                if (!targetCategorySelect || !targetCategorySelect.value) {
+                    throw new Error('Please select target category');
+                }
+                
+                const targetMenuGuid = targetMenuSelect.value;
+                const targetCategoryGuid = targetCategorySelect.value;
+                const results = [];
+                
+                // Note: Moving items between categories is complex and may not be fully supported
+                // This is a placeholder for the API structure
+                for (const item of bulkStagedItems) {
+                    results.push({
+                        item: item,
+                        success: false,
+                        error: 'Category move operation is not yet implemented - this requires complex menu structure updates'
+                    });
+                }
+                
+                return results;
+            }
+            
+            // Display bulk operation results
+            function displayBulkOperationResults(results) {
+                const successCount = results.filter(r => r.success).length;
+                const failCount = results.filter(r => !r.success).length;
+                
+                let html = `
+                    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+                        <h3 class="font-semibold text-lg mb-4">⚡ Bulk Operation Results</h3>
+                        <div class="mb-4">
+                            <div class="flex items-center gap-4 text-sm">
+                                <span class="text-green-600">✓ Successful: ${successCount}</span>
+                                <span class="text-red-600">✗ Failed: ${failCount}</span>
+                                <span class="text-gray-600">Total: ${results.length}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-3">
+                `;
+                
+                results.forEach(result => {
+                    const statusIcon = result.success ? '✅' : '❌';
+                    const statusClass = result.success ? 'text-green-600' : 'text-red-600';
+                    
+                    html += `
+                        <div class="border border-gray-200 dark:border-gray-600 rounded-lg p-3">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-grow">
+                                    <div class="font-medium">${statusIcon} ${result.item.name}</div>
+                                    <div class="text-sm text-gray-600 dark:text-gray-400">${result.item.menuName} → ${result.item.groupName}</div>
+                                </div>
+                                <div class="${statusClass} text-sm font-medium">
+                                    ${result.success ? 'Success' : 'Failed'}
+                                </div>
+                            </div>
+                            
+                            ${result.success ? getSuccessDetails(result) : `
+                                <div class="text-red-600 text-sm mt-2">
+                                    Error: ${result.error}
+                                </div>
+                            `}
+                        </div>
+                    `;
+                });
+                
+                html += `
+                        </div>
+                    </div>
+                `;
+                
+                const resultsSection = document.getElementById('resultsSection');
+                const resultsContainer = document.getElementById('resultsContainer');
+                resultsContainer.innerHTML = html;
+                resultsSection.classList.remove('hidden');
+                
+                // Update status
+                if (successCount === results.length) {
+                    bulkOperationStatus.innerHTML = `<span class="text-green-600">✓ All ${successCount} operations completed successfully!</span>`;
+                } else if (successCount > 0) {
+                    bulkOperationStatus.innerHTML = `<span class="text-yellow-600">⚠️ ${successCount} successful, ${failCount} failed</span>`;
+                } else {
+                    bulkOperationStatus.innerHTML = `<span class="text-red-600">✗ All operations failed</span>`;
+                }
+            }
+            
+            // Get success details for display
+            function getSuccessDetails(result) {
+                switch (currentBulkOperation) {
+                    case 'price-update':
+                        return `
+                            <div class="text-green-600 text-sm mt-2">
+                                Price updated: $${result.oldPrice.toFixed(2)} → $${result.newPrice.toFixed(2)}
+                                ${result.method !== 'set' ? `(${result.method})` : ''}
+                            </div>
+                        `;
+                    case 'availability-toggle':
+                        return `
+                            <div class="text-green-600 text-sm mt-2">
+                                Availability: ${result.oldStatus ? 'Available' : 'Unavailable'} → ${result.newStatus ? 'Available' : 'Unavailable'}
+                                ${result.reason ? `(${result.reason})` : ''}
+                            </div>
+                        `;
+                    case 'category-move':
+                        return `
+                            <div class="text-green-600 text-sm mt-2">
+                                Moved to new category successfully
+                            </div>
+                        `;
+                    default:
+                        return '';
+                }
+            }
+
             // --- Stock Management Functions ---
+            async function fetchMenuItemsForStock() {
+                fetchMenuItemsForStockBtnText.textContent = 'Loading...';
+                fetchMenuItemsForStockSpinner.classList.remove('hidden');
+                fetchMenuItemsForStockBtn.disabled = true;
+                fetchMenuItemsForStockStatus.innerHTML = '';
+                
+                try {
+                    const fullUrl = CORS_PROXY + environmentSelect.value + MENUS_PATH;
+                    const result = await makeApiCall(fullUrl, 'GET', null, null, 'Menu items loaded successfully');
+                    
+                    if (result.error) {
+                        const errorMessage = typeof result.error === 'object' ? 
+                            result.error.message || JSON.stringify(result.error) : 
+                            result.error;
+                        fetchMenuItemsForStockStatus.innerHTML = `<span class="text-red-500">✗ Error: ${errorMessage}</span>`;
+                        return;
+                    }
+                    
+                    let menus = result.data;
+                    if (!Array.isArray(menus)) {
+                        if (menus.menus && Array.isArray(menus.menus)) {
+                            menus = menus.menus;
+                        } else if (menus.data && Array.isArray(menus.data)) {
+                            menus = menus.data;
+                        } else if (typeof menus === 'object' && menus.guid) {
+                            menus = [menus];
+                        } else {
+                            menus = [];
+                        }
+                    }
+                    
+                    console.log('Fetched menus for stock management:', menus);
+                    
+                    // Extract menu items from menus
+                    const menuItems = [];
+                    menus.forEach(menu => {
+                        if (menu.menuGroups && Array.isArray(menu.menuGroups)) {
+                            menu.menuGroups.forEach(group => {
+                                if (group.menuItems && Array.isArray(group.menuItems)) {
+                                    group.menuItems.forEach(item => {
+                                        menuItems.push({
+                                            ...item,
+                                            menuName: menu.name || 'Unknown Menu',
+                                            groupName: group.name || 'Unknown Group'
+                                        });
+                                    });
+                                }
+                            });
+                        }
+                    });
+                    
+                    console.log(`Extracted ${menuItems.length} menu items for stock management`);
+                    
+                    // Store menu items for dropdown population
+                    if (!window.stockMenuItems) window.stockMenuItems = [];
+                    window.stockMenuItems = menuItems;
+                    
+                    // Update dropdowns with menu items
+                    populateInventoryDropdowns();
+                    populateUpdateInventoryDropdowns();
+                    
+                    // Display the menu items with GUIDs for easy reference
+                    displayMenuItemsForStock(menuItems);
+                    
+                    fetchMenuItemsForStockStatus.innerHTML = `
+                        <div class="text-green-500 mb-3">✓ Loaded ${menuItems.length} menu items from ${menus.length} menus</div>
+                        <div class="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-700 rounded-lg p-3">
+                            <h4 class="font-semibold text-emerald-800 dark:text-emerald-200 mb-2">💡 Next Steps:</h4>
+                            <ul class="list-disc list-inside text-emerald-700 dark:text-emerald-300 text-sm space-y-1">
+                                <li>Copy a GUID from the table below and use it in "Search Specific Items"</li>
+                                <li>Use "View Stock Levels" to see current inventory status</li>
+                                <li>Use "Update Inventory" to manage stock levels for these items</li>
+                            </ul>
+                        </div>
+                    `;
+                    
+                } catch (error) {
+                    console.error('Error fetching menu items for stock:', error);
+                    fetchMenuItemsForStockStatus.innerHTML = `<span class="text-red-500">✗ Error: ${error.message}</span>`;
+                } finally {
+                    fetchMenuItemsForStockBtnText.textContent = '🍽️ Fetch Menu Items';
+                    fetchMenuItemsForStockSpinner.classList.add('hidden');
+                    fetchMenuItemsForStockBtn.disabled = false;
+                }
+            }
+            
+            function displayMenuItemsForStock(menuItems) {
+                const resultsSection = document.getElementById('resultsSection');
+                const resultsContent = document.getElementById('resultsContainer');
+                
+                if (menuItems.length === 0) {
+                    resultsContent.innerHTML = `
+                        <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg p-4">
+                            <h3 class="font-semibold text-yellow-800 dark:text-yellow-200">No Menu Items Found</h3>
+                            <p class="text-yellow-700 dark:text-yellow-300 mt-1">
+                                No menu items were found. Make sure you have menus set up in your Toast restaurant configuration.
+                            </p>
+                        </div>
+                    `;
+                    resultsSection.classList.remove('hidden');
+                    return;
+                }
+                
+                let html = `
+                    <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4 mb-4">
+                        <h3 class="font-semibold text-blue-800 dark:text-blue-200">📋 Available Menu Items for Stock Management</h3>
+                        <p class="text-blue-700 dark:text-blue-300 mt-1">
+                            Found ${menuItems.length} menu items. Copy GUIDs to use in stock operations below.
+                        </p>
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white dark:bg-gray-800 rounded-lg shadow">
+                            <thead class="bg-gray-50 dark:bg-gray-700">
+                                <tr>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Item Name</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Menu</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Category</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">GUID</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Price</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200 dark:divide-gray-600">
+                `;
+                
+                menuItems.forEach(item => {
+                    const price = item.price ? `$${item.price.toFixed(2)}` : 
+                                 (item.basePrice ? `$${(item.basePrice / 100).toFixed(2)}` : 'No price set');
+                    
+                    html += `
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                            <td class="px-4 py-2 text-sm font-medium text-gray-900 dark:text-white">${item.name || 'Unknown Item'}</td>
+                            <td class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300">${item.menuName}</td>
+                            <td class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300">${item.groupName}</td>
+                            <td class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 font-mono">
+                                <div class="flex items-center gap-2">
+                                    <span class="bg-gray-100 dark:bg-gray-600 px-2 py-1 rounded text-xs">${item.guid}</span>
+                                    ${createCopyIcon(item.guid, 'Item GUID')}
+                                </div>
+                            </td>
+                            <td class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300">${price}</td>
+                        </tr>
+                    `;
+                });
+                
+                html += `
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                `;
+                
+                resultsContent.innerHTML = html;
+                resultsSection.classList.remove('hidden');
+            }
+
             async function viewInventory() {
                 const statusFilter = inventoryStatusFilter.value;
                 
@@ -3343,22 +4349,26 @@
                 viewInventoryStatus.innerHTML = '';
                 
                 try {
-                    let url = STOCK_INVENTORY_PATH;
+                    let path = STOCK_INVENTORY_PATH;
                     if (statusFilter) {
-                        url += `?status=${statusFilter}`;
+                        path += `?status=${statusFilter}`;
                     }
                     
-                    const response = await makeRequest(url, {
-                        method: 'GET'
-                    });
+                    const fullUrl = CORS_PROXY + environmentSelect.value + path;
+                    const result = await makeApiCall(fullUrl, 'GET', null, null, 'Inventory loaded successfully');
                     
-                    if (response.ok) {
-                        const inventory = await response.json();
-                        viewInventoryStatus.innerHTML = `<span class="text-green-600">✓ Found ${inventory.length} items</span>`;
-                        displayInventoryResults(inventory, 'Current Inventory');
+                    if (result.error) {
+                        const errorMessage = typeof result.error === 'object' ? 
+                            result.error.message || JSON.stringify(result.error) : 
+                            result.error;
+                        viewInventoryStatus.innerHTML = `<span class="text-red-600">✗ Failed: ${errorMessage}</span>`;
                     } else {
-                        const error = await response.text();
-                        viewInventoryStatus.innerHTML = `<span class="text-red-600">✗ Failed: ${error}</span>`;
+                        const inventory = result.data || [];
+                        allInventoryItems = inventory; // Store for dropdowns
+                        viewInventoryStatus.innerHTML = `<span class="text-green-600">✓ Found ${inventory.length} items</span>`;
+                        populateInventoryDropdowns(); // Populate dropdowns
+                        populateUpdateInventoryDropdowns(); // Populate update inventory dropdowns
+                        displayInventoryResults(inventory, 'Current Inventory');
                     }
                 } catch (error) {
                     viewInventoryStatus.innerHTML = `<span class="text-red-600">✗ Error: ${error.message}</span>`;
@@ -3394,18 +4404,26 @@
                         searchRequest.multiLocationIds = mlIdInput.split(',').map(id => id.trim()).filter(id => id);
                     }
                     
-                    const response = await makeRequest(STOCK_SEARCH_PATH, {
-                        method: 'POST',
-                        body: JSON.stringify(searchRequest)
-                    });
+                    const fullUrl = CORS_PROXY + environmentSelect.value + STOCK_SEARCH_PATH;
+                    const result = await makeApiCall(fullUrl, 'POST', searchRequest, null, 'Search completed successfully');
                     
-                    if (response.ok) {
-                        const inventory = await response.json();
-                        searchInventoryStatus.innerHTML = `<span class="text-green-600">✓ Found ${inventory.length} items</span>`;
-                        displayInventoryResults(inventory, 'Search Results');
+                    if (result.error) {
+                        const errorMessage = typeof result.error === 'object' ? 
+                            result.error.message || JSON.stringify(result.error) : 
+                            result.error;
+                        searchInventoryStatus.innerHTML = `<span class="text-red-600">✗ Failed: ${errorMessage}</span>`;
                     } else {
-                        const error = await response.text();
-                        searchInventoryStatus.innerHTML = `<span class="text-red-600">✗ Failed: ${error}</span>`;
+                        const inventory = result.data || [];
+                        // Merge with existing inventory data (avoid duplicates by GUID)
+                        inventory.forEach(newItem => {
+                            if (!allInventoryItems.find(existing => existing.guid === newItem.guid)) {
+                                allInventoryItems.push(newItem);
+                            }
+                        });
+                        searchInventoryStatus.innerHTML = `<span class="text-green-600">✓ Found ${inventory.length} items</span>`;
+                        populateInventoryDropdowns(); // Update dropdowns
+                        populateUpdateInventoryDropdowns(); // Update inventory update dropdowns
+                        displayInventoryResults(inventory, 'Search Results');
                     }
                 } catch (error) {
                     searchInventoryStatus.innerHTML = `<span class="text-red-600">✗ Error: ${error.message}</span>`;
@@ -3454,18 +4472,18 @@
                 bulkUpdateInventoryStatus.innerHTML = '';
                 
                 try {
-                    const response = await makeRequest(STOCK_UPDATE_PATH, {
-                        method: 'PUT',
-                        body: JSON.stringify(items)
-                    });
+                    const fullUrl = CORS_PROXY + environmentSelect.value + STOCK_UPDATE_PATH;
+                    const result = await makeApiCall(fullUrl, 'PUT', items, null, 'Inventory updated successfully');
                     
-                    if (response.ok) {
-                        const updatedInventory = await response.json();
+                    if (result.error) {
+                        const errorMessage = typeof result.error === 'object' ? 
+                            result.error.message || JSON.stringify(result.error) : 
+                            result.error;
+                        bulkUpdateInventoryStatus.innerHTML = `<span class="text-red-600">✗ Failed: ${errorMessage}</span>`;
+                    } else {
+                        const updatedInventory = result.data || [];
                         bulkUpdateInventoryStatus.innerHTML = `<span class="text-green-600">✓ Updated ${updatedInventory.length} items</span>`;
                         displayInventoryResults(updatedInventory, 'Updated Inventory');
-                    } else {
-                        const error = await response.text();
-                        bulkUpdateInventoryStatus.innerHTML = `<span class="text-red-600">✗ Failed: ${error}</span>`;
                     }
                 } catch (error) {
                     bulkUpdateInventoryStatus.innerHTML = `<span class="text-red-600">✗ Error: ${error.message}</span>`;
@@ -3476,11 +4494,81 @@
                 }
             }
             
+            // Populate Update Inventory dropdowns with menu items
+            function populateUpdateInventoryDropdowns() {
+                // Get all existing item dropdowns in the update section
+                const updateDropdowns = document.querySelectorAll('#inventoryUpdateList .item-identifier');
+                
+                updateDropdowns.forEach(dropdown => {
+                    if (dropdown.tagName === 'SELECT') {
+                        populateSingleUpdateDropdown(dropdown);
+                    }
+                });
+            }
+            
+            function populateSingleUpdateDropdown(dropdown) {
+                // Clear existing options
+                dropdown.innerHTML = '<option value="">Choose an item...</option>';
+                
+                const stockMenus = window.stockMenuItems || [];
+                const hasMenuData = allMenuItems.length > 0 || stockMenus.length > 0;
+                const hasInventoryData = allInventoryItems.length > 0;
+                
+                if (!hasMenuData && !hasInventoryData) {
+                    dropdown.innerHTML += '<option value="" disabled>Click "Fetch Menu Items" above to populate this list</option>';
+                    return;
+                }
+                
+                // Create a map of inventory items by GUID for quick lookup
+                const inventoryMap = new Map();
+                allInventoryItems.forEach(inv => {
+                    inventoryMap.set(inv.guid, inv);
+                });
+                
+                // Use menu items as the primary source since they have names
+                const menuItemsToProcess = [...allMenuItems, ...stockMenus];
+                if (menuItemsToProcess.length > 0) {
+                    // Remove duplicates by GUID
+                    const uniqueItems = new Map();
+                    menuItemsToProcess.forEach(item => {
+                        if (!uniqueItems.has(item.guid)) {
+                            uniqueItems.set(item.guid, item);
+                        }
+                    });
+                    
+                    Array.from(uniqueItems.values()).forEach(menuItem => {
+                        const inventoryItem = inventoryMap.get(menuItem.guid);
+                        const displayName = `${menuItem.name} (${menuItem.groupName || 'Unknown Category'})`;
+                        const status = inventoryItem ? ` - ${inventoryItem.status}` : '';
+                        
+                        const option = document.createElement('option');
+                        option.value = menuItem.guid;
+                        option.textContent = displayName + status;
+                        option.setAttribute('data-name', menuItem.name);
+                        option.setAttribute('data-category', menuItem.groupName || 'Unknown Category');
+                        dropdown.appendChild(option);
+                    });
+                } else {
+                    // Fallback to inventory items only if no menu data
+                    allInventoryItems.forEach(invItem => {
+                        const displayName = `Item ${invItem.guid.slice(-8)} (${invItem.status})`;
+                        const option = document.createElement('option');
+                        option.value = invItem.guid;
+                        option.textContent = displayName;
+                        dropdown.appendChild(option);
+                    });
+                }
+            }
+            
             function addUpdateItem() {
                 const template = document.getElementById('updateTemplate');
                 const newItem = template.cloneNode(true);
                 newItem.id = '';
                 newItem.style.display = 'block';
+                
+                // Populate the item dropdown in the new item
+                const itemDropdown = newItem.querySelector('.item-identifier');
+                populateSingleUpdateDropdown(itemDropdown);
                 
                 // Set up status change handler for quantity field
                 const statusSelect = newItem.querySelector('.item-status');
@@ -3490,10 +4578,14 @@
                     if (this.value === 'QUANTITY') {
                         quantityInput.disabled = false;
                         quantityInput.required = true;
+                        quantityInput.placeholder = 'Enter quantity';
+                        quantityInput.classList.remove('opacity-50');
                     } else {
                         quantityInput.disabled = true;
                         quantityInput.required = false;
                         quantityInput.value = '';
+                        quantityInput.placeholder = "Select 'Limited Quantity' first";
+                        quantityInput.classList.add('opacity-50');
                     }
                 });
                 
@@ -3527,8 +4619,18 @@
                         const validityClass = item.itemGuidValidity === 'INVALID' ? 'text-red-600' : 'text-green-600';
                         
                         html += `<tr class="hover:bg-gray-50 dark:hover:bg-gray-700">`;
-                        html += `<td class="px-3 py-2 font-mono text-xs">${item.guid || 'N/A'}</td>`;
-                        html += `<td class="px-3 py-2">${item.multiLocationId || 'N/A'}</td>`;
+                        html += `<td class="px-3 py-2 font-mono text-xs">
+                            <div class="flex items-center">
+                                ${item.guid || 'N/A'}
+                                ${item.guid ? createCopyIcon(item.guid, 'Item GUID') : ''}
+                            </div>
+                        </td>`;
+                        html += `<td class="px-3 py-2">
+                            <div class="flex items-center">
+                                ${item.multiLocationId || 'N/A'}
+                                ${item.multiLocationId ? createCopyIcon(item.multiLocationId, 'Multi-Location ID') : ''}
+                            </div>
+                        </td>`;
                         html += `<td class="px-3 py-2 ${statusClass}">${item.status}</td>`;
                         html += `<td class="px-3 py-2">${item.quantity !== null ? item.quantity : '-'}</td>`;
                         html += `<td class="px-3 py-2 ${validityClass}">${item.itemGuidValidity || 'N/A'}</td>`;
@@ -3540,6 +4642,109 @@
                 
                 html += '</div>';
                 resultsContainer.innerHTML = html;
+            }
+
+            // Populate inventory dropdowns with item names from menu data
+            function populateInventoryDropdowns() {
+                const itemDropdown = document.getElementById('inventoryItemDropdown');
+                if (!itemDropdown) return;
+
+                // Clear current options
+                itemDropdown.innerHTML = '<option value="">Select an item...</option>';
+
+                // Check for data from stock menu fetch, regular menus, or inventory
+                const stockMenus = window.stockMenuItems || [];
+                const hasMenuData = allMenuItems.length > 0 || stockMenus.length > 0;
+                const hasInventoryData = allInventoryItems.length > 0;
+
+                if (!hasMenuData && !hasInventoryData) {
+                    itemDropdown.innerHTML += '<option value="" disabled>Click "Fetch Menu Items" above to load items</option>';
+                    return;
+                }
+
+                // Create a map of inventory items by GUID for quick lookup
+                const inventoryMap = new Map();
+                allInventoryItems.forEach(inv => {
+                    inventoryMap.set(inv.guid, inv);
+                });
+
+                // Use menu items as the primary source since they have names
+                const menuItemsToProcess = [...allMenuItems, ...stockMenus];
+                if (menuItemsToProcess.length > 0) {
+                    menuItemsToProcess.forEach(menuItem => {
+                        const inventoryItem = inventoryMap.get(menuItem.guid);
+                        const displayName = `${menuItem.name} (${menuItem.groupName || 'Unknown Category'})`;
+                        const status = inventoryItem ? ` - ${inventoryItem.status}` : ' - No Stock Data';
+                        
+                        itemDropdown.innerHTML += `<option value="${menuItem.guid}" 
+                            data-stock-status="${inventoryItem?.status || 'UNKNOWN'}" 
+                            data-stock-quantity="${inventoryItem?.quantity || ''}"
+                            data-multi-location-id="${inventoryItem?.multiLocationId || ''}"
+                        >${displayName}${status}</option>`;
+                    });
+                } else {
+                    // Fallback to inventory items only if no menu data
+                    allInventoryItems.forEach(invItem => {
+                        const displayName = `Item ${invItem.guid.slice(-8)} (${invItem.status})`;
+                        
+                        itemDropdown.innerHTML += `<option value="${invItem.guid}" 
+                            data-stock-status="${invItem.status}" 
+                            data-stock-quantity="${invItem.quantity || ''}"
+                            data-multi-location-id="${invItem.multiLocationId || ''}"
+                        >${displayName}</option>`;
+                    });
+                }
+            }
+
+            // Handle item selection and auto-fill GUID and stock info
+            function handleInventoryItemSelection() {
+                const itemDropdown = document.getElementById('inventoryItemDropdown');
+                const guidField = document.getElementById('searchItemGuids');
+                const mlIdField = document.getElementById('searchItemMLIds');
+                const stockInfoDiv = document.getElementById('selectedItemStockInfo');
+
+                if (!itemDropdown || !guidField) return;
+
+                const selectedOption = itemDropdown.options[itemDropdown.selectedIndex];
+                if (!selectedOption || !selectedOption.value) {
+                    guidField.value = '';
+                    if (mlIdField) mlIdField.value = '';
+                    if (stockInfoDiv) stockInfoDiv.innerHTML = '';
+                    return;
+                }
+
+                // Auto-fill GUID
+                guidField.value = selectedOption.value;
+                
+                // Auto-fill Multi-Location ID if available
+                if (mlIdField && selectedOption.dataset.multiLocationId) {
+                    mlIdField.value = selectedOption.dataset.multiLocationId;
+                }
+
+                // Display current stock info
+                if (stockInfoDiv) {
+                    const status = selectedOption.dataset.stockStatus;
+                    const quantity = selectedOption.dataset.stockQuantity;
+                    const statusClass = status === 'OUT_OF_STOCK' ? 'text-red-600' : 
+                                      status === 'QUANTITY' ? 'text-yellow-600' : 
+                                      status === 'IN_STOCK' ? 'text-green-600' : 'text-gray-600';
+                    
+                    const quantityText = quantity ? ` (${quantity} available)` : '';
+                    
+                    stockInfoDiv.innerHTML = `
+                        <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3 border border-blue-200 dark:border-blue-800">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <span class="text-sm font-medium">Current Stock Status:</span>
+                                    <span class="ml-2 px-2 py-1 rounded text-xs font-semibold ${statusClass}">${status}${quantityText}</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="text-xs font-mono text-gray-600 dark:text-gray-400">${selectedOption.value}</span>
+                                    ${createCopyIcon(selectedOption.value, 'Item GUID')}
+                                </div>
+                            </div>
+                        </div>`;
+                }
             }
 
             // --- Labor Management Functions ---
@@ -3554,6 +4759,9 @@
             let allMenuItems = [];
             let allModifierGroups = [];
             let allModifierOptions = [];
+            
+            // Store fetched inventory data for dropdowns
+            let allInventoryItems = [];
             
             // Employee Management Functions
             async function fetchAllEmployees() {
@@ -5056,6 +6264,11 @@
                         
                         // Extract menu groups and items for other dropdowns
                         extractMenuGroupsAndItems();
+                        
+                        // Populate bulk operations dropdown if we're in bulk operations mode
+                        if (currentWorkflow === 'bulk-operations' && allMenuItems.length > 0) {
+                            populateBulkItemDropdown();
+                        }
                     }
                 } catch (error) {
                     viewMenusStatus.innerHTML = `<span class="text-red-600">✗ Error: ${error.message}</span>`;
@@ -5369,6 +6582,7 @@
                             return (
                                 (item.name && item.name.toLowerCase().includes(searchLower)) ||
                                 (item.description && item.description.toLowerCase().includes(searchLower)) ||
+                                (item.price && item.price.toString().includes(searchTerm)) ||
                                 (item.basePrice && item.basePrice.toString().includes(searchTerm)) ||
                                 (item.plu && item.plu.toLowerCase().includes(searchLower))
                             );
@@ -5399,14 +6613,17 @@
                     // Apply price range filter
                     if (priceRangeFilter) {
                         if (priceRangeFilter === '5000+') {
-                            filteredItems = filteredItems.filter(item => 
-                                item.basePrice && item.basePrice >= 5000
-                            );
+                            filteredItems = filteredItems.filter(item => {
+                                const itemPrice = item.price ? (item.price * 100) : (item.basePrice || 0);
+                                return itemPrice >= 5000;
+                            });
                         } else {
                             const [min, max] = priceRangeFilter.split('-').map(Number);
                             filteredItems = filteredItems.filter(item => {
-                                if (!item.basePrice) return false;
-                                return item.basePrice >= min && item.basePrice < max;
+                                // Convert item.price (dollars) to cents for comparison, or use basePrice (already in cents)
+                                const itemPrice = item.price ? (item.price * 100) : (item.basePrice || 0);
+                                if (!itemPrice) return false;
+                                return itemPrice >= min && itemPrice < max;
                             });
                         }
                     }
@@ -5876,7 +7093,7 @@
                                 <div class="grid gap-3">`;
                             
                             categoryItems.forEach(item => {
-                                const price = item.basePrice ? `$${(item.basePrice / 100).toFixed(2)}` : 'No price set';
+                                const price = item.price ? `$${item.price.toFixed(2)}` : (item.basePrice ? `$${(item.basePrice / 100).toFixed(2)}` : 'No price set');
                                 const isActive = item.active !== false;
                                 const statusClass = isActive ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
                                 const statusText = isActive ? 'Available' : 'Unavailable';
@@ -6088,6 +7305,11 @@
                 toggleNavPanel(); // Close nav panel
             });
 
+            // Bulk Operations Event Listeners
+            bulkOperationTypeSelect.addEventListener('change', handleBulkOperationTypeChange);
+            addToBulkStagingBtn.addEventListener('click', addToBulkStaging);
+            executeBulkOperationBtn.addEventListener('click', executeBulkOperation);
+
             // API Section toggles for collapsible navigation
             const toggleApiSection = (apiName) => {
                 const subMenu = document.getElementById(`${apiName}SubMenu`);
@@ -6246,10 +7468,17 @@
             resultsContainer.addEventListener('click', applyDiscountToOrder);
             
             // Stock Management
+            fetchMenuItemsForStockBtn.addEventListener('click', fetchMenuItemsForStock);
             viewInventoryBtn.addEventListener('click', viewInventory);
             searchInventoryBtn.addEventListener('click', searchInventory);
             bulkUpdateInventoryBtn.addEventListener('click', bulkUpdateInventory);
             addUpdateItemBtn.addEventListener('click', addUpdateItem);
+            
+            // Inventory Item Selection Dropdown
+            const inventoryItemDropdown = document.getElementById('inventoryItemDropdown');
+            if (inventoryItemDropdown) {
+                inventoryItemDropdown.addEventListener('change', handleInventoryItemSelection);
+            }
             
             // Labor Management
             fetchAllEmployeesBtn.addEventListener('click', fetchAllEmployees);
