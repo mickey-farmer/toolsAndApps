@@ -110,8 +110,8 @@
             <p class="mt-2 text-gray-600 dark:text-gray-400">A multi-workflow tool for testing the Toast Orders API.</p>
         </header>
 
-        <div id="mainContent" class="hidden grid grid-cols-1 lg:grid-cols-9 gap-6">
-            <div class="lg:col-span-4 space-y-6" id="configWrapper">
+        <div id="mainContent" class="hidden flex flex-col lg:flex-row gap-6">
+            <div class="w-full lg:w-1/4 flex-shrink-0 space-y-6" id="configWrapper">
                 <section id="savedLocationsSection" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
                     <h2 class="text-xl font-semibold mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">Quick Access</h2>
                     <div class="flex items-center gap-4">
@@ -204,10 +204,10 @@
                 </details>
             </div>
             
-            <div class="lg:col-span-5 space-y-6" id="workflowWrapper">
+            <div class="w-full lg:w-5/12 flex-shrink-0 space-y-6" id="workflowWrapper">
                 <section id="workflowSelectionSection" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
                     <h2 class="text-xl font-semibold mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">Step 3: Choose Your Workflow</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
                         <button id="createWorkflowBtn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition text-center">Create New Order</button>
                         <button id="fetchWorkflowBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition text-center">Fetch/Review Order</button>
                         <button id="updateWorkflowBtn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-lg transition text-center">Update Existing Order</button>
@@ -324,6 +324,182 @@
                             </button>
                             <div id="sendOrderStatus" class="mt-2 text-sm text-center"></div>
                         </div>
+                    </div>
+                </section>
+
+                <!-- Externally Priced Order Section -->
+                <section id="externalPricedOrderSection" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                    <div class="flex justify-between items-center mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">
+                        <h2 class="text-xl font-semibold">Create Externally Priced Order</h2>
+                        <button class="resetWorkflowBtn text-sm text-blue-500 hover:underline">Change Workflow</button>
+                    </div>
+                    
+                    <div class="space-y-6">
+                        <!-- Information Panel -->
+                        <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
+                            <h3 class="font-semibold text-blue-800 dark:text-blue-200 mb-2">📋 About Externally Priced Orders</h3>
+                            <p class="text-blue-700 dark:text-blue-300 text-sm">
+                                Use this when pricing is calculated outside of Toast (e.g., third-party ordering platforms). 
+                                You must provide all pricing and discount data for accurate reporting.
+                                <strong>Required scopes:</strong> <code>orders.selection_price_tax_override:write</code> and <code>orders.orders:write</code>
+                            </p>
+                        </div>
+
+                        <!-- Basic Order Info -->
+                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                            <h3 class="text-md font-semibold mb-3">Order Configuration</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="extDiningOption" class="block text-sm font-medium mb-1">Dining Option</label>
+                                    <select id="extDiningOption" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500">
+                                        <option value="">Select dining option...</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="extOrderType" class="block text-sm font-medium mb-1">Order Type</label>
+                                    <select id="extOrderType" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500">
+                                        <option value="simple">Simple Order (no discounts)</option>
+                                        <option value="item-discount">With Item-Level Discounts</option>
+                                        <option value="check-discount">With Check-Level Discounts</option>
+                                        <option value="complex">Complex (Both Discount Types)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Items Section -->
+                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                            <h3 class="text-md font-semibold mb-3">Add Items with External Pricing</h3>
+                            
+                            <div id="externalPricingControls" class="space-y-4">
+                                <!-- Add Item Form -->
+                                <div class="bg-white dark:bg-gray-800 p-3 rounded border">
+                                    <div class="grid grid-cols-1 md:grid-cols-6 gap-3 items-end">
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1">Menu Item</label>
+                                            <select id="extItemSelect" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                                <option value="">Select item...</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1">Quantity</label>
+                                            <input type="number" id="extItemQuantity" min="1" value="1" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1">Menu Price</label>
+                                            <input type="number" id="extMenuItemPrice" step="0.01" min="0" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm" placeholder="5.00">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1">External Price</label>
+                                            <input type="number" id="extExternalPrice" step="0.01" min="0" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm" placeholder="5.00">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1">Item Discount</label>
+                                            <input type="number" id="extItemDiscount" step="0.01" min="0" value="0" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm" placeholder="0.00">
+                                        </div>
+                                        <button id="addExternalItemBtn" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-3 rounded-md transition text-sm">Add Item</button>
+                                    </div>
+                                    
+                                    <!-- Item Discount Details (hidden by default) -->
+                                    <div id="itemDiscountDetails" class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600 hidden">
+                                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                            <input type="text" id="extItemDiscountName" placeholder="Discount name (e.g., $1 off promo)" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                            <input type="number" id="extItemDiscountAmount" step="0.01" min="0" placeholder="Total discount (with tax)" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                            <input type="number" id="extItemNonTaxDiscount" step="0.01" min="0" placeholder="Discount (no tax)" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500 text-sm">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- External Items List -->
+                            <div id="externalItemsList" class="mt-4 space-y-2">
+                                <!-- Items will be populated here -->
+                            </div>
+                        </div>
+
+                        <!-- Check-Level Discounts -->
+                        <div id="checkDiscountSection" class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 p-4 rounded-lg hidden">
+                            <h3 class="text-md font-semibold mb-3 text-amber-800 dark:text-amber-200">Check-Level Discount</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Discount Name</label>
+                                    <input type="text" id="extCheckDiscountName" placeholder="e.g., $2 off total order" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Total Discount Amount (with tax)</label>
+                                    <input type="number" id="extCheckDiscountAmount" step="0.01" min="0" placeholder="2.00" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Non-Tax Discount Amount</label>
+                                    <input type="number" id="extCheckNonTaxDiscount" step="0.01" min="0" placeholder="2.00" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500">
+                                </div>
+                            </div>
+                            <div class="mt-3 p-3 bg-amber-100 dark:bg-amber-900/30 rounded text-sm text-amber-800 dark:text-amber-200">
+                                <strong>💡 Note:</strong> Check-level discounts are automatically distributed among items based on their percentage of the total order value.
+                            </div>
+                        </div>
+
+                        <!-- Tax Information -->
+                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                            <h3 class="text-md font-semibold mb-3">Tax Information</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Tax Name</label>
+                                    <input type="text" id="extTaxName" value="External Tax" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Tax Amount</label>
+                                    <input type="number" id="extTaxAmount" step="0.01" min="0" value="0.00" class="w-full bg-gray-50 dark:bg-gray-600 rounded-md p-2 border border-gray-300 dark:border-gray-500">
+                                </div>
+                                <div class="flex items-end">
+                                    <label class="flex items-center text-sm">
+                                        <input type="checkbox" id="extFacilitatorTax" checked class="mr-2">
+                                        Facilitator Collect & Remit Tax
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pricing Summary -->
+                        <div id="extPricingSummary" class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 p-4 rounded-lg">
+                            <h3 class="text-md font-semibold mb-3 text-green-800 dark:text-green-200">📊 Pricing Summary</h3>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                                <div>
+                                    <span class="text-gray-600 dark:text-gray-400 block">Pre-Discount Amount:</span>
+                                    <span id="extPreDiscountAmount" class="font-mono font-semibold">$0.00</span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-600 dark:text-gray-400 block">Total Discount:</span>
+                                    <span id="extTotalDiscountAmount" class="font-mono font-semibold text-red-600">-$0.00</span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-600 dark:text-gray-400 block">Net Amount:</span>
+                                    <span id="extNetAmount" class="font-mono font-semibold">$0.00</span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-600 dark:text-gray-400 block">Total Amount:</span>
+                                    <span id="extTotalAmount" class="font-mono font-semibold text-green-600">$0.00</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="flex gap-4">
+                            <button id="validateExternalPricingBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition flex items-center">
+                                <span id="validateExternalPricingBtnText">🔍 Validate Pricing</span>
+                                <div id="validateExternalPricingSpinner" class="spinner ml-2 hidden"></div>
+                            </button>
+                            <button id="submitExternalOrderBtn" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-4 rounded-md transition flex items-center" disabled>
+                                <span id="submitExternalOrderBtnText">🚀 Submit External Order</span>
+                                <div id="submitExternalOrderSpinner" class="spinner ml-2 hidden"></div>
+                            </button>
+                            <button id="loadExternalTemplateBtn" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-md transition">
+                                📋 Load Sample
+                            </button>
+                        </div>
+
+                        <!-- Status Display -->
+                        <div id="externalOrderStatus" class="text-sm text-center"></div>
                     </div>
                 </section>
 
@@ -1173,10 +1349,18 @@
                     </div>
                 </section>
 
-                <section id="resultsSection" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-                     <h2 class="text-xl font-semibold mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">Results</h2>
-                     <div id="resultsContainer" class="space-y-4 max-h-[32rem] overflow-y-auto">
+            </div>
+
+            <!-- Results Panel -->
+            <div class="w-full lg:w-1/3 flex-shrink-0 space-y-6" id="resultsWrapper">
+                <section id="resultsSection" class="bg-white dark:bg-gray-800 rounded-lg shadow-md h-full">
+                    <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+                        <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">Results</h2>
+                    </div>
+                    <div class="p-6">
+                        <div id="resultsContainer" class="space-y-4 max-h-[600px] overflow-y-auto">
                          <p class="text-gray-500 dark:text-gray-400">Results will be displayed here.</p>
+                        </div>
                      </div>
                  </section>
             </div>
@@ -1257,6 +1441,10 @@
                     <button id="navUpdateOrderBtn" class="w-full text-left px-4 py-2 rounded-lg bg-green-50 dark:bg-green-900/10 hover:bg-green-100 dark:hover:bg-green-900/30 text-green-700 dark:text-green-300 transition text-sm flex items-center">
                         <span class="w-2 h-2 bg-green-400 rounded-full mr-3"></span>
                         Update Existing Order
+                    </button>
+                    <button id="navExternalOrderBtn" class="w-full text-left px-4 py-2 rounded-lg bg-green-50 dark:bg-green-900/10 hover:bg-green-100 dark:hover:bg-green-900/30 text-green-700 dark:text-green-300 transition text-sm flex items-center">
+                        <span class="w-2 h-2 bg-green-400 rounded-full mr-3"></span>
+                        Externally Priced Order
                     </button>
                 </div>
             </div>
@@ -1457,6 +1645,7 @@
             
             const configWrapper = document.getElementById('configWrapper');
             const workflowWrapper = document.getElementById('workflowWrapper');
+            const resultsWrapper = document.getElementById('resultsWrapper');
             const savedLocationsSection = document.getElementById('savedLocationsSection');
             const savedLocationsSelect = document.getElementById('savedLocationsSelect');
             const clearLocationsBtn = document.getElementById('clearLocationsBtn');
@@ -1494,6 +1683,44 @@
             const alternatePaymentTypeSelect = document.getElementById('alternatePaymentTypeSelect');
             
             const orderBuilderSection = document.getElementById('orderBuilderSection');
+            const externalPricedOrderSection = document.getElementById('externalPricedOrderSection');
+            
+            // External Pricing Elements
+            const extDiningOption = document.getElementById('extDiningOption');
+            const extOrderType = document.getElementById('extOrderType');
+            const extItemSelect = document.getElementById('extItemSelect');
+            const extItemQuantity = document.getElementById('extItemQuantity');
+            const extMenuItemPrice = document.getElementById('extMenuItemPrice');
+            const extExternalPrice = document.getElementById('extExternalPrice');
+            const extItemDiscount = document.getElementById('extItemDiscount');
+            const addExternalItemBtn = document.getElementById('addExternalItemBtn');
+            const itemDiscountDetails = document.getElementById('itemDiscountDetails');
+            const extItemDiscountName = document.getElementById('extItemDiscountName');
+            const extItemDiscountAmount = document.getElementById('extItemDiscountAmount');
+            const extItemNonTaxDiscount = document.getElementById('extItemNonTaxDiscount');
+            const externalItemsList = document.getElementById('externalItemsList');
+            const checkDiscountSection = document.getElementById('checkDiscountSection');
+            const extCheckDiscountName = document.getElementById('extCheckDiscountName');
+            const extCheckDiscountAmount = document.getElementById('extCheckDiscountAmount');
+            const extCheckNonTaxDiscount = document.getElementById('extCheckNonTaxDiscount');
+            const extTaxName = document.getElementById('extTaxName');
+            const extTaxAmount = document.getElementById('extTaxAmount');
+            const extFacilitatorTax = document.getElementById('extFacilitatorTax');
+            const validateExternalPricingBtn = document.getElementById('validateExternalPricingBtn');
+            const validateExternalPricingBtnText = document.getElementById('validateExternalPricingBtnText');
+            const validateExternalPricingSpinner = document.getElementById('validateExternalPricingSpinner');
+            const submitExternalOrderBtn = document.getElementById('submitExternalOrderBtn');
+            const submitExternalOrderBtnText = document.getElementById('submitExternalOrderBtnText');
+            const submitExternalOrderSpinner = document.getElementById('submitExternalOrderSpinner');
+            const loadExternalTemplateBtn = document.getElementById('loadExternalTemplateBtn');
+            const externalOrderStatus = document.getElementById('externalOrderStatus');
+            
+            // External Pricing Summary Elements
+            const extPreDiscountAmount = document.getElementById('extPreDiscountAmount');
+            const extTotalDiscountAmount = document.getElementById('extTotalDiscountAmount');
+            const extNetAmount = document.getElementById('extNetAmount');
+            const extTotalAmount = document.getElementById('extTotalAmount');
+
             const guestFirstNameInput = document.getElementById('guestFirstName');
             const guestLastNameInput = document.getElementById('guestLastName');
             const guestPhoneInput = document.getElementById('guestPhone');
@@ -1538,7 +1765,9 @@
             const navCreateOrderBtn = document.getElementById('navCreateOrderBtn');
             const navFetchOrderBtn = document.getElementById('navFetchOrderBtn');
             const navUpdateOrderBtn = document.getElementById('navUpdateOrderBtn');
+            const navExternalOrderBtn = document.getElementById('navExternalOrderBtn');
             const navStockBtn = document.getElementById('navStockBtn');
+            
             
             // Labor Management Sub-navigation
             const navEmployeeManagementBtn = document.getElementById('navEmployeeManagementBtn');
@@ -1807,8 +2036,23 @@
             let currentCredentials = { id: '', secret: '' };
             let bulkStagedItems = []; // Items staged for bulk operations
             let currentBulkOperation = null;
-            let currentWorkflow = null; // null, 'create', 'fetch', 'update', 'stock', 'labor'
+            let currentWorkflow = null; // null, 'create', 'fetch', 'update', 'stock', 'labor', 'external-pricing'
             let activeUpdateOrder = null; // Store the order being updated
+            
+            // Store fetched config data for dropdowns
+            let diningOptions = [];
+            let employees = [];
+            let discounts = [];
+            let taxes = [];
+            
+            // External Pricing State
+            let externalPricedItems = []; // Items for externally priced order
+            let externalOrderPricing = {
+                preDiscountAmount: 0,
+                totalDiscountAmount: 0,
+                netAmount: 0,
+                totalAmount: 0
+            };
 
             // --- Authentication & Token Management ---
             function getAuthToken() {
@@ -1883,8 +2127,10 @@
                 
                 // Hide all dynamic sections first
                 workflowWrapper.style.display = 'none';
+                resultsWrapper.style.display = 'none';
                 workflowSelectionSection.style.display = 'none';
                 orderBuilderSection.style.display = 'none';
+                externalPricedOrderSection.style.display = 'none';
                 fetchOrderSection.style.display = 'none';
                 updateOrderSection.style.display = 'none';
                 stockManagementSection.style.display = 'none';
@@ -1907,6 +2153,7 @@
                     if (isRestaurantSelected) {
                         configWrapper.style.display = 'none';
                         workflowWrapper.style.display = 'block';
+                        resultsWrapper.style.display = 'block';
                         toggleConfigBtn.classList.remove('hidden');
                         toggleNavBtn.classList.remove('hidden');
                         
@@ -1947,6 +2194,10 @@
                             case 'create':
                                 orderBuilderSection.style.display = 'block';
                                 break;
+                            case 'external-pricing':
+                            case 'external':
+                                externalPricedOrderSection.style.display = 'block';
+                                break;
                             case 'fetch':
                                 fetchOrderSection.style.display = 'block';
                                 break;
@@ -1986,12 +2237,16 @@
                     } else {
                         configWrapper.style.display = 'block';
                         workflowWrapper.style.display = 'none';
+                        resultsWrapper.style.display = 'none';
                         toggleConfigBtn.classList.add('hidden');
                         toggleNavBtn.classList.add('hidden');
                     }
                 } else {
                     authForm.style.display = 'block';
                     authenticatedView.style.display = 'none';
+                    configWrapper.style.display = 'block';
+                    workflowWrapper.style.display = 'none';
+                    resultsWrapper.style.display = 'none';
                 }
             }
 
@@ -2314,6 +2569,11 @@
                  try {
                     await Promise.all(fetches.map(f => fetchAndPopulate(f)));
                     showInlineStatus(allConfigStatus, '200', "All configuration fetched successfully!", false);
+                    
+                    // Update external pricing dropdowns if currently on that workflow
+                    if (currentWorkflow === 'external') {
+                        populateExternalPricingDropdowns();
+                    }
                  } catch (error) {
                     showInlineStatus(allConfigStatus, 'Error', "An error occurred during fetch.", true);
                  } finally {
@@ -2327,14 +2587,66 @@
              async function fetchAndPopulate(options) {
                 const { urlPath, selectElement, dataParser } = options;
                 
+                console.log(`🔄 Fetching data from: ${urlPath}`);
+                
                 const apiBase = environmentSelect.value;
                 const fullUrl = CORS_PROXY + apiBase + urlPath;
                 const { data, error } = await makeApiCall(fullUrl, 'GET', null, null);
 
                 if(data) {
                     selectElement.innerHTML = dataParser(data);
+                    
+                    // Store data in global arrays for external pricing dropdowns
+                    if(urlPath === DINING_OPTIONS_PATH) {
+                        diningOptions = data;
+                        console.log(`✅ Stored ${data.length} dining options`);
+                    } else if(urlPath === EMPLOYEES_PATH) {
+                        employees = data;
+                        console.log(`✅ Stored ${data.length} employees`);
+                    } else if(urlPath === MENUS_PATH) {
+                        allMenus = data;
+                        console.log(`✅ Raw menus data:`, data);
+                        
+                        // Extract menu items for external pricing
+                        allMenuItems = [];
+                        if (Array.isArray(data)) {
+                            data.forEach(menu => {
+                                console.log(`📋 Processing menu: ${menu.name}`, menu);
+                                if (menu.menuGroups && Array.isArray(menu.menuGroups)) {
+                                    menu.menuGroups.forEach(group => {
+                                        console.log(`📁 Processing group: ${group.name}`, group);
+                                        if (group.menuItems && Array.isArray(group.menuItems)) {
+                                            group.menuItems.forEach(item => {
+                                                allMenuItems.push({
+                                                    ...item,
+                                                    groupName: group.name,
+                                                    menuName: menu.name,
+                                                    menuGuid: menu.guid,
+                                                    groupGuid: group.guid
+                                                });
+                                            });
                 } else {
-                     throw new Error('Failed to fetch ' + urlPath);
+                                            console.log(`⚠️ No menuItems found in group: ${group.name}`);
+                                        }
+                                    });
+                                } else {
+                                    console.log(`⚠️ No menuGroups found in menu: ${menu.name}`);
+                                }
+                            });
+                        } else {
+                            console.log(`⚠️ Menus data is not an array:`, data);
+                        }
+                        console.log(`✅ Extracted ${allMenuItems.length} menu items for external pricing`);
+                    } else if(urlPath === DISCOUNTS_PATH) {
+                        discounts = data;
+                        console.log(`✅ Stored ${data.length} discounts`);
+                    } else if(urlPath === TAXES_PATH) {
+                        taxes = data;
+                        console.log(`✅ Stored ${data.length} taxes`);
+                    }
+                } else {
+                     console.error(`❌ Failed to fetch ${urlPath}:`, error);
+                     throw new Error('Failed to fetch ' + urlPath + ': ' + (error?.message || error));
                 }
             }
 
@@ -4181,6 +4493,575 @@
                     default:
                         return '';
                 }
+            }
+
+            // --- External Pricing Functions ---
+            
+            // Set up external pricing event handlers
+            function setupExternalPricingEventHandlers() {
+                // Item selection change handler
+                extItemSelect.addEventListener('change', handleExternalItemSelection);
+                
+                // Order type change handler
+                extOrderType.addEventListener('change', handleOrderTypeChange);
+                
+                // Item discount amount change handler
+                extItemDiscount.addEventListener('input', handleItemDiscountChange);
+                
+                // Auto-populate external price from menu price
+                extMenuItemPrice.addEventListener('input', () => {
+                    if (!extExternalPrice.value || parseFloat(extExternalPrice.value) === 0) {
+                        extExternalPrice.value = extMenuItemPrice.value;
+                    }
+                });
+                
+                // Real-time pricing calculation
+                [extTaxAmount, extCheckDiscountAmount, extCheckNonTaxDiscount].forEach(input => {
+                    if (input) {
+                        input.addEventListener('input', updateExternalPricingSummary);
+                    }
+                });
+            }
+            
+            // Populate dropdowns for external pricing
+            function populateExternalPricingDropdowns() {
+                console.log('🔄 Populating external pricing dropdowns...');
+                console.log('📊 Current global state:', {
+                    diningOptionsCount: diningOptions?.length || 0,
+                    menuItemsCount: allMenuItems?.length || 0,
+                    discountsCount: discounts?.length || 0,
+                    taxesCount: taxes?.length || 0,
+                    allMenusCount: allMenus?.length || 0
+                });
+                
+                // Debug: Log first few items of each array
+                if (diningOptions?.length > 0) {
+                    console.log('🍽️ Sample dining options:', diningOptions.slice(0, 2));
+                }
+                if (allMenuItems?.length > 0) {
+                    console.log('🍔 Sample menu items:', allMenuItems.slice(0, 2));
+                }
+                
+                // Populate dining options
+                if (diningOptions && diningOptions.length > 0) {
+                    extDiningOption.innerHTML = '<option value="">Select dining option...</option>';
+                    diningOptions.forEach(option => {
+                        extDiningOption.innerHTML += `<option value="${option.guid}">${option.name}</option>`;
+                    });
+                    console.log('✅ Populated dining options dropdown');
+                } else {
+                    extDiningOption.innerHTML = '<option value="">No dining options available (fetch data first)</option>';
+                    console.log('⚠️ No dining options available - diningOptions:', diningOptions);
+                }
+                
+                // Populate menu items
+                if (allMenuItems && allMenuItems.length > 0) {
+                    extItemSelect.innerHTML = '<option value="">Select item...</option>';
+                    
+                    // Group items by menu for better organization
+                    const itemsByMenu = allMenuItems.reduce((acc, item) => {
+                        const menuName = item.menuName || 'Unknown Menu';
+                        if (!acc[menuName]) acc[menuName] = [];
+                        acc[menuName].push(item);
+                        return acc;
+                    }, {});
+                    
+                    console.log('🗂️ Items grouped by menu:', Object.keys(itemsByMenu).map(menuName => 
+                        `${menuName}: ${itemsByMenu[menuName].length} items`
+                    ));
+                    
+                    Object.keys(itemsByMenu).forEach(menuName => {
+                        if (Object.keys(itemsByMenu).length > 1) {
+                            const optgroup = document.createElement('optgroup');
+                            optgroup.label = menuName;
+                            
+                            itemsByMenu[menuName].forEach(item => {
+                                const option = document.createElement('option');
+                                option.value = item.guid;
+                                option.textContent = `${item.name} (${item.groupName})`;
+                                option.setAttribute('data-price', item.price || (item.basePrice ? item.basePrice / 100 : 0));
+                                option.setAttribute('data-name', item.name);
+                                option.setAttribute('data-group', item.itemGroupGuid || item.groupGuid);
+                                optgroup.appendChild(option);
+                            });
+                            
+                            extItemSelect.appendChild(optgroup);
+                        } else {
+                            // If only one menu, don't use optgroups
+                            itemsByMenu[menuName].forEach(item => {
+                                const option = document.createElement('option');
+                                option.value = item.guid;
+                                option.textContent = `${item.name} (${item.groupName})`;
+                                option.setAttribute('data-price', item.price || (item.basePrice ? item.basePrice / 100 : 0));
+                                option.setAttribute('data-name', item.name);
+                                option.setAttribute('data-group', item.itemGroupGuid || item.groupGuid);
+                                extItemSelect.appendChild(option);
+                            });
+                        }
+                    });
+                    console.log('✅ Populated menu items dropdown with', allMenuItems.length, 'items');
+                } else {
+                    extItemSelect.innerHTML = '<option value="">No menu items available (fetch data first)</option>';
+                    console.log('⚠️ No menu items available - allMenuItems:', allMenuItems);
+                    console.log('⚠️ allMenus:', allMenus);
+                }
+            }
+            
+            // Debug function to check external pricing state
+            window.debugExternalPricing = function() {
+                console.log('🔍 External Pricing Debug Info:');
+                console.log('📊 Global Data State:', {
+                    diningOptions: diningOptions?.length || 0,
+                    employees: employees?.length || 0,
+                    allMenus: allMenus?.length || 0,
+                    allMenuItems: allMenuItems?.length || 0,
+                    discounts: discounts?.length || 0,
+                    taxes: taxes?.length || 0
+                });
+                
+                if (allMenus?.length > 0) {
+                    console.log('🍽️ First menu structure:', allMenus[0]);
+                }
+                
+                if (allMenuItems?.length > 0) {
+                    console.log('🍔 First menu item:', allMenuItems[0]);
+                } else {
+                    console.log('❌ No menu items extracted');
+                    if (allMenus?.length > 0) {
+                        console.log('🔍 Checking menu structure...');
+                        allMenus.forEach((menu, i) => {
+                            console.log(`Menu ${i}: ${menu.name}`, {
+                                hasMenuGroups: !!menu.menuGroups,
+                                menuGroupsCount: menu.menuGroups?.length || 0,
+                                menuGroupsIsArray: Array.isArray(menu.menuGroups)
+                            });
+                            
+                            if (menu.menuGroups) {
+                                menu.menuGroups.forEach((group, j) => {
+                                    console.log(`  Group ${j}: ${group.name}`, {
+                                        hasMenuItems: !!group.menuItems,
+                                        menuItemsCount: group.menuItems?.length || 0,
+                                        menuItemsIsArray: Array.isArray(group.menuItems)
+                                    });
+                                });
+                            }
+                        });
+                    }
+                }
+                
+                console.log('🎛️ Current workflow:', currentWorkflow);
+                console.log('📝 Call populateExternalPricingDropdowns() to refresh dropdowns');
+                return {
+                    diningOptions: diningOptions?.length || 0,
+                    allMenuItems: allMenuItems?.length || 0,
+                    allMenus: allMenus?.length || 0
+                };
+            };
+            
+            console.log('🚀 Debug function available: debugExternalPricing()');
+            
+            
+            // Handle external item selection
+            function handleExternalItemSelection() {
+                const selectedOption = extItemSelect.options[extItemSelect.selectedIndex];
+                if (selectedOption.value) {
+                    const price = parseFloat(selectedOption.dataset.price) || 0;
+                    const priceInDollars = price < 100 ? price : price / 100; // Handle cents vs dollars
+                    
+                    extMenuItemPrice.value = priceInDollars.toFixed(2);
+                    extExternalPrice.value = priceInDollars.toFixed(2);
+                    extItemDiscount.value = '0.00';
+                }
+            }
+            
+            // Handle order type changes
+            function handleOrderTypeChange() {
+                const orderType = extOrderType.value;
+                
+                // Show/hide discount sections based on order type
+                if (orderType === 'item-discount' || orderType === 'complex') {
+                    itemDiscountDetails.classList.remove('hidden');
+                } else {
+                    itemDiscountDetails.classList.add('hidden');
+                }
+                
+                if (orderType === 'check-discount' || orderType === 'complex') {
+                    checkDiscountSection.classList.remove('hidden');
+                } else {
+                    checkDiscountSection.classList.add('hidden');
+                }
+            }
+            
+            // Handle item discount changes
+            function handleItemDiscountChange() {
+                const discountAmount = parseFloat(extItemDiscount.value) || 0;
+                if (discountAmount > 0 && itemDiscountDetails.classList.contains('hidden')) {
+                    itemDiscountDetails.classList.remove('hidden');
+                    // Auto-populate discount fields
+                    if (!extItemDiscountName.value) {
+                        extItemDiscountName.value = '$' + discountAmount.toFixed(2) + ' off item';
+                    }
+                    if (!extItemDiscountAmount.value) {
+                        extItemDiscountAmount.value = discountAmount.toFixed(2);
+                    }
+                    if (!extItemNonTaxDiscount.value) {
+                        extItemNonTaxDiscount.value = discountAmount.toFixed(2);
+                    }
+                }
+            }
+            
+            // Add external item to list
+            function addExternalItem() {
+                if (!validateExternalItemInput()) return;
+                
+                const selectedOption = extItemSelect.options[extItemSelect.selectedIndex];
+                const item = {
+                    guid: selectedOption.value,
+                    name: selectedOption.dataset.name,
+                    itemGroupGuid: selectedOption.dataset.group,
+                    quantity: parseInt(extItemQuantity.value) || 1,
+                    menuItemPrice: parseFloat(extMenuItemPrice.value) || 0,
+                    externalPriceAmount: parseFloat(extExternalPrice.value) || 0,
+                    discount: parseFloat(extItemDiscount.value) || 0,
+                    preDiscountPrice: parseFloat(extExternalPrice.value) || 0,
+                    price: (parseFloat(extExternalPrice.value) || 0) - (parseFloat(extItemDiscount.value) || 0)
+                };
+                
+                // Add discount details if present
+                if (item.discount > 0) {
+                    item.appliedDiscounts = [{
+                        name: extItemDiscountName.value || `$${item.discount.toFixed(2)} off item`,
+                        discountAmount: parseFloat(extItemDiscountAmount.value) || item.discount,
+                        nonTaxDiscountAmount: parseFloat(extItemNonTaxDiscount.value) || item.discount
+                    }];
+                }
+                
+                externalPricedItems.push(item);
+                renderExternalItemsList();
+                clearExternalItemForm();
+                updateExternalPricingSummary();
+            }
+            
+            // Validate external item input
+            function validateExternalItemInput() {
+                if (!extItemSelect.value) {
+                    showInlineStatus(externalOrderStatus, 'Validation Error', 'Please select a menu item', true);
+                    return false;
+                }
+                if (!extMenuItemPrice.value || parseFloat(extMenuItemPrice.value) <= 0) {
+                    showInlineStatus(externalOrderStatus, 'Validation Error', 'Please enter a valid menu item price', true);
+                    return false;
+                }
+                if (!extExternalPrice.value || parseFloat(extExternalPrice.value) < 0) {
+                    showInlineStatus(externalOrderStatus, 'Validation Error', 'Please enter a valid external price', true);
+                    return false;
+                }
+                return true;
+            }
+            
+            // Clear external item form
+            function clearExternalItemForm() {
+                extItemSelect.value = '';
+                extItemQuantity.value = '1';
+                extMenuItemPrice.value = '';
+                extExternalPrice.value = '';
+                extItemDiscount.value = '0';
+                extItemDiscountName.value = '';
+                extItemDiscountAmount.value = '';
+                extItemNonTaxDiscount.value = '';
+                itemDiscountDetails.classList.add('hidden');
+            }
+            
+            // Render external items list
+            function renderExternalItemsList() {
+                if (externalPricedItems.length === 0) {
+                    externalItemsList.innerHTML = '<p class="text-gray-500 dark:text-gray-400 text-center py-4">No items added yet</p>';
+                    return;
+                }
+                
+                let html = '';
+                externalPricedItems.forEach((item, index) => {
+                    const hasDiscount = item.discount > 0;
+                    const totalPrice = item.price * item.quantity;
+                    
+                    html += `
+                        <div class="bg-white dark:bg-gray-800 p-3 rounded border flex justify-between items-start">
+                            <div class="flex-grow">
+                                <div class="font-medium">${item.quantity}x ${item.name}</div>
+                                <div class="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+                                    <div>Menu Price: $${item.menuItemPrice.toFixed(2)} | External Price: $${item.externalPriceAmount.toFixed(2)}</div>
+                                    ${hasDiscount ? `<div class="text-red-600">Discount: -$${item.discount.toFixed(2)} (${item.appliedDiscounts[0].name})</div>` : ''}
+                                    <div>Final Price: $${item.price.toFixed(2)} each | Total: $${totalPrice.toFixed(2)}</div>
+                                </div>
+                            </div>
+                            <button onclick="removeExternalItem(${index})" 
+                                    class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-xs transition ml-3">
+                                Remove
+                            </button>
+                        </div>
+                    `;
+                });
+                
+                externalItemsList.innerHTML = html;
+            }
+            
+            // Remove external item
+            function removeExternalItem(index) {
+                externalPricedItems.splice(index, 1);
+                renderExternalItemsList();
+                updateExternalPricingSummary();
+            }
+            
+            // Update pricing summary
+            function updateExternalPricingSummary() {
+                let preDiscountAmount = 0;
+                let totalItemDiscounts = 0;
+                
+                // Calculate item totals
+                externalPricedItems.forEach(item => {
+                    preDiscountAmount += item.preDiscountPrice * item.quantity;
+                    totalItemDiscounts += item.discount * item.quantity;
+                });
+                
+                // Get check-level discount
+                const checkDiscountAmount = parseFloat(extCheckDiscountAmount.value) || 0;
+                
+                // Calculate totals
+                const totalDiscountAmount = totalItemDiscounts + checkDiscountAmount;
+                const netAmount = preDiscountAmount - totalDiscountAmount;
+                const taxAmount = parseFloat(extTaxAmount.value) || 0;
+                const totalAmount = netAmount + taxAmount;
+                
+                // Update pricing state
+                externalOrderPricing = {
+                    preDiscountAmount,
+                    totalDiscountAmount,
+                    netAmount,
+                    totalAmount
+                };
+                
+                // Update display
+                extPreDiscountAmount.textContent = '$' + preDiscountAmount.toFixed(2);
+                extTotalDiscountAmount.textContent = '-$' + totalDiscountAmount.toFixed(2);
+                extNetAmount.textContent = '$' + netAmount.toFixed(2);
+                extTotalAmount.textContent = '$' + totalAmount.toFixed(2);
+                
+                // Enable/disable submit button
+                submitExternalOrderBtn.disabled = externalPricedItems.length === 0 || !extDiningOption.value;
+            }
+            
+            // Load sample external pricing data
+            function loadExternalPricingSample() {
+                // Clear existing data
+                externalPricedItems = [];
+                
+                // Set sample configuration
+                extOrderType.value = 'complex';
+                handleOrderTypeChange();
+                
+                // Sample check-level discount
+                extCheckDiscountName.value = '$2 off total order';
+                extCheckDiscountAmount.value = '2.00';
+                extCheckNonTaxDiscount.value = '2.00';
+                
+                // Sample tax
+                extTaxName.value = 'Sample Tax';
+                extTaxAmount.value = '0.75';
+                
+                // Show success message
+                showInlineStatus(externalOrderStatus, 'Sample Loaded', 'Sample external pricing configuration loaded. Add some items to test!', false);
+                
+                updateExternalPricingSummary();
+            }
+            
+            // Validate external pricing structure
+            function validateExternalPricing() {
+                validateExternalPricingBtnText.textContent = 'Validating...';
+                validateExternalPricingSpinner.classList.remove('hidden');
+                validateExternalPricingBtn.disabled = true;
+                
+                setTimeout(() => {
+                    const validation = performExternalPricingValidation();
+                    
+                    if (validation.isValid) {
+                        showInlineStatus(externalOrderStatus, 'Validation Passed', 'External pricing structure is valid and ready for submission!', false);
+                        submitExternalOrderBtn.disabled = false;
+                    } else {
+                        showInlineStatus(externalOrderStatus, 'Validation Failed', validation.errors.join(' | '), true);
+                    }
+                    
+                    validateExternalPricingBtnText.textContent = '🔍 Validate Pricing';
+                    validateExternalPricingSpinner.classList.add('hidden');
+                    validateExternalPricingBtn.disabled = false;
+                }, 1000);
+            }
+            
+            // Perform detailed validation
+            function performExternalPricingValidation() {
+                const errors = [];
+                
+                // Basic validations
+                if (!extDiningOption.value) {
+                    errors.push('Dining option is required');
+                }
+                if (externalPricedItems.length === 0) {
+                    errors.push('At least one item is required');
+                }
+                
+                // Item-level validations
+                externalPricedItems.forEach((item, index) => {
+                    if (item.price < 0) {
+                        errors.push(`Item ${index + 1}: Price cannot be negative`);
+                    }
+                    if (item.discount > item.preDiscountPrice) {
+                        errors.push(`Item ${index + 1}: Discount cannot exceed pre-discount price`);
+                    }
+                    if (item.price !== (item.preDiscountPrice - item.discount)) {
+                        errors.push(`Item ${index + 1}: Price calculation is inconsistent`);
+                    }
+                });
+                
+                // Check-level validations
+                const checkDiscount = parseFloat(extCheckDiscountAmount.value) || 0;
+                const checkNonTaxDiscount = parseFloat(extCheckNonTaxDiscount.value) || 0;
+                
+                if (checkDiscount > 0 && checkNonTaxDiscount > checkDiscount) {
+                    errors.push('Check-level non-tax discount cannot exceed total discount amount');
+                }
+                
+                return {
+                    isValid: errors.length === 0,
+                    errors: errors
+                };
+            }
+            
+            // Submit external order
+            async function submitExternalOrder() {
+                if (!validateExternalPricing().isValid) {
+                    showInlineStatus(externalOrderStatus, 'Validation Failed', 'Please validate pricing structure first', true);
+                    return;
+                }
+                
+                // Set loading state
+                submitExternalOrderBtnText.textContent = 'Submitting...';
+                submitExternalOrderSpinner.classList.remove('hidden');
+                submitExternalOrderBtn.disabled = true;
+                
+                try {
+                    const orderPayload = buildExternalPricingPayload();
+                    console.log('External Order Payload:', JSON.stringify(orderPayload, null, 2));
+                    
+                    const fullUrl = CORS_PROXY + environmentSelect.value + ORDERS_PATH;
+                    const result = await makeApiCall(fullUrl, 'POST', orderPayload, null, 'External order submitted successfully');
+                    
+                    if (result.error) {
+                        const errorMessage = typeof result.error === 'object' ? 
+                            result.error.message || JSON.stringify(result.error) : 
+                            result.error;
+                        showInlineStatus(externalOrderStatus, 'Submission Failed', errorMessage, true);
+                    } else {
+                        showInlineStatus(externalOrderStatus, 'Order Created', `External order created successfully! GUID: ${result.data.guid}`, false);
+                        
+                        // Display result
+                        const resultsSection = document.getElementById('resultsSection');
+                        const resultsContainer = document.getElementById('resultsContainer');
+                        resultsContainer.innerHTML = `
+                            <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg p-4">
+                                <h3 class="font-semibold text-green-800 dark:text-green-200 mb-2">Externally Priced Order Created</h3>
+                                <div class="space-y-2 text-sm">
+                                    <div><strong>Order GUID:</strong> <span class="font-mono">${result.data.guid}</span> ${createCopyIcon(result.data.guid, 'Order GUID')}</div>
+                                    <div><strong>Total Amount:</strong> $${externalOrderPricing.totalAmount.toFixed(2)}</div>
+                                    <div><strong>Items:</strong> ${externalPricedItems.length} item(s)</div>
+                                    <div><strong>Discount:</strong> -$${externalOrderPricing.totalDiscountAmount.toFixed(2)}</div>
+                                </div>
+                            </div>
+                        `;
+                        resultsSection.classList.remove('hidden');
+                        
+                        // Clear form
+                        externalPricedItems = [];
+                        renderExternalItemsList();
+                        updateExternalPricingSummary();
+                    }
+                } catch (error) {
+                    console.error('External order submission error:', error);
+                    showInlineStatus(externalOrderStatus, 'Error', error.message, true);
+                } finally {
+                    // Reset button state
+                    submitExternalOrderBtnText.textContent = '🚀 Submit External Order';
+                    submitExternalOrderSpinner.classList.add('hidden');
+                    submitExternalOrderBtn.disabled = false;
+                }
+            }
+            
+            // Build external pricing payload
+            function buildExternalPricingPayload() {
+                const checkDiscountAmount = parseFloat(extCheckDiscountAmount.value) || 0;
+                const checkNonTaxDiscount = parseFloat(extCheckNonTaxDiscount.value) || 0;
+                const taxAmount = parseFloat(extTaxAmount.value) || 0;
+                
+                // Build selections with external pricing
+                const selections = externalPricedItems.map(item => {
+                    const selection = {
+                        item: { guid: item.guid },
+                        itemGroup: { guid: item.itemGroupGuid },
+                        quantity: item.quantity,
+                        menuItemPrice: item.menuItemPrice,
+                        externalPriceAmount: item.externalPriceAmount,
+                        preDiscountPrice: item.preDiscountPrice,
+                        price: item.price,
+                        discount: item.discount
+                    };
+                    
+                    if (item.appliedDiscounts && item.appliedDiscounts.length > 0) {
+                        selection.appliedDiscounts = item.appliedDiscounts;
+                    }
+                    
+                    return selection;
+                });
+                
+                // Build check
+                const check = {
+                    selections: selections,
+                    netAmount: externalOrderPricing.netAmount,
+                    totalAmount: externalOrderPricing.totalAmount,
+                    discountAmount: checkDiscountAmount,
+                    totalDiscountAmount: externalOrderPricing.totalDiscountAmount,
+                    preDiscountAmount: externalOrderPricing.preDiscountAmount
+                };
+                
+                // Add check-level discount if present
+                if (checkDiscountAmount > 0) {
+                    check.appliedDiscounts = [{
+                        name: extCheckDiscountName.value || '$' + checkDiscountAmount.toFixed(2) + ' off order',
+                        discountAmount: checkDiscountAmount,
+                        nonTaxDiscountAmount: checkNonTaxDiscount
+                    }];
+                }
+                
+                // Build order
+                const orderPayload = {
+                    diningOption: { guid: extDiningOption.value },
+                    checks: [check],
+                    netAmount: externalOrderPricing.netAmount,
+                    totalAmount: externalOrderPricing.totalAmount,
+                    discountAmount: checkDiscountAmount,
+                    totalDiscountAmount: externalOrderPricing.totalDiscountAmount,
+                    preDiscountAmount: externalOrderPricing.preDiscountAmount
+                };
+                
+                // Add tax information
+                if (taxAmount > 0) {
+                    orderPayload.marketplaceFacilitatorTaxInfo = {
+                        taxes: [{
+                            name: extTaxName.value || 'External Tax',
+                            taxAmount: taxAmount,
+                            facilitatorCollectAndRemitTax: extFacilitatorTax.checked
+                        }]
+                    };
+                }
+                
+                return orderPayload;
             }
 
             // --- Stock Management Functions ---
@@ -7206,11 +8087,28 @@
             });
             
             // Navigation workflow buttons
-            navCreateOrderBtn.addEventListener('click', () => { 
+            navCreateOrderBtn.addEventListener('click', async () => { 
                 currentWorkflow = 'create'; 
                 updateUIState(); 
                 toggleNavPanel(); // Close nav panel
-                resultsContainer.innerHTML='<p class="text-gray-500 dark:text-gray-400">Order results will appear here after sending.</p>';
+                resultsContainer.innerHTML='<p class="text-gray-500 dark:text-gray-400">Loading order data...</p>';
+                
+                // Auto-fetch data if not already available
+                const needsData = !diningOptions?.length || !allMenuItems?.length;
+                if (needsData) {
+                    console.log('🔄 Auto-fetching data for order builder...');
+                    try {
+                        await fetchAllConfig();
+                        console.log('✅ Data fetched successfully for order builder');
+                        resultsContainer.innerHTML='<p class="text-gray-500 dark:text-gray-400">Order builder ready! Add items to your cart and send the order.</p>';
+                    } catch (error) {
+                        console.error('❌ Failed to fetch data for order builder:', error);
+                        resultsContainer.innerHTML='<p class="text-red-500 dark:text-red-400">⚠️ Failed to load data. Please check your connection and try refreshing.</p>';
+                    }
+                } else {
+                    console.log('✅ Data already available for order builder');
+                    resultsContainer.innerHTML='<p class="text-gray-500 dark:text-gray-400">Order builder ready! Add items to your cart and send the order.</p>';
+                }
             });
             navFetchOrderBtn.addEventListener('click', () => { 
                 currentWorkflow = 'fetch'; 
@@ -7224,11 +8122,61 @@
                 toggleNavPanel(); // Close nav panel
                 resultsContainer.innerHTML='<p class="text-gray-500 dark:text-gray-400">Load an order to begin editing.</p>' 
             });
-            navStockBtn.addEventListener('click', () => { 
-                currentWorkflow = 'stock'; 
+            navExternalOrderBtn.addEventListener('click', async () => { 
+                currentWorkflow = 'external'; 
                 updateUIState(); 
                 toggleNavPanel(); // Close nav panel
-                resultsContainer.innerHTML='<p class="text-gray-500 dark:text-gray-400">Inventory results will be displayed here.</p>' 
+                resultsContainer.innerHTML='<p class="text-gray-500 dark:text-gray-400">Loading external pricing data...</p>';
+                
+                // Check authentication
+                const isAuthenticated = !!getAuthToken();
+                if (!isAuthenticated) {
+                    resultsContainer.innerHTML='<p class="text-red-500 dark:text-red-400">⚠️ Please authenticate first in the configuration panel.</p>';
+                    return;
+                }
+                
+                // Auto-fetch data if not already available
+                const needsData = !diningOptions?.length || !allMenuItems?.length;
+                if (needsData) {
+                    console.log('🔄 Auto-fetching data for external pricing...');
+                    try {
+                        await fetchAllConfig();
+                        console.log('✅ Data fetched successfully for external pricing');
+                        resultsContainer.innerHTML='<p class="text-gray-500 dark:text-gray-400">External pricing ready! Select items to build your order.</p>';
+                    } catch (error) {
+                        console.error('❌ Failed to fetch data for external pricing:', error);
+                        resultsContainer.innerHTML='<p class="text-red-500 dark:text-red-400">⚠️ Failed to load data. Please check your connection and try refreshing.</p>';
+                    }
+                } else {
+                    console.log('✅ Data already available for external pricing');
+                    resultsContainer.innerHTML='<p class="text-gray-500 dark:text-gray-400">External pricing ready! Select items to build your order.</p>';
+                }
+                
+                populateExternalPricingDropdowns();
+                setupExternalPricingEventHandlers();
+            });
+            navStockBtn.addEventListener('click', async () => { 
+                currentWorkflow = 'stock'; 
+                updateUIState();
+                toggleNavPanel(); // Close nav panel
+                resultsContainer.innerHTML='<p class="text-gray-500 dark:text-gray-400">Loading inventory data...</p>';
+                
+                // Auto-fetch data if not already available
+                const needsData = !diningOptions?.length || !allMenuItems?.length;
+                if (needsData) {
+                    console.log('🔄 Auto-fetching data for stock management...');
+                    try {
+                        await fetchAllConfig();
+                        console.log('✅ Data fetched successfully for stock management');
+                        resultsContainer.innerHTML='<p class="text-gray-500 dark:text-gray-400">Stock management ready! Use the tools above to manage inventory.</p>';
+                    } catch (error) {
+                        console.error('❌ Failed to fetch data for stock management:', error);
+                        resultsContainer.innerHTML='<p class="text-red-500 dark:text-red-400">⚠️ Failed to load data. Please check your connection and try refreshing.</p>';
+                    }
+                } else {
+                    console.log('✅ Data already available for stock management');
+                    resultsContainer.innerHTML='<p class="text-gray-500 dark:text-gray-400">Stock management ready! Use the tools above to manage inventory.</p>';
+                }
             });
 
             // Labor Management Navigation
@@ -7268,23 +8216,47 @@
                 toggleNavPanel(); // Close nav panel
             });
             // Menu Management Sub-navigation
-            navMenuStructureBtn.addEventListener('click', () => { 
+            navMenuStructureBtn.addEventListener('click', async () => { 
                 currentWorkflow = 'menu-structure'; 
                 updateUIState();
-                // Auto-fetch menu data for structure management
-                if (isAuthenticated) {
-                    fetchAllMenus();
-                }
                 toggleNavPanel(); // Close nav panel
+                
+                // Auto-fetch menu data if not already available
+                const needsData = !allMenus?.length;
+                if (needsData && isAuthenticated) {
+                    console.log('🔄 Auto-fetching menu data for structure management...');
+                    try {
+                        await fetchAllMenus();
+                        console.log('✅ Menu data fetched successfully');
+                    } catch (error) {
+                        console.error('❌ Failed to fetch menu data:', error);
+                    }
+                } else if (!isAuthenticated) {
+                    console.log('⚠️ Not authenticated - skipping auto-fetch');
+                } else {
+                    console.log('✅ Menu data already available');
+                }
             });
-            navMenuItemsBtn.addEventListener('click', () => { 
+            navMenuItemsBtn.addEventListener('click', async () => { 
                 currentWorkflow = 'menu-items'; 
                 updateUIState();
-                // Auto-fetch menu items for item management
-                if (isAuthenticated) {
-                    fetchAllItems();
-                }
                 toggleNavPanel(); // Close nav panel
+                
+                // Auto-fetch menu items if not already available
+                const needsData = !allMenuItems?.length;
+                if (needsData && isAuthenticated) {
+                    console.log('🔄 Auto-fetching menu items for item management...');
+                    try {
+                        await fetchAllItems();
+                        console.log('✅ Menu items fetched successfully');
+                    } catch (error) {
+                        console.error('❌ Failed to fetch menu items:', error);
+                    }
+                } else if (!isAuthenticated) {
+                    console.log('⚠️ Not authenticated - skipping auto-fetch');
+                } else {
+                    console.log('✅ Menu items already available');
+                }
             });
             navModifiersBtn.addEventListener('click', () => { 
                 currentWorkflow = 'modifiers'; 
@@ -7309,6 +8281,12 @@
             bulkOperationTypeSelect.addEventListener('change', handleBulkOperationTypeChange);
             addToBulkStagingBtn.addEventListener('click', addToBulkStaging);
             executeBulkOperationBtn.addEventListener('click', executeBulkOperation);
+
+            // External Pricing Event Listeners
+            addExternalItemBtn.addEventListener('click', addExternalItem);
+            validateExternalPricingBtn.addEventListener('click', validateExternalPricing);
+            submitExternalOrderBtn.addEventListener('click', submitExternalOrder);
+            loadExternalTemplateBtn.addEventListener('click', loadExternalPricingSample);
 
             // API Section toggles for collapsible navigation
             const toggleApiSection = (apiName) => {
@@ -7356,6 +8334,7 @@
                 renderCustomFields();
                  resultsContainer.innerHTML='<p class="text-gray-500 dark:text-gray-400">Order results will appear here after sending.</p>';
             });
+
             // Legacy workflow buttons (now handled by navigation panel)
             fetchWorkflowBtn.addEventListener('click', () => { currentWorkflow = 'fetch'; updateUIState(); resultsContainer.innerHTML='<p class="text-gray-500 dark:text-gray-400">Results will be displayed here.</p>' });
             updateWorkflowBtn.addEventListener('click', () => { currentWorkflow = 'update'; updateUIState(); resultsContainer.innerHTML='<p class="text-gray-500 dark:text-gray-400">Load an order to begin editing.</p>' });

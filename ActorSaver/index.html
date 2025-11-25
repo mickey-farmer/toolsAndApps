@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ActorSaver - Learn Lines Faster</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="title">ActorSaver</h1>
+            <p class="subtitle">Learn lines faster with proven memorization techniques</p>
+        </header>
+
+        <nav class="method-nav">
+            <button class="nav-btn active" data-method="first-letter">First Letter Method</button>
+            <button class="nav-btn" data-method="buildup">Line Buildup Method</button>
+            <button class="nav-btn" data-method="backwards">Backwards Method</button>
+        </nav>
+
+        <main class="main-content">
+            <!-- Script Input Section -->
+            <section class="input-section">
+                <h2>Enter Your Script</h2>
+                <textarea id="script-input" placeholder="Paste your script or monologue here..."></textarea>
+                <button id="process-script" class="btn-primary">Process Script</button>
+            </section>
+
+            <!-- First Letter Method -->
+            <section id="first-letter-method" class="method-section active">
+                <h2>First Letter Method</h2>
+                <p class="method-description">
+                    Each word is replaced by its first letter. Click letters to reveal words, or use the reveal buttons to check your memory.
+                </p>
+                <div class="controls">
+                    <button id="reveal-all-letters" class="btn-secondary">Reveal All</button>
+                    <button id="hide-all-letters" class="btn-secondary">Hide All</button>
+                    <button id="new-script-letters" class="btn-secondary">New Script</button>
+                </div>
+                <div id="letters-display" class="letters-container"></div>
+            </section>
+
+            <!-- Line Buildup Method -->
+            <section id="buildup-method" class="method-section">
+                <h2>Line Buildup Method</h2>
+                <p class="method-description">
+                    Start with the first word, then gradually add more words. Build your memory progressively.
+                </p>
+                <div class="controls">
+                    <button id="start-buildup" class="btn-primary">Start Practice</button>
+                    <button id="next-buildup" class="btn-secondary" disabled>Next Level</button>
+                    <button id="reset-buildup" class="btn-secondary">Reset</button>
+                </div>
+                <div id="buildup-display" class="buildup-container">
+                    <div class="current-line"></div>
+                    <div class="progress-indicator"></div>
+                </div>
+            </section>
+
+            <!-- Backwards Method -->
+            <section id="backwards-method" class="method-section">
+                <h2>Backwards Method</h2>
+                <p class="method-description">
+                    Learn your lines backwards. If you know them backwards, you've got them down!
+                </p>
+                <div class="controls">
+                    <button id="start-backwards" class="btn-primary">Start Backwards Practice</button>
+                    <button id="check-backwards" class="btn-secondary" disabled>Check Answer</button>
+                    <button id="reset-backwards" class="btn-secondary">Reset</button>
+                </div>
+                <div id="backwards-display" class="backwards-container">
+                    <div class="backwards-prompt"></div>
+                    <input type="text" id="backwards-input" placeholder="Type the word that comes before..." disabled>
+                    <div class="backwards-feedback"></div>
+                    <div class="backwards-progress">
+                        <h3>Words you've learned (in order):</h3>
+                        <div id="learned-words" class="learned-words-container"></div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p>Made for actors, by actors. Learn lines faster without paying for services.</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
